@@ -158,7 +158,7 @@ const START_TIPS=['Probá cada plano en 5 segundos y a la resolución más baja 
 const PATHS=[{t:'Un clip corto para redes',s:'15 a 30 s, sin personaje fijo.',steps:[['pc-idea','Idea'],['estilos','Estilo'],['p-t2v','Texto a video'],['pc-audio','Audio'],['p-exportar','Exportar en vertical']]},
   {t:'Un corto con personaje',s:'Varias escenas con el mismo protagonista.',steps:[['pc-idea','Idea'],['pc-historia','Historia'],['pc-guion','Guion y planos'],['pc-estilo','Estilo y color'],['pc-consistencia','Consistencia'],['pc-storyboard','Storyboard'],['pc-imagen','Imágenes'],['pc-video','Video'],['pc-audio','Audio'],['pc-edicion','Edición']]},
   {t:'Un videoclip',s:'La imagen sigue a la música.',steps:[['p-orden-audio','Música primero'],['p-videoclip','Concepto o actuación'],['estilos','Estilo'],['pc-storyboard','Storyboard'],['pc-video','Video'],['p-ritmo','Cortar al ritmo']]},
-  {t:'Un anuncio de producto',s:'Gancho en los primeros segundos.',steps:[['p-anuncio','Gancho y estructura'],['e-commercial','Estilo comercial'],['pc-imagen','Imágenes'],['pc-video','Video'],['p-exportar','Exportar']]}];
+  {t:'Un anuncio de producto',s:'Gancho en los primeros segundos y el producto igual en cada plano.',steps:[['p-anuncio','Gancho y estructura'],['p-producto','Producto que no cambie'],['e-commercial','Estilo comercial'],['generador','Armar los planos'],['pc-video','Video'],['p-exportar','Exportar']]}];
 const SECS=[['glosario','dolly','Glosario','El vocabulario de cine en '+CATS.length+' capítulos: cada término con su animación y la frase para el prompt.'],
   ['produccion','pipeline','Producción','De la idea al video final en '+PCH.length+' etapas, con plantillas, prompts para un LLM y los errores típicos.'],
   ['herramientas','motiontransfer','Herramientas','Qué hace cada IA de video, imagen y audio en 2026 y cómo escribirle a cada una.'],
@@ -310,45 +310,68 @@ const GV={
   move:[['static','static camera'],['pan','slow pan'],['tilt','slow tilt up'],['pedestal','pedestal up'],['dolly','slow dolly in'],['pullout','slow pull-out reveal'],['zoom','slow zoom in'],['crashzoom','crash zoom in'],['dollyzoom','dolly zoom'],['tracking','tracking shot following the subject'],['leadingshot','leading shot, camera moving backward ahead of the subject'],['steadicam','smooth gimbal follow'],['handheld','handheld camera'],['crane','crane up'],['orbit','slow orbit around the subject'],['drone','aerial drone shot'],['fpv','FPV drone flythrough'],['whip','whip pan'],['rack','rack focus']],
   lens:[['','Sin indicar'],['24','24mm wide-angle lens'],['35','35mm lens'],['50','50mm lens'],['85','85mm portrait lens'],['macro','macro lens'],['anam','anamorphic lens']],
   light:[['','Sin indicar'],['golden','golden hour light'],['bluehour','blue hour light'],['highkey','bright high-key lighting'],['lowkey','low-key lighting, deep shadows'],['hardsoft','soft diffused light'],['neon','neon lighting'],['moonlight','cool moonlight'],['practical','practical lights in the scene'],['silhouette','backlit silhouette'],['volumetric','volumetric light through haze'],['rim','strong rim light'],['split','split lighting'],['toplight','hard top light'],['under','underlighting']]};
+/* vocabulario de producto y publicidad */
+GV.shot.push(['hero','hero product shot, the product centered and lit like a premium ad'],['packshot','packshot of the product on a clean seamless background'],['detail','extreme close-up macro detail of the product'],['inhand','in-hand shot, a hand holding the product'],['flatlay','flat lay, top-down view of the product on a styled surface'],['lifestyle','lifestyle shot, the product in use in a real setting'],['endcard','end card, the product centered with clean empty space for the logo and text']);
+GV.move.push(['pushin','slow push-in toward the product'],['orbitsm','small slow orbit of about 15 degrees'],['turntable','the product rotates slowly on a turntable, camera locked'],['slide','short lateral camera slide']);
+GV.light.push(['studio','large soft key light with a white rim light and controlled reflections']);
+const PL={hero:'Hero del producto',packshot:'Packshot (fondo limpio)',detail:'Detalle macro',inhand:'En mano',flatlay:'Flat lay (cenital)',lifestyle:'Producto en uso',endcard:'Cierre con logo',pushin:'Acercamiento lento',orbitsm:'Órbita corta',turntable:'Giro sobre base (360°)',slide:'Desplazamiento lateral corto',studio:'Estudio de producto'};
 const GVM={};for(const k in GV)GVM[k]=Object.fromEntries(GV[k]);
 const LENS_ES={'':'Sin indicar','24':'24 mm gran angular','35':'35 mm','50':'50 mm','85':'85 mm retrato','macro':'Macro','anam':'Anamórfico'};
-const gvLabel=(k,id)=>k==='lens'?LENS_ES[id]:id===''?'Sin indicar':(byId[id]?byId[id].es:id);
+const gvLabel=(k,id)=>k==='lens'?LENS_ES[id]:id===''?'Sin indicar':PL[id]||(byId[id]?byId[id].es:id);
 const ARS=[['16:9','16:9 horizontal'],['9:16','9:16 vertical'],['1:1','1:1 cuadrado'],['2.39:1','2.39:1 cinemascope'],['4:3','4:3']];
 const GEN_VIDEO=['kling','flow','seedance','higgsfield','runway','wan','hailuo','generic'],GEN_IMG=['nanobanana','midjourney','gptimage','seedream','flux'],GEN_ALL=GEN_VIDEO.concat(GEN_IMG);
-const newShot=o=>Object.assign({shot:'wide',angle:'eye',move:'static',lens:'',action:'',dialogue:'',sound:'',dur:4,who:0,with:-1,where:0},o||{});
+const newShot=o=>Object.assign({shot:'wide',angle:'eye',move:'static',lens:'',action:'',dialogue:'',sound:'',dur:4,els:[],subj:''},o||{});
 const pick=(k,v,d)=>GVM[k]&&Object.prototype.hasOwnProperty.call(GVM[k],v)?v:d;
-const newEnt=o=>Object.assign({n:'',d:'',ref:false,img:''},o||{});
-const GS={idea:'',cast:[newEnt()],locs:[newEnt()],light:'',mood:'',style:'',ar:'16:9',tool:GEN_VIDEO.includes(PREF.video)?PREF.video:'kling',shots:[newShot()]};
-const loadPreset=p=>Object.assign(GS,{idea:p.idea,cast:p.cast.map(newEnt),locs:p.locs.map(newEnt),light:p.light,mood:p.mood,shots:p.shots.map(s=>newShot(s))});
+/* elementos del proyecto: personajes, lugares y productos que se describen una vez y se reusan en los planos (todo opcional) */
+const ETYPE={char:{n:'Personaje',add:'Personaje',ph:'Ana',dl:'Cómo se ve: edad, pelo, ropa y colores',dp:'mujer de unos 30 años, pelo negro corto, chaqueta roja, pantalón negro'},
+  prod:{n:'Producto',add:'Producto',ph:'Taza Aurora',dl:'Cómo es: forma, material, colores exactos y etiqueta',dp:'taza de cerámica mate amarilla, asa redonda, logo blanco pequeño al frente'},
+  loc:{n:'Lugar',add:'Lugar',ph:'Parque',dl:'Cómo es el lugar o el fondo',dp:'estudio con fondo gris degradado y una mesa de madera redonda'}};
+let elSeq=1;const newEl=o=>Object.assign({id:'e'+(elSeq++),t:'char',n:'',d:'',ref:false,img:''},o||{});
+const GS={idea:'',els:[],light:'',mood:'',style:'',ar:'16:9',tool:GEN_VIDEO.includes(PREF.video)?PREF.video:'kling',shots:[newShot()]};
+function loadPreset(p){const ids={};GS.els=(p.els||[]).map(e=>{const x=newEl(e);ids[e.k]=x.id;return x});
+  Object.assign(GS,{idea:p.idea,light:p.light||'',mood:p.mood||'',style:p.style||'',ar:p.ar||'16:9',shots:p.shots.map(s=>newShot(Object.assign({},s,{els:(s.els||[]).map(k=>ids[k]).filter(Boolean)})))})}
 const P_ANA='a woman in her late twenties with shoulder-length dark brown hair and light-tan skin, wearing a plain red crew-neck t-shirt, dark blue jeans and white sneakers',
   P_LEO='a man in his thirties with short black hair, wearing a teal t-shirt and gray trousers',
-  P_PARK='a small quiet park with tall pine trees, a light gravel path, a vintage black street lamp and a small cream-colored house with a dark red roof';
+  P_PARK='a small quiet park with tall pine trees, a light gravel path, a vintage black street lamp and a small cream-colored house with a dark red roof',
+  P_MUG='a matte yellow ceramic mug with a rounded handle and a small white logo on the front';
 const PRESETS=[
   {n:'Corto con dos personajes',idea:'Ana espera bajo el farol del parque. Cuando la luz se enciende, llega Leo, tarde como siempre.',light:'bluehour',mood:'quiet, hopeful, a little playful',
-    cast:[{n:'Ana',d:P_ANA,ref:true,img:'ref-personaje-a'},{n:'Leo',d:P_LEO,ref:true,img:'ref-personaje-b'}],locs:[{n:'Parque',d:P_PARK,ref:true,img:'ref-parque'}],
-    shots:[{shot:'establishing',who:-1,action:'the street lamp flickers in the empty park as night falls',sound:'crickets, distant traffic',dur:3},
-      {shot:'wide',who:0,action:'waits alone under the unlit street lamp and checks her watch',dur:4},
-      {shot:'full',move:'tracking',who:1,action:'hurries along the gravel path toward the lamp',sound:'footsteps on gravel',dur:3},
-      {shot:'ots',lens:'50',who:0,with:1,action:'looks at him over his shoulder, trying not to smile',dialogue:'(softly) Siempre llegás tarde.',dur:4},
-      {shot:'closeup',move:'dolly',lens:'85',who:1,action:'smiles, a little embarrassed',dialogue:'(laughing) Pero llegué.',dur:3},
-      {shot:'wide',move:'pullout',who:0,with:1,action:'the lamp turns on above them as they walk away together',sound:'electric hum of the lamp, soft music',dur:4}]},
-  {n:'Escena con diálogo',idea:'Alguien espera bajo un farol; cuando la luz se enciende, llega la persona que esperaba.',light:'bluehour',mood:'quiet, hopeful',
-    cast:[{n:'Ana',d:'a young woman in a red shirt and a red cap'}],locs:[{n:'Parque',d:'a quiet park at dusk with pine trees and a single street lamp'}],
-    shots:[{shot:'wide',move:'static',action:'stands alone under the unlit street lamp and checks her watch',sound:'distant traffic, crickets',dur:4},{shot:'closeup',move:'dolly',lens:'50',action:'looks up as the lamp flickers on and smiles',dialogue:'(softly) Siempre llegás tarde.',sound:'electric hum of the lamp',dur:4}]},
+    els:[{k:'a',t:'char',n:'Ana',d:P_ANA,ref:true,img:'ref-personaje-a'},{k:'b',t:'char',n:'Leo',d:P_LEO,ref:true,img:'ref-personaje-b'},{k:'p',t:'loc',n:'Parque',d:P_PARK,ref:true,img:'ref-parque'}],
+    shots:[{shot:'establishing',els:['p'],action:'the street lamp flickers in the empty park as night falls',sound:'crickets, distant traffic',dur:3},
+      {shot:'wide',els:['a','p'],action:'waits alone under the unlit street lamp and checks her watch',dur:4},
+      {shot:'full',move:'tracking',els:['b','p'],action:'hurries along the gravel path toward the lamp',sound:'footsteps on gravel',dur:3},
+      {shot:'ots',lens:'50',els:['a','b','p'],action:'looks at him over his shoulder, trying not to smile',dialogue:'(softly) Siempre llegás tarde.',dur:4},
+      {shot:'closeup',move:'dolly',lens:'85',els:['b','p'],action:'smiles, a little embarrassed',dialogue:'(laughing) Pero llegué.',dur:3},
+      {shot:'wide',move:'pullout',els:['a','b','p'],action:'the lamp turns on above them as they walk away together',sound:'electric hum of the lamp, soft music',dur:4}]},
+  {n:'Anuncio de producto 15 s',idea:'Una taza que mantiene el café caliente toda la mañana. Anuncio vertical para redes.',light:'studio',mood:'warm, calm, premium',ar:'9:16',style:'commercial',
+    els:[{k:'m',t:'prod',n:'Taza Aurora',d:P_MUG,img:'estilo-commercial'},{k:'s',t:'loc',n:'Estudio',d:'a clean studio with a warm beige gradient background and a round light-wood table'}],
+    shots:[{shot:'detail',move:'pushin',lens:'macro',els:['m','s'],action:'steam curls up slowly from the hot coffee',sound:'soft pour, ceramic clink',dur:2},
+      {shot:'hero',move:'orbitsm',lens:'50',els:['m','s'],action:'rests on the table, a thin line of steam rising',dur:3},
+      {shot:'inhand',move:'static',lens:'50',els:['m','s'],action:'a hand lifts the mug by the handle toward the camera',dur:3},
+      {shot:'detail',move:'slide',lens:'macro',els:['m','s'],action:'morning light slides across the glaze, steam still rising',sound:'soft music swell',dur:3},
+      {shot:'endcard',move:'static',lens:'50',els:['m','s'],action:'the mug centered, empty space above it for the logo and the call to action',sound:'single soft chime',dur:4}]},
+  {n:'Producto en uso con persona',idea:'Una persona empieza el día con su café en la ventana; la taza es protagonista sin que parezca anuncio.',light:'golden',mood:'cozy, natural, aspirational',ar:'4:5',
+    els:[{k:'a',t:'char',n:'Ana',d:P_ANA,ref:true,img:'ref-personaje-a'},{k:'m',t:'prod',n:'Taza Aurora',d:P_MUG},{k:'k',t:'loc',n:'Cocina',d:'a bright small kitchen with a window, plants on the sill and morning sun'}],
+    shots:[{shot:'medium',move:'static',lens:'35',els:['a','k'],action:'opens the curtains and squints at the morning sun',dur:3},
+      {shot:'inhand',move:'pushin',lens:'50',els:['a','m','k'],action:'wraps both hands around the mug and lifts it',dur:3},
+      {shot:'closeup',move:'static',lens:'85',els:['a','m','k'],action:'takes a slow sip and smiles with closed eyes',dur:3},
+      {shot:'lifestyle',move:'pullout',els:['a','m','k'],action:'leans on the window frame holding the mug as the city wakes up',sound:'birds, soft acoustic guitar',dur:4}]},
+  {n:'Bebida con splash',idea:'Una lata de bebida helada; el gancho es un splash en cámara lenta.',light:'studio',mood:'fresh, energetic, bold',ar:'9:16',style:'commercial',
+    els:[{k:'c',t:'prod',n:'Lata',d:'a chilled aluminum drink can with condensation drops, glossy teal finish, plain label area'},{k:'s',t:'loc',n:'Fondo',d:'a deep teal gradient studio background'}],
+    shots:[{shot:'detail',move:'pushin',lens:'macro',els:['c','s'],action:'a single condensation drop slides down the can',dur:2},
+      {shot:'hero',move:'static',lens:'50',els:['c','s'],action:'drops into a wave of ice-cold water and splashes in slow motion, the can stays upright and rigid',sound:'deep splash, fizz',dur:3},
+      {shot:'hero',move:'orbitsm',lens:'50',els:['c','s'],action:'stands on wet ice cubes, mist drifting around it',dur:3},
+      {shot:'endcard',move:'static',els:['c','s'],action:'the can centered on the ice, empty space at the top for the logo',sound:'can opening pop',dur:3}]},
   {n:'Videoclip',idea:'Una bailarina sola en un parque de noche; cada golpe de la música cambia la luz.',light:'neon',mood:'energetic, hypnotic',
-    cast:[{n:'Bailarina',d:'a dancer in a white tank top and black trousers'}],locs:[{n:'Parque de noche',d:'an empty park at night with wet pavement and neon reflections'}],
-    shots:[{shot:'wide',angle:'low',move:'crane',action:'starts dancing in the center of the frame',sound:'deep bass hit',dur:3},{shot:'medium',move:'orbit',action:'spins with arms open, hair flying',dur:3},{shot:'closeup',move:'handheld',action:'stops and stares into the lens, breathing',dur:2},{shot:'ews',angle:'topdown',move:'drone',action:'dances alone, a tiny figure on the wet ground',dur:4}]},
-  {n:'Tráiler',idea:'Un pueblo donde los faroles se apagan uno por uno y alguien decide averiguar por qué.',light:'lowkey',mood:'mysterious, tense',
-    cast:[{n:'Tomás',d:'a man in his 40s in a dark wool coat'}],locs:[{n:'Pueblo',d:'a small foggy town at night with old street lamps'}],
-    shots:[{shot:'ews',move:'drone',who:-1,action:'street lamps go dark one by one across the town',sound:'low drone, wind',dur:4},{shot:'medium',move:'tracking',action:'walks fast down an empty street, looking back',sound:'footsteps on cobblestones',dur:3},{shot:'insert',move:'static',lens:'macro',who:-1,action:'a lamp bulb flickers and dies',sound:'electric crackle',dur:2},{shot:'closeup',angle:'low',move:'dolly',action:'looks up at the last lit lamp',dialogue:'No es casualidad.',dur:3},{shot:'wide',move:'pullout',action:'stands alone as the last lamp goes out',sound:'silence, then a deep hit',dur:4}]},
-  {n:'Producto',idea:'Una taza amarilla que mantiene el café caliente toda la mañana.',light:'hardsoft',mood:'warm, calm, premium',
-    cast:[{n:'Taza',d:'a matte yellow ceramic mug with steam rising'}],locs:[{n:'Mesa',d:'a wooden table by a window in the early morning'}],
-    shots:[{shot:'insert',move:'orbit',lens:'macro',action:'steam curls up from the coffee in slow motion',sound:'soft pour, ceramic clink',dur:4},{shot:'medium',move:'dolly',lens:'85',action:'a hand lifts the mug from the table',dur:3},{shot:'closeup',move:'static',lens:'50',action:'the mug rests on the table, morning light across it',dur:3}]}];
+    els:[{k:'d',t:'char',n:'Bailarina',d:'a dancer in a white tank top and black trousers'},{k:'p',t:'loc',n:'Parque de noche',d:'an empty park at night with wet pavement and neon reflections'}],
+    shots:[{shot:'wide',angle:'low',move:'crane',els:['d','p'],action:'starts dancing in the center of the frame',sound:'deep bass hit',dur:3},{shot:'medium',move:'orbit',els:['d','p'],action:'spins with arms open, hair flying',dur:3},{shot:'closeup',move:'handheld',els:['d','p'],action:'stops and stares into the lens, breathing',dur:2},{shot:'ews',angle:'topdown',move:'drone',els:['d','p'],action:'dances alone, a tiny figure on the wet ground',dur:4}]},
+  {n:'Clip sin personajes fijos',idea:'Un pueblo donde los faroles se apagan uno por uno.',light:'lowkey',mood:'mysterious, tense',
+    els:[],shots:[{shot:'ews',move:'drone',subj:'a small foggy town at night with old street lamps',action:'the street lamps go dark one by one',sound:'low drone, wind',dur:4},{shot:'insert',lens:'macro',subj:'an old street lamp bulb',action:'flickers and dies',sound:'electric crackle',dur:2},{shot:'medium',move:'tracking',subj:'a man in his 40s in a dark wool coat',action:'walks fast down an empty street, looking back',dur:3}]}];
 
 /* traducción: el texto se puede escribir en español; antes de armar el prompt se pasa al inglés.
    Orden: traductor integrado de Chrome (en tu equipo), Claude (si la página corre dentro de Claude) y MyMemory (servicio gratis, unos 5000 caracteres por día) */
 const isES=t=>{t=' '+String(t||'').toLowerCase().replace(/[.,;:!?()"]/g,' ')+' ';if(/[áéíóúñ¿¡]/.test(t))return true;
-  const es=(t.match(/\s(el|la|los|las|un|una|unos|unas|del|con|que|en|y|se|su|sus|por|para|mira|camina|corre|lleva|pelo|cabello|mujer|hombre|chica|chico|noche|calle|parque|casa|camisa|pantalón|ojos|cerca|lejos|hacia|sobre|bajo|entre|muy|luz|al|lo|le|es|está|pequeño|pequeña|viejo|vieja|joven)(?=\s)/g)||[]).length,
+  const es=(t.match(/\s(el|la|los|las|un|una|unos|unas|del|con|que|en|y|se|su|sus|por|para|mira|camina|corre|lleva|pelo|cabello|mujer|hombre|chica|chico|noche|calle|parque|casa|camisa|pantalón|ojos|cerca|lejos|hacia|sobre|bajo|entre|muy|luz|al|lo|le|es|está|pequeño|pequeña|viejo|vieja|joven|taza|botella|lata|caja|fondo|mesa|mano)(?=\s)/g)||[]).length,
     en=(t.match(/\s(the|and|with|of|a|an|is|his|her|in|on|at|wearing|looks|walks|toward|light|from|into|by)(?=\s)/g)||[]).length;return es>=2&&es>en};
 const TRC=(()=>{try{return JSON.parse(store.get('tr')||'{}')||{}}catch(e){return {}}})();
 const saveTRC=()=>{try{const k=Object.keys(TRC);k.slice(0,Math.max(0,k.length-400)).forEach(x=>delete TRC[x]);store.set('tr',JSON.stringify(TRC))}catch(e){}};
@@ -377,27 +400,28 @@ const CL=(...a)=>a.map(trimEnd).filter(Boolean).join(', ');
 const pascal=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+(.)?/g,(m,c)=>c?c.toUpperCase():'').replace(/^./,c=>c.toUpperCase());
 const slug=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
 function shortWho(d){const s=trimEnd(EN(d)||'the character').replace(/^(a|an|the)\s+/i,'');return cap1(s.split(/\s+(?:in|with|wearing|who|holding)\s+/i)[0].split(/\s+/).slice(0,4).join(' '))}
-const entOk=e=>e&&String(e.d||'').trim()?e:null;
-const castAt=(G,i)=>i>=0?entOk(G.cast[i]):null,locAt=(G,i)=>i>=0?entOk(G.locs[i]):null;
-const entName=(e,isLoc)=>trimEnd(e.n)||(isLoc?'Location':shortWho(e.d));
-function refList(G){return G.cast.filter(c=>c.ref&&entOk(c)).concat(G.locs.filter(l=>l.ref&&entOk(l)))}
+const elOk=e=>e&&String(e.d||'').trim()?e:null;
+const elById=(G,id)=>G.els.find(e=>e.id===id);
+const elName=e=>trimEnd(e.n)||(e.t==='loc'?'Location':e.t==='prod'?'Product':shortWho(e.d));
+const shotEls=(G,s)=>(s.els||[]).map(id=>elOk(elById(G,id))).filter(Boolean);
+function refList(G){const used=new Set([].concat(...G.shots.map(s=>s.els||[])));return G.els.filter(e=>e.ref&&elOk(e)&&used.has(e.id))}
 const TAG_TOOLS=['seedance','runway','higgsfield'],IMGN_TOOLS=['generic','nanobanana','gptimage','seedream'];
-function refTok(G,e,R){const k=R.indexOf(e)+1;if(!e.ref||!k)return '';const t=G.tool,isLoc=G.locs.includes(e);
-  if(t==='seedance')return '@Image'+k;if(t==='runway')return '@'+pascal(entName(e,isLoc));if(t==='higgsfield')return '@'+slug(entName(e,isLoc));if(t==='kling')return '[@'+pascal(entName(e,isLoc))+']';return ''}
-function textOf(G,e,R){const d=trimEnd(EN(e.d)),tok=refTok(G,e,R),k=R.indexOf(e)+1;
+function refTok(tool,e,R){const k=R.indexOf(e)+1;if(!e.ref||!k)return '';
+  if(tool==='seedance')return '@Image'+k;if(tool==='runway')return '@'+pascal(elName(e));if(tool==='higgsfield')return '@'+slug(elName(e));if(tool==='kling')return '[@'+pascal(elName(e))+']';return ''}
+function textOf(G,e,R){const d=trimEnd(EN(e.d)),tok=refTok(G.tool,e,R),k=R.indexOf(e)+1;
   if(tok&&TAG_TOOLS.includes(G.tool))return tok;if(e.ref&&k&&IMGN_TOOLS.includes(G.tool))return d+' (Image '+k+')';return d}
 function declOf(G,ents,R){const used=R.filter(e=>ents.includes(e));if(!used.length)return '';
-  if(G.tool==='seedance')return used.map(e=>refTok(G,e,R)+' is '+sent(EN(e.d))).join(' ');
-  if(IMGN_TOOLS.includes(G.tool))return used.map(e=>'Image '+(R.indexOf(e)+1)+': '+(G.locs.includes(e)?'location':'character')+' reference for '+entName(e,G.locs.includes(e))+'.').join(' ');return ''}
-function parts(G,s,R){R=R||refList(G);const st=G.style&&SBY[G.style]?SBY[G.style].block:'';
-  const c1=castAt(G,s.who),c2=s.with!==s.who?castAt(G,s.with):null,cs=[c1,c2].filter(Boolean),L=locAt(G,s.where),noOne=s.who<0&&!c2;
-  const subj=cs.length?cs.map(e=>textOf(G,e,R)).join(' and '):(noOne?'':'the character');
-  const tags=cs.length?cs.map(e=>R.includes(e)?refTok({tool:'kling',locs:G.locs},e,R):'['+entName(e)+': '+trimEnd(EN(e.d))+']').join(' and '):'';
-  const sp=c1||c2;
+  if(G.tool==='seedance')return used.map(e=>refTok('seedance',e,R)+' is '+(e.t==='prod'?'the product: ':'')+sent(EN(e.d))).join(' ');
+  if(IMGN_TOOLS.includes(G.tool))return used.map(e=>'Image '+(R.indexOf(e)+1)+': '+(e.t==='loc'?'location':e.t==='prod'?'product':'character')+' reference for '+elName(e)+'.').join(' ');return ''}
+const PROD_LOCK='The product stays rigid and keeps its exact shape, colors and label.';
+function parts(G,s,R){R=R||refList(G);const st=G.style&&SBY[G.style]?SBY[G.style].block:'',E=shotEls(G,s),cs=E.filter(e=>e.t!=='loc'),L=E.find(e=>e.t==='loc');
+  const free=trimEnd(EN(s.subj)),subj=J(cs.map(e=>textOf(G,e,R)).join(' and '),cs.length&&free?'and':'',free)||(E.length?'':'');
+  const tags=cs.map(e=>R.includes(e)?refTok('kling',e,R):'['+elName(e)+': '+trimEnd(EN(e.d))+']').join(' and ')+(free?(cs.length?' and ':'')+free:'');
+  const sp=cs.find(e=>e.t==='char');
   return {shot:GVM.shot[s.shot]||'',angle:GVM.angle[s.angle]||'',move:GVM.move[s.move]||'',lens:GVM.lens[s.lens]&&s.lens?GVM.lens[s.lens]:'',
     subj,tags,spk:sp?textOf(G,sp,R):'',act:trimEnd(EN(s.action)),scene:L?textOf(G,L,R):'',light:s.light?GVM.light[s.light]:(G.light?GVM.light[G.light]:''),mood:trimEnd(EN(G.mood)),style:trimEnd(st),
     dlg:String(s.dialogue||'').trim().replace(/^\([^)]*\)\s*/,'').replace(/^["“]|["”]$/g,''),tone:EN((String(s.dialogue||'').trim().match(/^\(([^)]*)\)/)||[])[1]||''),snd:trimEnd(EN(s.sound)),dur:Math.max(1,+s.dur||4),
-    who:sp?entName(sp):'the character',named:!!(sp&&trimEnd(sp.n)),decl:declOf(G,cs.concat(L?[L]:[]),R),ents:cs.concat(L?[L]:[]),s}}
+    who:sp?elName(sp):'the character',named:!!(sp&&trimEnd(sp.n)),decl:declOf(G,E,R),ents:E,lock:cs.some(e=>e.t==='prod')?PROD_LOCK:'',s}}
 const kd=P=>'['+P.who+(P.tone?', '+P.tone:'')+']: "'+P.dlg+'"';
 const tot=G=>G.shots.reduce((a,s)=>a+Math.max(1,+s.dur||4),0);
 const ts=x=>'00:'+pad2(Math.floor(x));
@@ -410,21 +434,23 @@ const moodS=P=>P.mood?sent(cap1(P.mood)+' mood'):'';
 const SA=(P,pre)=>pre?pre+' '+sent(P.snd):sent(P.snd);
 const klS=P=>P.tags?P.tags+(P.act?' '+trimEnd(P.act)+'.':'.'):sent(P.act);
 const sdA=P=>J(P.subj,P.act||(P.subj?'holds still':''));
+const ofS=(P,L,i,w)=>P.scene&&(i===0||P.scene!==L[i-1].scene)?' '+(PL[P.s.shot]?'in':w)+' '+P.scene:'';
 const uniqDecl=(G,L,R)=>declOf(G,[...new Set([].concat(...L.map(P=>P.ents)))],R);
+const lockAll=L=>L.some(P=>P.lock)?PROD_LOCK:'';
 const FMT={
   generic:{one:(G,P)=>J(sent(J(P.subj,P.act)+(P.scene?' in '+P.scene:'')),sent(CL(frm(P),P.move,P.lens)),sent(P.light),sent(P.style),moodS(P),P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):''),
-    all:(G,L)=>J(L.map((P,i)=>'Shot '+(i+1)+': '+J(sent(frm(P)+(P.scene&&(i===0||P.scene!==L[i-1].scene)?' of '+P.scene:'')),sent(J(P.subj,P.act)),sent(mv(P)),i===0?sent(P.light):'',P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):'')).join(' '),sent(L[0].style),moodS(L[0]))},
+    all:(G,L)=>J(L.map((P,i)=>'Shot '+(i+1)+': '+J(sent(frm(P)+ofS(P,L,i,'of')),sent(J(P.subj,P.act)),sent(mv(P)),i===0?sent(P.light):'',P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):'')).join(' '),sent(L[0].style),moodS(L[0]))},
   kling:{one:(G,P)=>J(sent(CL(P.scene,P.light)),P.snd?sent(P.snd):'',klS(P),P.dlg?kd(P):'',sent(CL(frm(P),P.move,P.lens)),sent(P.style),moodS(P)),
-    all:(G,L)=>J(L.map((P,i)=>'Shot '+(i+1)+' (Duration: '+P.dur+' seconds): '+J(sent(CL(frm(P)+(P.scene&&(i===0||P.scene!==L[i-1].scene)?' of '+P.scene:''),i===0?P.light:'')),klS(P),P.dlg?kd(P):'',P.snd?sent(P.snd):'',sent(mv(P)))).join(' '),sent(L[0].style),moodS(L[0]))},
-  flow:{one:(G,P)=>J(sent(CL(frm(P)+(P.scene?' of '+P.scene:''),P.move,P.lens)),sent(J(P.subj,P.act)),sent(CL(P.light,P.style)),moodS(P),P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):''),
-    all:(G,L)=>{let t=0;return J(L.map((P,i)=>{const a=t;t+=P.dur;return '['+ts(a)+'-'+ts(t)+'] '+J(sent(CL(frm(P)+(P.scene&&(i===0||P.scene!==L[i-1].scene)?' of '+P.scene:''),P.move,P.lens)),sent(J(P.subj,P.act)),i===0?sent(P.light):'',P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):'')}).join(' '),sent(L[0].style),moodS(L[0]))}},
+    all:(G,L)=>J(L.map((P,i)=>'Shot '+(i+1)+' (Duration: '+P.dur+' seconds): '+J(sent(CL(frm(P)+ofS(P,L,i,'of'),i===0?P.light:'')),klS(P),P.dlg?kd(P):'',P.snd?sent(P.snd):'',sent(mv(P)))).join(' '),sent(L[0].style),moodS(L[0]))},
+  flow:{one:(G,P)=>J(sent(CL(frm(P)+(P.scene?(PL[P.s.shot]?' in ':' of ')+P.scene:''),P.move,P.lens)),sent(J(P.subj,P.act)),sent(CL(P.light,P.style)),moodS(P),P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):''),
+    all:(G,L)=>{let t=0;return J(L.map((P,i)=>{const a=t;t+=P.dur;return '['+ts(a)+'-'+ts(t)+'] '+J(sent(CL(frm(P)+ofS(P,L,i,'of'),P.move,P.lens)),sent(J(P.subj,P.act)),i===0?sent(P.light):'',P.snd?SA(P,'SFX:'):'',P.dlg?saysT(P):'')}).join(' '),sent(L[0].style),moodS(L[0]))}},
   seedance:{one:(G,P)=>J(P.decl,P.style?'Style: '+sent(P.style):'',sent(CL(frm(P)+': '+sdA(P)+(P.scene?' in '+P.scene:''),P.move,P.lens,P.light)),P.dlg?(P.spk||cap1(theW(P)))+' says'+(P.tone?', '+P.tone:'')+': "'+P.dlg+'". Only one person speaks.':'',P.snd?SA(P,'Sound:'):''),
     all:(G,L,R)=>{let t=0;const P0=L[0];return J(uniqDecl(G,L,R),P0.style?'Style: '+sent(P0.style):'',
-      L.map((P,i)=>{const a=t;t+=P.dur;return '['+ts(a)+'-'+ts(t)+'] '+J(sent(CL(frm(P)+': '+sdA(P)+(P.scene&&(i===0||P.scene!==L[i-1].scene)?' in '+P.scene:''),P.move,P.lens,i===0?P.light:'')),P.dlg?(P.spk||cap1(theW(P)))+' says'+(P.tone?', '+P.tone:'')+': "'+P.dlg+'"':'',P.snd?SA(P,'Sound:'):'')}).join(' '),L.some(P=>P.dlg)?'Only one person speaks at a time.':'',moodS(P0))}},
+      L.map((P,i)=>{const a=t;t+=P.dur;return '['+ts(a)+'-'+ts(t)+'] '+J(sent(CL(frm(P)+': '+sdA(P)+ofS(P,L,i,'in'),P.move,P.lens,i===0?P.light:'')),P.dlg?(P.spk||cap1(theW(P)))+' says'+(P.tone?', '+P.tone:'')+': "'+P.dlg+'"':'',P.snd?SA(P,'Sound:'):'')}).join(' '),L.some(P=>P.dlg)?'Only one person speaks at a time.':'',moodS(P0))}},
   higgsfield:{one:(G,P)=>J('[UI: '+hfUI(P)+']',sent(J(P.subj,P.act)+(P.scene?' in '+P.scene:'')),P.dlg?saysT(P):'',P.snd?sent(P.snd):'',sent(P.style),moodS(P)),
-    all:(G,L)=>L.map((P,i)=>'Shot '+(i+1)+' [UI: '+hfUI(P)+']: '+J(sent(J(P.subj,P.act)+(P.scene&&(i===0||P.scene!==L[i-1].scene)?' in '+P.scene:'')),P.dlg?saysT(P):'',P.snd?sent(P.snd):'')).join('\n')+(L[0].style?'\n'+sent(L[0].style):'')},
+    all:(G,L)=>L.map((P,i)=>'Shot '+(i+1)+' [UI: '+hfUI(P)+']: '+J(sent(J(P.subj,P.act)+ofS(P,L,i,'in')),P.dlg?saysT(P):'',P.snd?sent(P.snd):'')).join('\n')+(L[0].style?'\n'+sent(L[0].style):'')},
   runway:{one:(G,P)=>J(sent(CL(frm(P),P.move,P.lens)),sent(J(P.subj,P.act)+(P.scene?' in '+P.scene:'')),sent(CL(P.light,P.style)),moodS(P),P.dlg?cap1(theW(P))+' mouths the words "'+P.dlg+'".':'')},
-  wan:{one:(G,P)=>J(sent(frm(P)+(P.scene?' of '+P.scene:'')),sent(J(P.subj,P.act)),sent(mv(P)),sent(P.light),sent(P.style),moodS(P),P.snd?SA(P,'Sound:'):'',P.dlg?saysT(P):'')},
+  wan:{one:(G,P)=>J(sent(frm(P)+(P.scene?(PL[P.s.shot]?' in ':' of ')+P.scene:'')),sent(J(P.subj,P.act)),sent(mv(P)),sent(P.light),sent(P.style),moodS(P),P.snd?SA(P,'Sound:'):'',P.dlg?saysT(P):'')},
   hailuo:{one:(G,P)=>J(sent(J(P.subj,P.act)+(P.scene?' in '+P.scene:'')),sent(CL(frm(P),P.move,P.lens)),sent(CL(P.light,P.style)),moodS(P),P.dlg?saysT(P):'',P.snd?SA(P,'Audio:'):'')},
   nanobanana:{img:1,one:(G,P)=>J(P.decl,sent(cap1(J(P.subj,P.act))+(P.scene?' in '+P.scene:'')),sent(CL(cap1(P.shot),P.angle,P.lens)),sent(CL(P.light,P.style,'cinematic film still',G.ar)))},
   midjourney:{img:1,one:(G,P)=>CL(cap1(J(P.subj,P.act))+(P.scene?' in '+P.scene:''),P.shot,P.angle==='eye-level'?'':P.angle,P.style,P.mood?P.mood+' mood':'',P.light,P.lens,'cinematic still')+' --ar '+mjAr(G.ar)+' --raw'},
@@ -432,7 +458,7 @@ const FMT={
   seedream:{img:1,one:(G,P)=>J(P.decl,sent(cap1(J(P.subj,P.act))+(P.scene?' in '+P.scene:'')),sent(CL(P.shot,P.angle,P.lens,P.light)),sent(CL(P.style,'cinematic still',G.ar)))},
   flux:{img:1,one:(G,P)=>J(sent(cap1(J(P.subj,P.act))+(P.scene?' in '+P.scene:'')),sent(CL(P.shot,P.angle,P.lens)),sent(CL(P.light,P.style,'cinematic film still')),'Aspect ratio '+G.ar+'.')}};
 FMT.generic.oneD=(G,P)=>J(P.decl,FMT.generic.one(G,P));
-const HF_MOVE={static:'Static',pan:'Pan',tilt:'Tilt up',pedestal:'Pedestal up',dolly:'Dolly in',pullout:'Dolly out',zoom:'Zoom in',crashzoom:'Crash zoom',dollyzoom:'Dolly zoom',tracking:'Tracking',leadingshot:'Leading shot',steadicam:'Gimbal follow',handheld:'Handheld',crane:'Crane up',orbit:'Orbit',drone:'Drone',fpv:'FPV',whip:'Whip pan',rack:'Rack focus'};
+const HF_MOVE={static:'Static',pan:'Pan',tilt:'Tilt up',pedestal:'Pedestal up',dolly:'Dolly in',pushin:'Dolly in',pullout:'Dolly out',zoom:'Zoom in',crashzoom:'Crash zoom',dollyzoom:'Dolly zoom',tracking:'Tracking',leadingshot:'Leading shot',steadicam:'Gimbal follow',handheld:'Handheld',crane:'Crane up',orbit:'Orbit',orbitsm:'Orbit',turntable:'Orbit',slide:'Truck',drone:'Drone',fpv:'FPV',whip:'Whip pan',rack:'Rack focus'};
 const hfUI=P=>CL(cap1(P.shot),P.lens||'',P.s&&HF_MOVE[P.s.move]?HF_MOVE[P.s.move]:'',P.light?cap1(P.light):'');
 const GEN_HINT={generic:'Formato neutro para cualquier herramienta: un plano, una acción y una cámara por prompt, con la misma descripción del personaje en todos.',
   kling:'Kling 4.0: escena y luz, sonido, el sujeto con etiqueta [Nombre: descripción], el diálogo como [Nombre, tono]: "línea" y al final la cámara. Con varios planos, cada uno lleva "Shot n (Duration: n seconds)". Los elementos guardados se citan como [@Elemento].',
@@ -453,125 +479,157 @@ const REF_HOW={kling:'En Kling guardá cada ficha como elemento con ese mismo no
 
 /* lectura en español de cada prompt */
 const lower=s=>String(s||'').charAt(0).toLowerCase()+String(s||'').slice(1);
-function lect(G,s,i){const c1=castAt(G,s.who),c2=s.with!==s.who?castAt(G,s.with):null,cs=[c1,c2].filter(Boolean),L=locAt(G,s.where),lt=s.light||G.light;
+function lect(G,s,i){const E=shotEls(G,s),cs=E.filter(e=>e.t!=='loc'),L=E.find(e=>e.t==='loc'),lt=s.light||G.light;
   return ['Plano '+(i+1)+': '+gvLabel('shot',s.shot)+' · '+Math.max(1,+s.dur||4)+' s',
     'Cámara: '+[s.angle&&s.angle!=='eye'?'ángulo '+lower(gvLabel('angle',s.angle)):'a la altura de los ojos',lower(gvLabel('move',s.move)),s.lens?'lente '+LENS_ES[s.lens]:''].filter(Boolean).join(', '),
-    cs.length?'Quién: '+cs.map(e=>(trimEnd(e.n)||'Personaje')+' ('+trimEnd(e.d)+')'+(e.ref?', con imagen de referencia':'')).join(' y '):'Sin personajes en cuadro',
+    cs.length||s.subj?'En cuadro: '+cs.map(e=>ETYPE[e.t].n.toLowerCase()+' '+(trimEnd(e.n)||'sin nombre')+' ('+trimEnd(e.d)+')'+(e.ref?', con imagen de referencia':'')).concat(s.subj?[trimEnd(s.subj)]:[]).join(' y '):'',
     s.action?'Acción: '+trimEnd(s.action):'',L?'Dónde: '+(trimEnd(L.n)||'Lugar')+' ('+trimEnd(L.d)+')':'',lt?'Luz: '+lower(gvLabel('light',lt)):'',G.style&&SBY[G.style]?'Estilo: '+SBY[G.style].n:'',
-    G.mood?'Ánimo: '+trimEnd(G.mood):'',s.sound?'Sonido: '+trimEnd(s.sound):'',s.dialogue?'Diálogo: '+String(s.dialogue).trim():''].filter(Boolean).join('\n')}
+    G.mood?'Ánimo: '+trimEnd(G.mood):'',s.sound?'Sonido: '+trimEnd(s.sound):'',s.dialogue?'Diálogo: '+String(s.dialogue).trim():'',cs.some(e=>e.t==='prod')?'Pide que el producto no cambie de forma, colores ni etiqueta.':''].filter(Boolean).join('\n')}
 const lectNote='(Lo que dice el prompt, explicado en español con tus propias palabras. Para pegar en la herramienta usá la pestaña en inglés.)';
 
 /* sugerencias de plano siguiente, con la gramática clásica de cobertura */
 const SG={
-  est:[['medium','Presentá al personaje','Ya se sabe dónde estamos: ahora mostrá quién está.',{lens:'50'}],['full','La acción completa','El cuerpo entero haciendo algo, todavía con el lugar alrededor.',{}],['insert','Un detalle del lugar','Un objeto que cuente algo del lugar o de la historia.',{lens:'macro',who:-1}]],
+  est:[['medium','Presentá al personaje','Ya se sabe dónde estamos: ahora mostrá quién está.',{lens:'50'}],['full','La acción completa','El cuerpo entero haciendo algo, todavía con el lugar alrededor.',{}],['insert','Un detalle del lugar','Un objeto que cuente algo del lugar o de la historia.',{lens:'macro',only:'loc'}]],
   wide:[['medium','Acercate','Después del general, el paso natural es acercarse al personaje.',{lens:'50'}],['closeup','Saltá a la emoción','Un salto grande de tamaño marca un momento importante.',{lens:'85',move:'dolly'}],['insert','El objeto clave','Lo que el personaje mira o toca.',{lens:'macro'}]],
   full:[['medium','Más cerca','Plano medio para ver gestos y manos.',{lens:'50'}],['closeup','La emoción','La cara cuenta lo que siente.',{lens:'85'}],['ots','Sobre el hombro','Si hay alguien enfrente, mostralo por encima del hombro del otro.',{lens:'50',both:1}]],
-  medium:[['closeup','La emoción','El momento importante se cuenta en la cara.',{lens:'85',move:'dolly'}],['ots','Contraplano','En un diálogo, alterná el punto de vista sobre el hombro.',{lens:'50',both:1,swap:1}],['insert','Lo que mira o toca','Un inserto del objeto que importa.',{lens:'macro'}]],
+  medium:[['closeup','La emoción','El momento importante se cuenta en la cara.',{lens:'85',move:'dolly'}],['ots','Contraplano','En un diálogo, alterná el punto de vista sobre el hombro.',{lens:'50',both:1}],['insert','Lo que mira o toca','Un inserto del objeto que importa.',{lens:'macro'}]],
   closeup:[['closeup','La reacción','Primer plano del otro personaje: cómo recibe lo que pasó.',{lens:'85',other:1}],['pov','Lo que ve','La cámara toma su mirada.',{}],['wide','Respirar','Volvé al general para ubicar después de un momento intenso.',{lens:'24',move:'pullout'}]],
   ecu:[['closeup','Abrí un poco','Del detalle a la cara completa.',{lens:'85'}],['wide','Cerrar la escena','Abrí al general para terminar.',{move:'pullout'}]],
   ots:[['ots','El otro lado','Contraplano sobre el otro hombro; cada uno queda siempre del mismo lado de la pantalla.',{lens:'50',both:1,swap:1}],['closeup','El que escucha','La reacción suele contar más que quien habla.',{lens:'85',other:1}],['twoshot','Los dos','Los dos en cuadro para mostrar la relación.',{both:1}]],
   twoshot:[['ots','Sobre el hombro','Entrá al diálogo por encima del hombro de uno.',{lens:'50',both:1}],['closeup','El que habla','Primer plano de quien tiene el momento.',{lens:'85'}],['wide','Volver al general','Para cerrar o cambiar de momento.',{}]],
   insert:[['closeup','La reacción al objeto','Primer plano de quien lo mira.',{lens:'85'}],['medium','Volver a la acción','Seguí la escena en plano medio.',{}]],
-  pov:[['closeup','Quién mira','El primer plano de quien mira cierra el subjetivo.',{lens:'85'}],['insert','Más cerca de lo que ve','Un inserto del objeto que está mirando.',{lens:'macro'}]]};
-const SGK={ews:'est',establishing:'est',wide:'wide',full:'full',cowboy:'full',medium:'medium',mcu:'medium',closeup:'closeup',ecu:'ecu',insert:'insert',twoshot:'twoshot',ots:'ots',pov:'pov'};
-function suggestions(G){const l=G.shots[G.shots.length-1];if(!l)return [];const live=G.cast.map((c,i)=>entOk(c)?i:-1).filter(i=>i>=0);
-  const other=w=>live.find(i=>i!==w);return (SG[SGK[l.shot]]||SG.medium).map(([shot,t,why,o])=>{const s={shot,angle:'eye',move:o.move||'static',lens:o.lens||'',where:l.where,dur:shot==='closeup'||shot==='insert'||shot==='ecu'?3:4};
-    let w=l.who>=0?l.who:(live[0]!=null?live[0]:-1);if(o.who===-1)w=-1;if(o.other&&other(w)!=null)w=other(w);if(o.swap&&l.with>=0){s.who=l.with;s.with=l.who}else{s.who=w;s.with=o.both&&other(w)!=null?other(w):-1}
-    if((o.other||o.swap||o.both)&&live.length<2&&shot!=='closeup'&&o.both)return null;return {t,why,s,term:shot}}).filter(Boolean)}
-function suggHTML(){const L=suggestions(GS),two=GS.cast.filter(entOk).length>1;if(!L.length)return '';
-  return '<div class="sugg"><span class="lbl">¿Qué plano sigue?</span><div class="sg-row">'+L.map((x,i)=>'<button type="button" class="sg" data-sg="'+i+'"><b>'+esc(gvLabel('shot',x.s.shot))+' · '+esc(x.t)+'</b><span>'+esc(x.why)+'</span></button>').join('')+'</div>'+
-    '<p class="g-note">'+(two?'Regla de los 180°: dejá a cada personaje siempre del mismo lado de la pantalla. ':'')+'Entre dos planos seguidos del mismo personaje, cambiá el tamaño o el ángulo para que el corte no salte. Para ideas más libres, usá el prompt para un LLM de la derecha'+(sampleFn?' o "Proponer planos con Claude"':'')+'.</p></div>'}
+  pov:[['closeup','Quién mira','El primer plano de quien mira cierra el subjetivo.',{lens:'85'}],['insert','Más cerca de lo que ve','Un inserto del objeto que está mirando.',{lens:'macro'}]],
+  /* producto */
+  pdetail:[['hero','El producto entero','Después del gancho, mostralo completo y con luz de estudio.',{lens:'50',move:'orbitsm',prod:1}],['inhand','En mano','Una mano lo toma: escala y uso real en un solo plano.',{lens:'50',prod:1}],['endcard','Cierre','Si el anuncio es corto, cerrá con espacio para logo y texto.',{prod:1}]],
+  phero:[['detail','Detalle macro','La textura o el beneficio, muy cerca.',{lens:'macro',move:'pushin',prod:1}],['lifestyle','En uso','El producto en su lugar real, con alguien usándolo.',{move:'pullout',prod:1,char:1}],['endcard','Cierre','El producto centrado con espacio para logo y llamado a la acción.',{prod:1}]],
+  pinhand:[['closeup','La reacción','La cara de quien lo usa: el beneficio se ve en el gesto.',{lens:'85',char:1,prod:1}],['detail','El detalle que convence','Lo que hace distinto al producto, en macro.',{lens:'macro',prod:1}],['endcard','Cierre','Logo y llamado a la acción.',{prod:1}]],
+  plife:[['detail','Volver al producto','Después del ambiente, un detalle que lo destaque.',{lens:'macro',prod:1}],['hero','Hero','El producto solo, limpio y bien iluminado.',{move:'orbitsm',prod:1}],['endcard','Cierre','Logo y llamado a la acción.',{prod:1}]],
+  pend:[['hero','Otra versión del hero','Variá la luz o el fondo para tener opciones de cierre.',{move:'orbitsm',prod:1}]]};
+const SGK={ews:'est',establishing:'est',wide:'wide',full:'full',cowboy:'full',medium:'medium',mcu:'medium',closeup:'closeup',ecu:'ecu',insert:'insert',twoshot:'twoshot',ots:'ots',pov:'pov',
+  detail:'pdetail',hero:'phero',packshot:'phero',inhand:'pinhand',flatlay:'phero',lifestyle:'plife',endcard:'pend'};
+function suggestions(G){const l=G.shots[G.shots.length-1];if(!l)return [];const E=shotEls(G,l),chars=G.els.filter(e=>e.t==='char'&&elOk(e)),prods=G.els.filter(e=>e.t==='prod'&&elOk(e)),loc=E.find(e=>e.t==='loc');
+  const lastC=E.filter(e=>e.t==='char'),cur=lastC[0]||chars[0],other=chars.find(c=>c!==cur);
+  return (SG[SGK[l.shot]]||SG.medium).map(([shot,t,why,o])=>{const ids=[];
+    if(o.only==='loc'){}else if(o.prod){if(prods[0])ids.push((E.find(e=>e.t==='prod')||prods[0]).id);if(o.char&&cur)ids.unshift(cur.id)}
+    else if(o.swap&&lastC.length>1){ids.push(lastC[1].id,lastC[0].id)}
+    else if(o.other&&other){ids.push(other.id)}
+    else{if(cur)ids.push(cur.id);if(o.both&&other)ids.push(other.id);E.filter(e=>e.t==='prod').forEach(e=>{if(!o.both)ids.push(e.id)})}
+    if(loc)ids.push(loc.id);
+    if((o.both||o.swap)&&!other)return null;if(o.prod&&!prods.length&&!E.some(e=>e.t==='prod'))return null;
+    return {t,why,s:{shot,angle:'eye',move:o.move||'static',lens:o.lens||'',els:ids,subj:ids.filter(id=>elById(G,id).t!=='loc').length?'':l.subj,dur:['closeup','insert','ecu','detail'].includes(shot)?3:shot==='endcard'?3:4}}}).filter(Boolean)}
+function suggHTML(){const L=suggestions(GS),two=GS.els.filter(e=>e.t==='char'&&elOk(e)).length>1,prod=GS.els.some(e=>e.t==='prod'&&elOk(e));if(!L.length)return '';
+  return '<div class="sugg"><span class="lbl">¿Qué plano sigue?</span><div class="sg-row">'+L.map((x,i)=>'<div class="sg-w"><button type="button" class="sg" data-sg="'+i+'"><b>'+esc(gvLabel('shot',x.s.shot))+' · '+esc(x.t)+'</b><span>'+esc(x.why)+'</span></button>'+qa(QR.shot(x.s.shot),'Qué es '+gvLabel('shot',x.s.shot))+'</div>').join('')+'</div>'+
+    '<p class="g-note">'+(two?'Regla de los 180°: dejá a cada personaje siempre del mismo lado de la pantalla. ':'')+(prod?'Con producto, preferí cámara fija, acercamiento lento u órbita corta: deforman menos que un giro completo. ':'')+'Entre dos planos seguidos del mismo sujeto, cambiá el tamaño o el ángulo para que el corte no salte. Para ideas más libres, usá el prompt para un LLM'+(sampleFn?' o "Proponer planos con Claude"':'')+'.</p></div>'}
+
+/* enlaces "qué es": abren la explicación en otra pestaña (dentro de un visor, en la misma página) */
+const QR={shot:v=>PL[v]?'p-producto':v,angle:v=>v,move:v=>PL[v]?'p-producto':v,lens:v=>({'':'focal','24':'focal','35':'focal','50':'focal','85':'focal',macro:'macro',anam:'anamorphic'})[v]||'focal',
+  light:v=>!v?'pc-estilo':PL[v]?'p-producto':v,style:v=>v?'e-'+v:'estilos',ar:()=>'aspect',tool:v=>TBY[v]?'h-'+v:'herramientas'};
+const qa=(r,t,k)=>'<a class="qa" href="#'+esc(r)+'" target="_blank" rel="noopener"'+(k?' data-qk="'+k+'"':'')+' title="'+esc(t||'Qué es')+' (se abre en otra pestaña)" aria-label="'+esc(t||'Qué es')+', en otra pestaña">?</a>';
+const qaSel=(k,t)=>qa('glosario',t,k);
+document.addEventListener('click',e=>{const a=e.target.closest('a.qa');if(!a)return;e.stopPropagation();
+  if(a.dataset.qk){const f=a.closest('.fld,.gen-tool'),sel=f&&f.querySelector('select');if(sel&&QR[a.dataset.qk])a.setAttribute('href','#'+QR[a.dataset.qk](sel.value))}
+  let framed=false;try{framed=window.top!==window}catch(err){framed=true}
+  if(framed){e.preventDefault();go(a.getAttribute('href').slice(1))}},true);
 
 /* formulario */
 const gForm=$('#gen-form'),gShots=$('#g-shots'),gRes=$('#g-result');
 const opt=(v,t,sel)=>'<option value="'+esc(v)+'"'+(String(v)===String(sel)?' selected':'')+'>'+esc(t)+'</option>';
-const gvOpts=(k,sel)=>GV[k].map(x=>opt(x[0],x[0]===''?'Sin indicar':gvLabel(k,x[0]),sel)).join('');
-const castOpts=(sel,none)=>opt(-1,none,sel)+GS.cast.map((c,i)=>opt(i,trimEnd(c.n)||('Personaje '+(i+1)),sel)).join('');
-const locOpts=sel=>opt(-1,'Sin lugar',sel)+GS.locs.map((l,i)=>opt(i,trimEnd(l.n)||('Lugar '+(i+1)),sel)).join('');
+const gvOpts=(k,sel)=>{const P=GV[k].filter(x=>PL[x[0]]),N=GV[k].filter(x=>!PL[x[0]]);return N.map(x=>opt(x[0],x[0]===''?'Sin indicar':gvLabel(k,x[0]),sel)).join('')+(P.length?'<optgroup label="Producto y publicidad">'+P.map(x=>opt(x[0],gvLabel(k,x[0]),sel)).join('')+'</optgroup>':'')};
 const enh=k=>'<small class="enh" data-enh="'+k+'"></small>';
-function entRow(e,i,kind){const isC=kind==='c';return '<div class="ent" data-'+kind+'="'+i+'">'+(e.img&&REALIMG.has(e.img)?'<img class="ent-img" src="img/'+esc(e.img)+'.webp" alt="Ficha de '+esc(e.n||'')+'" loading="lazy">':'')+
-  '<div class="ent-b"><div class="fld2"><label class="fld"><span>'+(isC?'Nombre':'Nombre del lugar')+'</span><input data-ek="n" value="'+esc(e.n)+'" placeholder="'+(isC?'Ana':'Parque')+'"></label>'+
-  '<label class="chk"><input type="checkbox" data-ek="ref"'+(e.ref?' checked':'')+'> Tengo imagen de referencia</label></div>'+
-  '<label class="fld"><span>'+(isC?'Cómo se ve: edad, pelo, ropa y colores':'Cómo es el lugar')+'</span><textarea rows="2" data-ek="d" placeholder="'+(isC?'mujer de unos 30 años, pelo negro corto, chaqueta roja, pantalón negro':'parque pequeño con pinos altos, un camino de grava y un farol negro antiguo')+'">'+esc(e.d)+'</textarea></label>'+enh('d')+
-  ((isC?GS.cast:GS.locs).length>1?'<button type="button" class="linkbtn" data-delent>Quitar</button>':'')+'</div></div>'}
-function shotRow(s,i){return '<div class="shot" data-i="'+i+'"><div class="shot-h"><b>Plano '+(i+1)+'</b><label class="dur">Duración <input type="number" min="1" max="30" step="1" data-k="dur" value="'+esc(s.dur)+'"> s</label>'+(GS.shots.length>1?'<button type="button" class="linkbtn" data-del>Quitar</button>':'')+'</div>'+
-  '<div class="fld4"><label class="fld"><span>Plano</span><select data-k="shot">'+gvOpts('shot',s.shot)+'</select></label><label class="fld"><span>Ángulo</span><select data-k="angle">'+gvOpts('angle',s.angle)+'</select></label>'+
-  '<label class="fld"><span>Movimiento</span><select data-k="move">'+gvOpts('move',s.move)+'</select></label><label class="fld"><span>Lente</span><select data-k="lens">'+gvOpts('lens',s.lens)+'</select></label></div>'+
-  '<div class="fld4 who"><label class="fld"><span>Quién</span><select data-k="who">'+castOpts(s.who,'Nadie')+'</select></label><label class="fld"><span>Con</span><select data-k="with">'+castOpts(s.with,'Solo')+'</select></label><label class="fld"><span>Dónde</span><select data-k="where">'+locOpts(s.where)+'</select></label></div>'+
+const lab=(t,k,qt)=>'<span>'+esc(t)+' '+qaSel(k,qt||'Qué es')+'</span>';
+function elRow(e){const T=ETYPE[e.t];return '<div class="ent ent-'+e.t+'" data-el="'+e.id+'">'+(e.img&&REALIMG.has(e.img)?'<img class="ent-img" src="img/'+esc(e.img)+'.webp" alt="Ficha de '+esc(e.n||'')+'" loading="lazy">':'')+
+  '<div class="ent-b"><div class="ent-h"><span class="badge b-'+e.t+'">'+T.n+'</span><button type="button" class="linkbtn" data-delel>Quitar</button></div>'+
+  '<div class="fld2"><label class="fld"><span>Nombre</span><input data-ek="n" value="'+esc(e.n)+'" placeholder="'+esc(T.ph)+'"></label>'+
+  '<label class="chk"><input type="checkbox" data-ek="ref"'+(e.ref?' checked':'')+'> Tengo imagen de referencia '+qa('p-referencias','Cómo usar imágenes de referencia')+'</label></div>'+
+  '<label class="fld"><span>'+esc(T.dl)+'</span><textarea rows="2" data-ek="d" placeholder="'+esc(T.dp)+'">'+esc(e.d)+'</textarea></label>'+enh('d')+'</div></div>'}
+function chipsHTML(s){if(!GS.els.length)return '';return '<div class="inshot"><span class="lbl2">En este plano</span><div class="elchips">'+GS.els.map(e=>'<button type="button" class="chip c-'+e.t+'" data-chip="'+e.id+'" aria-pressed="'+(s.els||[]).includes(e.id)+'">'+esc(trimEnd(e.n)||ETYPE[e.t].n)+'</button>').join('')+'</div></div>'}
+function shotRow(s,i){const hasEls=(s.els||[]).some(id=>{const e=elById(GS,id);return e&&e.t!=='loc'});
+  return '<div class="shot" data-i="'+i+'"><div class="shot-h"><b>Plano '+(i+1)+'</b><label class="dur">Duración <input type="number" min="1" max="30" step="1" data-k="dur" value="'+esc(s.dur)+'"> s</label>'+(GS.shots.length>1?'<button type="button" class="linkbtn" data-del>Quitar</button>':'')+'</div>'+
+  '<div class="fld4"><label class="fld">'+lab('Plano','shot','Qué es este plano')+'<select data-k="shot">'+gvOpts('shot',s.shot)+'</select></label><label class="fld">'+lab('Ángulo','angle','Qué es este ángulo')+'<select data-k="angle">'+gvOpts('angle',s.angle)+'</select></label>'+
+  '<label class="fld">'+lab('Movimiento','move','Qué es este movimiento')+'<select data-k="move">'+gvOpts('move',s.move)+'</select></label><label class="fld">'+lab('Lente','lens','Qué hace este lente')+'<select data-k="lens">'+gvOpts('lens',s.lens)+'</select></label></div>'+
+  chipsHTML(s)+
+  '<label class="fld"><span>'+(hasEls?'Algo más en cuadro (opcional)':'Quién o qué aparece')+'</span><input data-k="subj" value="'+esc(s.subj||'')+'" placeholder="'+(hasEls?'un perro duerme a sus pies':'una mujer joven con chaqueta roja')+'"></label>'+enh('subj')+
   '<label class="fld"><span>Acción (en español o inglés)</span><input data-k="action" value="'+esc(s.action)+'" placeholder="mira hacia arriba cuando se enciende el farol"></label>'+enh('action')+
   '<div class="fld2"><label class="fld"><span>Diálogo · tono opcional entre paréntesis</span><input data-k="dialogue" value="'+esc(s.dialogue)+'" placeholder="(en voz baja) Siempre llegás tarde."></label><label class="fld"><span>Sonido</span><input data-k="sound" value="'+esc(s.sound)+'" placeholder="zumbido eléctrico, grillos"></label></div>'+enh('sound')+'</div>'}
-function drawCast(){$('#g-cast').innerHTML=GS.cast.map((e,i)=>entRow(e,i,'c')).join('');$('#g-locs').innerHTML=GS.locs.map((e,i)=>entRow(e,i,'l')).join('')}
+function drawEls(){const box=$('#g-els');box.innerHTML=GS.els.length?GS.els.map(elRow).join(''):'<p class="g-note empty">No hace falta: si no agregás nada, en cada plano escribís quién o qué aparece. Agregá personajes, lugares o productos cuando quieras que se vean iguales en varios planos.</p>'}
 function drawShots(){gShots.innerHTML=GS.shots.map(shotRow).join('')+suggHTML()}
 function fillForm(){$('#g-idea').value=GS.idea;$('#g-mood').value=GS.mood;
   $('#g-light').innerHTML=gvOpts('light',GS.light);$('#g-ar').innerHTML=ARS.map(a=>opt(a[0],a[1],GS.ar)).join('');
   $('#g-style').innerHTML=opt('','Sin estilo',GS.style)+STYLE_GROUPS.map(g=>{const L=STYLES.filter(s=>s.g===g[0]);return L.length?'<optgroup label="'+esc(g[1])+'">'+L.map(s=>opt(s.id,s.n,GS.style)).join('')+'</optgroup>':''}).join('');
-  $('#g-tool').innerHTML='<optgroup label="Video">'+GEN_VIDEO.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup><optgroup label="Imagen para el frame inicial">'+GEN_IMG.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup>';drawCast();drawShots()}
-/* textos libres que pasan al prompt (se traducen si están en español) */
-function freeTexts(){const L=[];GS.cast.concat(GS.locs).forEach(e=>L.push(e.d));L.push(GS.mood);GS.shots.forEach(s=>{L.push(s.action,s.sound);const t=(String(s.dialogue||'').match(/^\(([^)]*)\)/)||[])[1];if(t)L.push(t)});return L.map(x=>String(x||'').trim()).filter(x=>x&&isES(x))}
+  $('#g-tool').innerHTML='<optgroup label="Video">'+GEN_VIDEO.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup><optgroup label="Imagen para el frame inicial">'+GEN_IMG.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup>';drawEls();drawShots()}
 /* las acciones se traducen como "La persona …" para que salgan en tercera persona y no como orden */
-function trItems(){const L=[];GS.cast.concat(GS.locs).forEach(e=>L.push([e.d,0]));L.push([GS.mood,0]);GS.shots.forEach(s=>{L.push([s.action,1],[s.sound,0]);const t=(String(s.dialogue||'').match(/^\(([^)]*)\)/)||[])[1];if(t)L.push([t,0])});
+function trItems(){const L=[];GS.els.forEach(e=>L.push([e.d,0]));L.push([GS.mood,0]);GS.shots.forEach(s=>{L.push([s.subj,0],[s.action,1],[s.sound,0]);const t=(String(s.dialogue||'').match(/^\(([^)]*)\)/)||[])[1];if(t)L.push([t,0])});
   const seen=new Set();return L.map(([x,a])=>[String(x||'').trim(),a]).filter(([x])=>x&&isES(x)&&!TRC[trKey('es','en',x)]&&!seen.has(x)&&seen.add(x))}
 async function trFields(localOnly){const L=trItems();if(!L.length)return {missing:[],via:''};const qs=L.map(([x,a])=>a?'La persona '+x.charAt(0).toLowerCase()+x.slice(1):x);
   const r=await translate(qs,'es','en',localOnly),missing=[];L.forEach(([x,a],i)=>{let v=r.res[i];if(v){if(a)v=v.replace(/^(the|a|this)\s+person\s+/i,'');TRC[trKey('es','en',x)]=v}else missing.push(x)});saveTRC();return {missing,via:r.via}}
 function updHints(){const put=(el,v)=>{if(!el)return;const t=String(v||'').trim(),tr=isES(t)?TRC[trKey('es','en',t)]:'';el.textContent=tr?'En inglés: '+tr:'';el.hidden=!tr};
-  $('#g-cast').querySelectorAll('.ent').forEach(r=>put(r.querySelector('[data-enh="d"]'),(GS.cast[+r.dataset.c]||{}).d));$('#g-locs').querySelectorAll('.ent').forEach(r=>put(r.querySelector('[data-enh="d"]'),(GS.locs[+r.dataset.l]||{}).d));
-  gShots.querySelectorAll('.shot').forEach(r=>{const s=GS.shots[+r.dataset.i]||{};put(r.querySelector('[data-enh="action"]'),s.action);put(r.querySelector('[data-enh="sound"]'),s.sound)});
-  const m=$('#g-mood-en');if(m)put(m,GS.mood)}
-function metaPrompt(G){const sy=typeof SYNTAX!=='undefined'&&SYNTAX[G.tool],st=G.style&&SBY[G.style]?SBY[G.style].block:'',img=FMT[G.tool]&&FMT[G.tool].img,cs=G.cast.filter(entOk),ls=G.locs.filter(entOk);
+  $('#g-els').querySelectorAll('.ent').forEach(r=>put(r.querySelector('[data-enh="d"]'),(elById(GS,r.dataset.el)||{}).d));
+  gShots.querySelectorAll('.shot').forEach(r=>{const s=GS.shots[+r.dataset.i]||{};['subj','action','sound'].forEach(k=>put(r.querySelector('[data-enh="'+k+'"]'),s[k]))});
+  put($('#g-mood-en'),GS.mood)}
+function metaPrompt(G){const sy=typeof SYNTAX!=='undefined'&&SYNTAX[G.tool],st=G.style&&SBY[G.style]?SBY[G.style].block:'',img=FMT[G.tool]&&FMT[G.tool].img,E=G.els.filter(elOk),by=t=>E.filter(e=>e.t===t);
   return J('You are a film director and an expert prompt writer for '+toolLabel(G.tool)+'.','Turn the idea below into a shot list of '+(G.shots.length>1?G.shots.length+' shots':'3 to 5 shots')+' for a '+tot(G)+'-second video, aspect ratio '+G.ar+'.',
-    'Idea: '+(G.idea||'[tu idea]'),cs.length?'Characters, keep each description identical in every shot where they appear: '+cs.map(c=>entName(c)+': '+trimEnd(EN(c.d))).join('; ')+'.':'',ls.length?'Locations: '+ls.map(l=>entName(l,1)+': '+trimEnd(EN(l.d))).join('; ')+'.':'',
+    'Idea: '+(G.idea||'[tu idea]'),by('char').length?'Characters, keep each description identical in every shot where they appear: '+by('char').map(c=>elName(c)+': '+trimEnd(EN(c.d))).join('; ')+'.':'',
+    by('prod').length?'Products, keep each one identical and rigid, with its exact shape, colors and label: '+by('prod').map(c=>elName(c)+': '+trimEnd(EN(c.d))).join('; ')+'. Prefer locked shots, slow push-ins or small orbits for the product, and leave empty space for the logo instead of rendering text.':'',
+    by('loc').length?'Locations: '+by('loc').map(l=>elName(l)+': '+trimEnd(EN(l.d))).join('; ')+'.':'',
     st?'Visual style, paste it unchanged at the end of every prompt: '+sent(st):'',
-    'For each shot give: shot size, camera angle, camera movement, lens, who is in frame, action, dialogue if any, sound and duration. Cover the scene like a film: establish the place, move closer, and add a reaction or an insert when it helps the cut. Keep screen direction consistent (180-degree rule).',
+    'For each shot give: shot size, camera angle, camera movement, lens, who or what is in frame, action, dialogue if any, sound and duration. Cover the scene like a film: establish the place, move closer, and add a reaction or an insert when it helps the cut. Keep screen direction consistent (180-degree rule).',
     img?'Then write one image prompt per shot to generate its start frame.':'Then write the final video prompt for each shot.',
     sy?'Follow this tool syntax. Order: '+(sy.order||[]).join(', ')+'.'+(sy.dialogue?' Dialogue: '+sy.dialogue+'.':'')+(sy.multishot?' Several shots in one prompt: '+sy.multishot+'.':'')+(sy.refs?' References: '+sy.refs+'.':'')+(sy.negative?' Negatives: '+sy.negative+'.':''):'',
     'Write the prompts in English even if the idea is in Spanish, keep dialogue in its original language, and use positive phrasing: describe what should be on screen, not what should not.')}
-function metaPromptES(G){const st=G.style&&SBY[G.style]?SBY[G.style]:null,img=FMT[G.tool]&&FMT[G.tool].img,cs=G.cast.filter(entOk),ls=G.locs.filter(entOk);
+function metaPromptES(G){const st=G.style&&SBY[G.style]?SBY[G.style]:null,img=FMT[G.tool]&&FMT[G.tool].img,E=G.els.filter(elOk),by=t=>E.filter(e=>e.t===t);
   return ['Sos director de cine y experto en escribir prompts para '+toolLabel(G.tool)+'.','Convertí la idea de abajo en una lista de '+(G.shots.length>1?G.shots.length+' planos':'3 a 5 planos')+' para un video de '+tot(G)+' segundos, formato '+G.ar+'.',
-    'Idea: '+(G.idea||'[tu idea]'),cs.length?'Personajes (la descripción va idéntica en cada plano donde aparecen): '+cs.map(c=>entName(c)+': '+trimEnd(c.d)).join('; ')+'.':'',ls.length?'Lugares: '+ls.map(l=>entName(l,1)+': '+trimEnd(l.d)).join('; ')+'.':'',
+    'Idea: '+(G.idea||'[tu idea]'),by('char').length?'Personajes (la descripción va idéntica en cada plano donde aparecen): '+by('char').map(c=>elName(c)+': '+trimEnd(c.d)).join('; ')+'.':'',
+    by('prod').length?'Productos (idénticos y rígidos, con su forma, colores y etiqueta exactos): '+by('prod').map(c=>elName(c)+': '+trimEnd(c.d)).join('; ')+'. Para el producto preferí cámara fija, acercamiento lento u órbita corta, y dejá espacio para el logo en vez de generar texto.':'',
+    by('loc').length?'Lugares: '+by('loc').map(l=>elName(l)+': '+trimEnd(l.d)).join('; ')+'.':'',
     st?'Estilo visual ('+st.n+'): pegalo sin cambios al final de cada prompt.':'',
-    'Para cada plano indicá: tamaño, ángulo, movimiento de cámara, lente, quién está en cuadro, acción, diálogo si hay, sonido y duración. Cubrí la escena como en el cine: ubicá el lugar, acercate y sumá una reacción o un inserto cuando ayude al corte. Mantené la dirección en pantalla (regla de los 180°).',
+    'Para cada plano indicá: tamaño, ángulo, movimiento de cámara, lente, quién o qué está en cuadro, acción, diálogo si hay, sonido y duración. Cubrí la escena como en el cine: ubicá el lugar, acercate y sumá una reacción o un inserto cuando ayude al corte. Mantené la dirección en pantalla (regla de los 180°).',
     img?'Después escribí un prompt de imagen por plano para generar su frame inicial.':'Después escribí el prompt final de video de cada plano.','Seguí la sintaxis de la herramienta (orden, diálogo, varios planos, referencias).',
     'Escribí los prompts en inglés aunque la idea esté en español, dejá los diálogos en su idioma original y describí en positivo lo que se ve, no lo que no se ve.'].filter(Boolean).join(' ')}
-function bibleTxt(G,es){const L=[];G.cast.forEach(c=>{if(entOk(c))L.push((es?'Personaje · ':'Character · ')+entName(c)+': '+trimEnd(es?c.d:EN(c.d))+'.')});G.locs.forEach(l=>{if(entOk(l))L.push((es?'Lugar · ':'Location · ')+entName(l,1)+': '+trimEnd(es?l.d:EN(l.d))+'.')});
+function bibleTxt(G,es){const L=[];const lb={char:es?'Personaje':'Character',prod:es?'Producto':'Product',loc:es?'Lugar':'Location'};G.els.forEach(e=>{if(elOk(e))L.push(lb[e.t]+' · '+elName(e)+': '+trimEnd(es?e.d:EN(e.d))+'.')});
   if(G.style&&SBY[G.style])L.push((es?'Estilo · ':'Style · ')+SBY[G.style].n+': '+(es?(ES[SBY[G.style].block]||SBY[G.style].block):SBY[G.style].block));return L.join('\n')}
 function renderGen(){const tool=GS.tool,F=FMT[tool]||FMT.generic,R=refList(GS),L=GS.shots.map(s=>parts(GS,s,R)),img=!!F.img,one=tool==='generic'?F.oneD:F.one;let h='';
-  const pend=freeTexts().filter(x=>!TRC[trKey('es','en',x)]);
+  const pend=trItems();
   if(pend.length)h+='<div class="trbar"><p><b>Hay texto en español.</b> Las herramientas de video entienden mejor el inglés: traducilo antes de copiar.</p><button type="button" class="btn primary" id="g-tr">Traducir al inglés</button><span class="g-note" id="g-tr-st"></span></div>';
-  if(R.length)h+='<div class="refs-note"><span class="lbl">Imágenes de referencia</span><p>'+R.map((e,k)=>esc((k+1)+'. '+(trimEnd(e.n)||'Sin nombre'))).join(' · ')+'</p><p class="g-note">'+esc(REF_HOW[tool]||'')+' <a href="#p-referencias" data-r="p-referencias">Cómo combinar referencias →</a></p></div>';
-  if(!img&&F.all&&L.length>1)h+='<div class="gblock">'+codeBlock('Todo en un prompt · '+L.length+' planos · '+tot(GS)+' s',(tool==='generic'?J(uniqDecl(GS,L,R),F.all(GS,L,R)):F.all(GS,L,R)),lectNote+'\n\n'+GS.shots.map((s,i)=>lect(GS,s,i)).join('\n\n'))+'</div>';
-  h+=L.map((P,i)=>{const s=GS.shots[i];return '<div class="gshot"><span class="thumb" data-thumb="'+s.shot+'"></span><div class="gshot-b">'+codeBlock((img?'Frame inicial · plano ':'Plano ')+(i+1)+' · '+gvLabel('shot',s.shot)+(img?'':' · '+P.dur+' s'),one(GS,P,i),lect(GS,s,i))+
+  if(R.length)h+='<div class="refs-note"><span class="lbl">Imágenes de referencia</span><p>'+R.map((e,k)=>esc((k+1)+'. '+(trimEnd(e.n)||ETYPE[e.t].n))).join(' · ')+'</p><p class="g-note">'+esc(REF_HOW[tool]||'')+' '+qa('p-referencias','Cómo combinar referencias')+'</p></div>';
+  if(GS.els.some(e=>e.t==='prod'&&elOk(e)))h+='<p class="g-note warn">Las IA deforman logos y textos chicos: usá la foto real del producto como referencia y poné el logo y el texto final en la edición. '+qa('p-producto','Videos de producto')+'</p>';
+  if(!img&&F.all&&L.length>1)h+='<div class="gblock">'+codeBlock('Todo en un prompt · '+L.length+' planos · '+tot(GS)+' s',J(tool==='generic'?uniqDecl(GS,L,R):'',F.all(GS,L,R),lockAll(L)),lectNote+'\n\n'+GS.shots.map((s,i)=>lect(GS,s,i)).join('\n\n'))+'</div>';
+  h+=L.map((P,i)=>{const s=GS.shots[i];return '<div class="gshot"><span class="thumb" data-thumb="'+(PL[s.shot]?'commercial':s.shot)+'"></span><div class="gshot-b">'+codeBlock((img?'Frame inicial · plano ':'Plano ')+(i+1)+' · '+gvLabel('shot',s.shot)+(img?'':' · '+P.dur+' s'),J(one(GS,P,i),img&&tool==='midjourney'?'':P.lock),lect(GS,s,i))+
     '</div></div>'}).join('');
   if(!GS.shots.some(s=>s.action))h='<p class="g-note">Escribí la acción de al menos un plano o cargá una plantilla.</p>'+h;
   const bib=bibleTxt(GS,false);if(bib)h+='<details class="llm bible"><summary>Fichas del proyecto</summary><p class="g-note">Las mismas descripciones para pegar en cualquier herramienta, en un LLM o en tu guía de estilo.</p>'+bibox(bib,bibleTxt(GS,true))+'</details>';
   gRes.innerHTML=h;queueThumbs(gRes);$('#g-hint').textContent=syntaxNote(tool);$('#g-llmbox').innerHTML=bibox(metaPrompt(GS),metaPromptES(GS));updHints();saveGen()}
-let saveT=0;function saveGen(){clearTimeout(saveT);saveT=setTimeout(()=>{try{store.set('gen',JSON.stringify(GS))}catch(e){}},400)}
-function loadSaved(){try{const o=JSON.parse(store.get('gen')||'null');if(!o||!Array.isArray(o.shots)||!Array.isArray(o.cast)||!Array.isArray(o.locs)||!o.shots.length)return false;
-  Object.assign(GS,{idea:String(o.idea||''),cast:o.cast.slice(0,8).map(e=>newEnt({n:String(e.n||''),d:String(e.d||''),ref:!!e.ref,img:String(e.img||'')})),locs:o.locs.slice(0,8).map(e=>newEnt({n:String(e.n||''),d:String(e.d||''),ref:!!e.ref,img:String(e.img||'')})),
-    light:pick('light',o.light,''),mood:String(o.mood||''),style:SBY[o.style]?o.style:'',ar:ARS.some(a=>a[0]===o.ar)?o.ar:'16:9',
-    shots:o.shots.slice(0,20).map(s=>newShot({shot:pick('shot',s.shot,'medium'),angle:pick('angle',s.angle,'eye'),move:pick('move',s.move,'static'),lens:pick('lens',String(s.lens||''),''),action:String(s.action||''),dialogue:String(s.dialogue||''),sound:String(s.sound||''),dur:Math.max(1,Math.min(30,+s.dur||4)),who:+s.who|0,with:s.with==null?-1:+s.with|0,where:s.where==null?0:+s.where|0}))});
+let saveT=0;function saveGen(){clearTimeout(saveT);saveT=setTimeout(()=>{try{store.set('gen2',JSON.stringify(GS))}catch(e){}},400)}
+function loadSaved(){try{const o=JSON.parse(store.get('gen2')||'null');if(!o||!Array.isArray(o.shots)||!Array.isArray(o.els)||!o.shots.length)return false;
+  const els=o.els.slice(0,24).map(e=>newEl({t:ETYPE[e.t]?e.t:'char',n:String(e.n||''),d:String(e.d||''),ref:!!e.ref,img:String(e.img||'')})),map={};o.els.slice(0,24).forEach((e,i)=>map[e.id]=els[i].id);
+  Object.assign(GS,{idea:String(o.idea||''),els,light:pick('light',o.light,''),mood:String(o.mood||''),style:SBY[o.style]?o.style:'',ar:ARS.some(a=>a[0]===o.ar)?o.ar:'16:9',
+    shots:o.shots.slice(0,30).map(s=>newShot({shot:pick('shot',s.shot,'medium'),angle:pick('angle',s.angle,'eye'),move:pick('move',s.move,'static'),lens:pick('lens',String(s.lens||''),''),action:String(s.action||''),dialogue:String(s.dialogue||''),sound:String(s.sound||''),subj:String(s.subj||''),dur:Math.max(1,Math.min(30,+s.dur||4)),els:(s.els||[]).map(id=>map[id]).filter(Boolean)}))});
   if(o.tool&&GEN_ALL.includes(o.tool))GS.tool=o.tool;return true}catch(e){return false}}
 gForm.addEventListener('input',e=>{const el=e.target,row=el.closest('.shot'),ent=el.closest('.ent');
-  if(row){const s=GS.shots[+row.dataset.i],k=el.dataset.k;if(!s||!k)return;s[k]=k==='dur'?Math.max(1,Math.min(30,+el.value||4)):['who','with','where'].includes(k)?+el.value:el.value}
-  else if(ent){const isC=ent.dataset.c!=null,arr=isC?GS.cast:GS.locs,e2=arr[+(isC?ent.dataset.c:ent.dataset.l)],k=el.dataset.ek;if(!e2||!k)return;e2[k]=k==='ref'?el.checked:el.value;
-    if(k==='n')gShots.querySelectorAll('select[data-k="'+(isC?'who':'where')+'"],'+(isC?'select[data-k="with"]':'x')).forEach(sel=>{const v=sel.value;sel.innerHTML=isC?castOpts(v,sel.dataset.k==='who'?'Nadie':'Solo'):locOpts(v)})}
+  if(row){const s=GS.shots[+row.dataset.i],k=el.dataset.k;if(!s||!k)return;s[k]=k==='dur'?Math.max(1,Math.min(30,+el.value||4)):el.value}
+  else if(ent){const x=elById(GS,ent.dataset.el),k=el.dataset.ek;if(!x||!k)return;x[k]=k==='ref'?el.checked:el.value;
+    if(k==='n')gShots.querySelectorAll('[data-chip="'+x.id+'"]').forEach(c=>c.textContent=trimEnd(x.n)||ETYPE[x.t].n)}
   else{const m={'g-idea':'idea','g-mood':'mood','g-light':'light','g-style':'style','g-ar':'ar'}[el.id];if(m)GS[m]=el.value}
-  renderGen();if(row&&['shot','who','with'].includes(el.dataset.k)){const sg=gShots.querySelector('.sugg');if(sg)sg.outerHTML=suggHTML()||''}});
+  renderGen();if(row&&el.dataset.k==='shot'){const sg=gShots.querySelector('.sugg');if(sg)sg.outerHTML=suggHTML()||''}});
 gForm.addEventListener('submit',e=>e.preventDefault());
 /* al salir de un campo en español se traduce solo con el traductor del navegador o con Claude; MyMemory (servicio externo) solo con el botón */
-let autoBusy=false;gForm.addEventListener('change',async e=>{if(autoBusy||!e.target.matches('textarea[data-ek="d"],input[data-k="action"],input[data-k="sound"],#g-mood'))return;
+let autoBusy=false;gForm.addEventListener('change',async e=>{if(autoBusy||!e.target.matches('textarea[data-ek="d"],input[data-k="action"],input[data-k="sound"],input[data-k="subj"],#g-mood'))return;
   if(!trItems().length)return;autoBusy=true;try{const r=await trFields(true);if(r.via)renderGen()}catch(err){}finally{autoBusy=false}});
-gForm.addEventListener('click',e=>{const d=e.target.closest('[data-del]'),de=e.target.closest('[data-delent]'),sg=e.target.closest('[data-sg]');
+function redrawShot(i){const r=gShots.querySelector('.shot[data-i="'+i+'"]');if(r)r.outerHTML=shotRow(GS.shots[i],i);const sg=gShots.querySelector('.sugg');if(sg)sg.outerHTML=suggHTML()||'';else gShots.insertAdjacentHTML('beforeend',suggHTML())}
+gForm.addEventListener('click',e=>{const d=e.target.closest('[data-del]'),de=e.target.closest('[data-delel]'),sg=e.target.closest('[data-sg]'),ch=e.target.closest('[data-chip]'),ad=e.target.closest('[data-addel]');
   if(d){GS.shots.splice(+d.closest('.shot').dataset.i,1);drawShots();renderGen()}
-  else if(de){const r=de.closest('.ent'),isC=r.dataset.c!=null,i=+(isC?r.dataset.c:r.dataset.l),arr=isC?GS.cast:GS.locs;arr.splice(i,1);
-    GS.shots.forEach(s=>{const fix=k=>{if(s[k]===i)s[k]=k==='where'?0:-1;else if(s[k]>i)s[k]--};if(isC){fix('who');fix('with')}else fix('where')});drawCast();drawShots();renderGen()}
+  else if(de){const id=de.closest('.ent').dataset.el;GS.els=GS.els.filter(x=>x.id!==id);GS.shots.forEach(s=>s.els=(s.els||[]).filter(x=>x!==id));drawEls();drawShots();renderGen()}
+  else if(ad){if(GS.els.length>=24)return;const t=ad.dataset.addel,x=newEl({t});GS.els.push(x);
+    if(t==='loc')GS.shots.forEach(s=>{if(!(s.els||[]).some(id=>(elById(GS,id)||{}).t==='loc'))s.els.push(x.id)});else if(GS.els.filter(y=>y.t===t).length===1&&GS.shots.length===1)GS.shots[0].els.push(x.id);
+    drawEls();drawShots();renderGen();const r=$('#g-els').lastElementChild;if(r){const i=r.querySelector('input');if(i)i.focus()}}
+  else if(ch){const i=+ch.closest('.shot').dataset.i,s=GS.shots[i],id=ch.dataset.chip;s.els=s.els.includes(id)?s.els.filter(x=>x!==id):s.els.concat(id);
+    if((elById(GS,id)||{}).t==='loc'&&s.els.includes(id))s.els=s.els.filter(x=>x===id||(elById(GS,x)||{}).t!=='loc');
+    s.els.sort((a,b)=>GS.els.findIndex(x=>x.id===a)-GS.els.findIndex(x=>x.id===b));redrawShot(i);renderGen()}
   else if(sg){const x=suggestions(GS)[+sg.dataset.sg];if(!x)return;GS.shots.push(newShot(x.s));drawShots();renderGen();const rows=gShots.querySelectorAll('.shot');const last=rows[rows.length-1];if(last){last.scrollIntoView({block:'nearest'});const a=last.querySelector('[data-k="action"]');if(a)a.focus({preventScroll:true})}}});
-$('#g-add').addEventListener('click',()=>{const l=GS.shots[GS.shots.length-1];GS.shots.push(newShot({shot:l&&l.shot==='wide'?'closeup':'medium',angle:'eye',move:'static',who:l?l.who:0,with:l?l.with:-1,where:l?l.where:0}));drawShots();renderGen()});
-$('#g-addcast').addEventListener('click',()=>{if(GS.cast.length>=8)return;GS.cast.push(newEnt());drawCast();drawShots();renderGen();const r=$('#g-cast').lastElementChild;if(r)r.querySelector('input').focus()});
-$('#g-addloc').addEventListener('click',()=>{if(GS.locs.length>=8)return;GS.locs.push(newEnt());drawCast();drawShots();renderGen();const r=$('#g-locs').lastElementChild;if(r)r.querySelector('input').focus()});
+$('#g-add').addEventListener('click',()=>{const l=GS.shots[GS.shots.length-1];GS.shots.push(newShot({shot:l&&l.shot==='wide'?'closeup':'medium',angle:'eye',move:'static',els:l?l.els.slice():[],subj:l&&!l.els.length?l.subj:''}));drawShots();renderGen()});
 $('#g-tool').addEventListener('change',e=>{GS.tool=e.target.value;setPref(GS.tool);renderGen()});
 $('#gen-presets').innerHTML=PRESETS.map((p,i)=>'<button type="button" class="go" data-p="'+i+'">'+esc(p.n)+'</button>').join('')+'<button type="button" class="go" data-p="clear">Proyecto nuevo</button>';
 $('#gen-presets').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const k=b.dataset.p;
-  if(k==='clear')Object.assign(GS,{idea:'',cast:[newEnt()],locs:[newEnt()],light:'',mood:'',style:'',shots:[newShot()]});else loadPreset(PRESETS[+k]);
+  if(k==='clear')Object.assign(GS,{idea:'',els:[],light:'',mood:'',style:'',ar:'16:9',shots:[newShot()]});else loadPreset(PRESETS[+k]);
   fillForm();renderGen()});
 gRes.addEventListener('click',async e=>{const b=e.target.closest('#g-tr');if(!b)return;const st=$('#g-tr-st');b.disabled=true;st.textContent='Traduciendo…';
   try{const r=await trFields(false);if(r.missing.length){const u='https://translate.google.com/?sl=es&tl=en&op=translate&text='+encodeURIComponent(r.missing.join('\n'));
@@ -590,8 +648,8 @@ const AI_HIDE=['not_granted','sampling_disabled','not_declared','capability_disa
 function aiPrompt(){const ids=k=>GV[k].map(x=>x[0]).filter(Boolean).join(', ');const n=GS.shots.length>1?GS.shots.length:0;
   return ['You turn a short video idea into a shot list for an AI video generator. Reply with only one JSON object and no other text, shaped like:',
     '{"subject":"...","setting":"...","light":"bluehour","mood":"...","shots":[{"shot":"wide","angle":"eye","move":"static","lens":"","action":"...","dialogue":"","sound":"...","dur":4}]}',
-    'Rules:','- subject: one English description of the main character (age, clothing and colors) that will be repeated unchanged in every shot.'+(entOk(GS.cast[0])?' Use this one: '+EN(GS.cast[0].d):''),
-    '- setting: one English description of the location.'+(entOk(GS.locs[0])?' Use this one: '+EN(GS.locs[0].d):''),'- light: one of: '+ids('light')+'.','- mood: two or three English words.',
+    'Rules:','- subject: one English description of the main character (age, clothing and colors) that will be repeated unchanged in every shot.'+((c=>c?' Use this one: '+EN(c.d):'')(GS.els.find(e=>e.t==='char'&&elOk(e)))),
+    '- setting: one English description of the location.'+((c=>c?' Use this one: '+EN(c.d):'')(GS.els.find(e=>e.t==='loc'&&elOk(e)))),'- light: one of: '+ids('light')+'.','- mood: two or three English words.',
     '- shot: one of: '+ids('shot')+'. angle: one of: '+ids('angle')+'. move: one of: '+ids('move')+'. lens: "" or one of: '+ids('lens')+'.',
     '- action and sound: English, present tense, one clear filmable action per shot.','- dialogue: short, in the language the idea is written in, or "" when nobody speaks.',
     '- dur: seconds per shot, between 3 and 10.',n?'- Use exactly '+n+' shots.':'- Use 3 to 5 shots.',
@@ -599,8 +657,8 @@ function aiPrompt(){const ids=k=>GV[k].map(x=>x[0]).filter(Boolean).join(', ');c
     GS.style&&SBY[GS.style]?'- The visual style is: '+SBY[GS.style].n+'. Choose shots and moves that suit it.':'',
     'Idea: """'+String(GS.idea).slice(0,3000)+'"""'].filter(Boolean).join('\n')}
 function applyAI(o){if(!o||typeof o!=='object'||!Array.isArray(o.shots)||!o.shots.length)throw {code:'invalid_json'};
-  if(o.subject){if(!GS.cast.length)GS.cast.push(newEnt());GS.cast[0].d=String(o.subject)}if(o.setting){if(!GS.locs.length)GS.locs.push(newEnt());GS.locs[0].d=String(o.setting)}GS.light=pick('light',o.light,GS.light);if(o.mood)GS.mood=String(o.mood);
-  GS.shots=o.shots.slice(0,10).map(s=>newShot({shot:pick('shot',s.shot,'medium'),angle:pick('angle',s.angle,'eye'),move:pick('move',s.move,'static'),lens:pick('lens',String(s.lens||''),''),action:String(s.action||''),dialogue:String(s.dialogue||''),sound:String(s.sound||''),dur:Math.max(1,Math.min(15,Math.round(+s.dur||4))),who:0,where:0}));
+  const ids=[];if(o.subject){let c=GS.els.find(e=>e.t==='char');if(!c){c=newEl({t:'char'});GS.els.unshift(c)}c.d=String(o.subject);ids.push(c.id)}if(o.setting){let l=GS.els.find(e=>e.t==='loc');if(!l){l=newEl({t:'loc'});GS.els.push(l)}l.d=String(o.setting);ids.push(l.id)}GS.light=pick('light',o.light,GS.light);if(o.mood)GS.mood=String(o.mood);
+  GS.shots=o.shots.slice(0,10).map(s=>newShot({shot:pick('shot',s.shot,'medium'),angle:pick('angle',s.angle,'eye'),move:pick('move',s.move,'static'),lens:pick('lens',String(s.lens||''),''),action:String(s.action||''),dialogue:String(s.dialogue||''),sound:String(s.sound||''),dur:Math.max(1,Math.min(15,Math.round(+s.dur||4))),els:ids.slice()}));
   fillForm();renderGen()}
 async function runAI(){const st=$('#g-ai-status'),b=$('#g-ai'),stop=$('#g-ai-stop');if(!GS.idea.trim()){st.textContent='Escribí primero la idea.';$('#g-idea').focus();return}
   aiCtl=new AbortController();b.disabled=true;stop.hidden=false;st.textContent='Pensando…';

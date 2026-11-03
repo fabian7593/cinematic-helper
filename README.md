@@ -10,8 +10,9 @@ Qué incluye:
 - el flujo de producción paso a paso;
 - herramientas de video e imagen con IA;
 - una biblioteca de 44 estilos, con una imagen de ejemplo de cada uno;
+- videos de producto y publicidad: guía, plantillas y planos de producto;
 - un generador de prompts para cada herramienta, que:
-  - acepta personajes y lugares escritos una sola vez, para mantener la consistencia;
+  - acepta personajes, lugares y productos escritos una sola vez, para mantener la consistencia (opcional);
   - traduce del español al inglés;
   - sugiere el plano siguiente.
 
