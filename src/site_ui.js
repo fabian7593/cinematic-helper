@@ -508,6 +508,11 @@ function fillForm(){$('#g-idea').value=GS.idea;$('#g-mood').value=GS.mood;
   $('#g-tool').innerHTML='<optgroup label="Video">'+GEN_VIDEO.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup><optgroup label="Imagen para el frame inicial">'+GEN_IMG.map(k=>opt(k,toolLabel(k),GS.tool)).join('')+'</optgroup>';drawCast();drawShots()}
 /* textos libres que pasan al prompt (se traducen si están en español) */
 function freeTexts(){const L=[];GS.cast.concat(GS.locs).forEach(e=>L.push(e.d));L.push(GS.mood);GS.shots.forEach(s=>{L.push(s.action,s.sound);const t=(String(s.dialogue||'').match(/^\(([^)]*)\)/)||[])[1];if(t)L.push(t)});return L.map(x=>String(x||'').trim()).filter(x=>x&&isES(x))}
+/* las acciones se traducen como "La persona …" para que salgan en tercera persona y no como orden */
+function trItems(){const L=[];GS.cast.concat(GS.locs).forEach(e=>L.push([e.d,0]));L.push([GS.mood,0]);GS.shots.forEach(s=>{L.push([s.action,1],[s.sound,0]);const t=(String(s.dialogue||'').match(/^\(([^)]*)\)/)||[])[1];if(t)L.push([t,0])});
+  const seen=new Set();return L.map(([x,a])=>[String(x||'').trim(),a]).filter(([x])=>x&&isES(x)&&!TRC[trKey('es','en',x)]&&!seen.has(x)&&seen.add(x))}
+async function trFields(localOnly){const L=trItems();if(!L.length)return {missing:[],via:''};const qs=L.map(([x,a])=>a?'La persona '+x.charAt(0).toLowerCase()+x.slice(1):x);
+  const r=await translate(qs,'es','en',localOnly),missing=[];L.forEach(([x,a],i)=>{let v=r.res[i];if(v){if(a)v=v.replace(/^(the|a|this)\s+person\s+/i,'');TRC[trKey('es','en',x)]=v}else missing.push(x)});saveTRC();return {missing,via:r.via}}
 function updHints(){const put=(el,v)=>{if(!el)return;const t=String(v||'').trim(),tr=isES(t)?TRC[trKey('es','en',t)]:'';el.textContent=tr?'En inglés: '+tr:'';el.hidden=!tr};
   $('#g-cast').querySelectorAll('.ent').forEach(r=>put(r.querySelector('[data-enh="d"]'),(GS.cast[+r.dataset.c]||{}).d));$('#g-locs').querySelectorAll('.ent').forEach(r=>put(r.querySelector('[data-enh="d"]'),(GS.locs[+r.dataset.l]||{}).d));
   gShots.querySelectorAll('.shot').forEach(r=>{const s=GS.shots[+r.dataset.i]||{};put(r.querySelector('[data-enh="action"]'),s.action);put(r.querySelector('[data-enh="sound"]'),s.sound)});
@@ -554,7 +559,7 @@ gForm.addEventListener('input',e=>{const el=e.target,row=el.closest('.shot'),ent
 gForm.addEventListener('submit',e=>e.preventDefault());
 /* al salir de un campo en español se traduce solo con el traductor del navegador o con Claude; MyMemory (servicio externo) solo con el botón */
 let autoBusy=false;gForm.addEventListener('change',async e=>{if(autoBusy||!e.target.matches('textarea[data-ek="d"],input[data-k="action"],input[data-k="sound"],#g-mood'))return;
-  const L=freeTexts().filter(x=>!TRC[trKey('es','en',x)]);if(!L.length)return;autoBusy=true;try{const r=await translate(L,'es','en',true);if(r.res.some(Boolean))renderGen()}catch(err){}finally{autoBusy=false}});
+  if(!trItems().length)return;autoBusy=true;try{const r=await trFields(true);if(r.via)renderGen()}catch(err){}finally{autoBusy=false}});
 gForm.addEventListener('click',e=>{const d=e.target.closest('[data-del]'),de=e.target.closest('[data-delent]'),sg=e.target.closest('[data-sg]');
   if(d){GS.shots.splice(+d.closest('.shot').dataset.i,1);drawShots();renderGen()}
   else if(de){const r=de.closest('.ent'),isC=r.dataset.c!=null,i=+(isC?r.dataset.c:r.dataset.l),arr=isC?GS.cast:GS.locs;arr.splice(i,1);
@@ -568,8 +573,8 @@ $('#gen-presets').innerHTML=PRESETS.map((p,i)=>'<button type="button" class="go"
 $('#gen-presets').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const k=b.dataset.p;
   if(k==='clear')Object.assign(GS,{idea:'',cast:[newEnt()],locs:[newEnt()],light:'',mood:'',style:'',shots:[newShot()]});else loadPreset(PRESETS[+k]);
   fillForm();renderGen()});
-gRes.addEventListener('click',async e=>{const b=e.target.closest('#g-tr');if(!b)return;const st=$('#g-tr-st'),L=freeTexts();b.disabled=true;st.textContent='Traduciendo…';
-  try{const r=await translate(L,'es','en');if(r.missing.length){const u='https://translate.google.com/?sl=es&tl=en&op=translate&text='+encodeURIComponent(r.missing.join('\n'));
+gRes.addEventListener('click',async e=>{const b=e.target.closest('#g-tr');if(!b)return;const st=$('#g-tr-st');b.disabled=true;st.textContent='Traduciendo…';
+  try{const r=await trFields(false);if(r.missing.length){const u='https://translate.google.com/?sl=es&tl=en&op=translate&text='+encodeURIComponent(r.missing.join('\n'));
       st.innerHTML='No se pudo traducir todo desde acá. <a href="'+u+'" target="_blank" rel="noopener">Abrilo en el Traductor de Google</a> y pegá el resultado en los campos.';b.disabled=false;renderGen()}
     else{renderGen();const s2=$('#g-tr-st');if(s2)s2.textContent='Traducido con '+r.via+'.'}}catch(err){st.textContent='No se pudo traducir. Probá de nuevo.';b.disabled=false}});
 $('#g-copyall').addEventListener('click',e=>{const t=[...gRes.querySelectorAll('.gblock code.en, .gshot code.en')].map(c=>c.textContent).join('\n\n');const b=e.currentTarget;try{navigator.clipboard.writeText(t).then(()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar todo',1400)},()=>{})}catch(err){}});
