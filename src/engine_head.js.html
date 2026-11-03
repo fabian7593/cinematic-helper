@@ -209,8 +209,10 @@ function mkRig(gltf,clips,tint){const root=new THREE.Group();root.add(gltf.scene
 /* mezcla sobre una parte del cuerpo: evalúa el clip en ese instante y lo aplica con peso a los huesos que pasan el filtro */
 function overlay(r,name,tm,w,re){const cl=r.clips[name];if(!cl||w<=0)return;let L=r.ip[name];
   if(!L){L=r.ip[name]=cl.tracks.filter(tr=>/\.quaternion$/.test(tr.name)&&re.test(tr.name.split('.')[0])).map(tr=>({b:r.bones[tr.name.split('.')[0]],ip:tr.createInterpolant()})).filter(x=>x.b)}
-  const d=cl.duration,tt=((tm%d)+d)%d;L.forEach(x=>{const v=x.ip.evaluate(tt);_qa.set(v[0],v[1],v[2],v[3]);x.b.quaternion.slerp(_qa,w)})}
-function poseRig(r,s,t,isB){r.root.visible=s.vis;if(!s.vis)return;r.root.position.set(s.x,s.y||0,s.z);r.root.rotation.y=s.ry;
+  const d=cl.duration,tt=((tm%d)+d)%d;L.forEach(x=>{const v=x.ip.evaluate(tt);_qa.set(v[0],v[1],v[2],v[3]);touch(r,x.b);x.b.quaternion.slerp(_qa,w)})}
+function touch(r,b){if(!r.touched)r.touched=[];if(!r.touched.some(x=>x[0]===b))r.touched.push([b,b.quaternion.clone()])}
+function poseRig(r,s,t,isB){if(r.touched){r.touched.forEach(x=>x[0].quaternion.copy(x[1]));r.touched.length=0}else r.touched=[];
+  r.root.visible=s.vis;if(!s.vis)return;r.root.position.set(s.x,s.y||0,s.z);r.root.rotation.y=s.ry;
   const A=r.acts;for(const k in A)A[k].setEffectiveWeight(0);
   const set=(n,w,tm)=>{const a=A[n];if(!a||w<=0)return;const d=a.getClip().duration;a.setEffectiveWeight(w);a.time=((tm%d)+d)%d};
   if(s.act)set(s.act[0],1,s.act[1]);
@@ -219,7 +221,7 @@ function poseRig(r,s,t,isB){r.root.visible=s.vis;if(!s.vis)return;r.root.positio
     if(wD>0)set(s.danceClip||'dance',wD,t);if(wT>0)set('talk',wT,t);if(rest>0)set(s.idleClip||'idle',rest,t+(isB?2.3:0))}
   r.mixer.update(0);
   if(!s.act&&s.wave>0)overlay(r,'wave',t+1.2,clamp(s.wave,0,1)*(1-clamp(s.dance||0,0,1)),ARM_R);
-  const H=r.bones.Head,N=r.bones.Neck;if(H&&(s.headYaw||s.nod)){_q.setFromEuler(_e.set(s.nod||0,(s.headYaw||0)*.6,0));H.quaternion.multiply(_q);if(N){_q.setFromEuler(_e.set(0,(s.headYaw||0)*.4,0));N.quaternion.multiply(_q)}}
+  const H=r.bones.Head,N=r.bones.Neck;if(H&&(s.headYaw||s.nod)){const yw=clamp(s.headYaw||0,-.7,.7),nd=clamp(s.nod||0,-.4,.4);touch(r,H);_q.setFromEuler(_e.set(nd,yw*.55,0));H.quaternion.multiply(_q);if(N){touch(r,N);_q.setFromEuler(_e.set(0,yw*.35,0));N.quaternion.multiply(_q)}}
   if(r.coat)r.coat.color.set(s.shirt);if(r.hat){r.hat.visible=!!s.hat;if(s.hat)r.hatMat.color.set(s.hat)}}
 function b64buf(s){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u.buffer}
 (function loadRigs(){const src=window.__RIGS;if(!src||!THREE.GLTFLoader||!window.MeshoptDecoder)return;

@@ -30,7 +30,9 @@ head = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">\n'
         '<style>body{margin:0;font:14px system-ui}[hidden]{display:none!important}img{max-width:100%}</style>\n'
         '<style>' + rd('base.css') + rd('site.css') + '</style>\n</head>\n<body>\n')
-body = (rd('markup.html') + rigs + eng + rd('demos-v1.js') + rd('demos-v2.js') + rd('demos-v3.js') + rd('demos-v4.js')
+# traducciones al español de los prompts (pestaña Español)
+es = '<script>window.__ES=' + rd('es.json').replace('</', '<\\/') + ';</script>\n'
+body = (rd('markup.html') + rigs + es + eng + rd('demos-v1.js') + rd('demos-v2.js') + rd('demos-v3.js') + rd('demos-v4.js')
         + rd('data-prod.js') + rd('data-tools.js') + rd('data-styles.js') + tail + ui)
 open(ROOT + 'index.html', 'w', encoding='utf-8').write(head + body + '\n</body>\n</html>\n')
 print('index.html', len(head + body) // 1024, 'KB ·', len(keys), 'imágenes')

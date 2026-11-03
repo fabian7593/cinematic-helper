@@ -9,8 +9,13 @@ Qué incluye:
 - un glosario de cine con una animación 3D en cada término;
 - el flujo de producción paso a paso;
 - herramientas de video e imagen con IA;
-- una biblioteca de 44 estilos;
-- un generador de prompts para cada herramienta.
+- una biblioteca de 44 estilos, con una imagen de ejemplo de cada uno;
+- un generador de prompts para cada herramienta, que:
+  - acepta personajes y lugares escritos una sola vez, para mantener la consistencia;
+  - traduce del español al inglés;
+  - sugiere el plano siguiente.
+
+Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en español, para entender qué dice.
 
 ## Cómo está armado
 
@@ -25,6 +30,16 @@ Qué incluye:
   - los modelos `.glb`.
 
 Necesita conexión a internet para cargar three.js y las fuentes desde CDN.
+
+Las traducciones de los prompts están en `src/es.json`: cada texto en inglés apunta a su versión en español.
+
+El generador traduce lo que escribás en español usando, en este orden:
+
+1. el traductor integrado de Chrome, que funciona en el equipo;
+2. Claude, cuando la página se abre dentro de Claude;
+3. MyMemory, un servicio gratis de unos 5000 caracteres por día, que solo se usa al tocar "Traducir al inglés".
+
+El proyecto del generador se guarda en el navegador de cada persona.
 
 ## Editar
 

@@ -115,15 +115,18 @@
     </div>
     <div class="gen">
       <form class="gen-form" id="gen-form" autocomplete="off">
-        <fieldset><legend>Plantillas</legend><div class="go-row" id="gen-presets"></div></fieldset>
+        <fieldset><legend>Plantillas</legend><div class="go-row" id="gen-presets"></div><p class="g-note">Tu proyecto se guarda solo en este navegador.</p></fieldset>
         <fieldset><legend>Idea</legend>
           <label class="fld"><span>Idea o escena</span><textarea id="g-idea" rows="3" placeholder="Ej.: alguien espera bajo un farol; cuando la luz se enciende, llega la persona que esperaba."></textarea></label>
           <div class="ai-row" id="gen-ai" hidden><button type="button" class="btn primary" id="g-ai">Proponer planos con Claude</button><button type="button" class="btn" id="g-ai-stop" hidden>Detener</button><span class="g-note" id="g-ai-status" aria-live="polite"></span></div>
         </fieldset>
+        <fieldset><legend>Personajes y lugares</legend>
+          <p class="g-note">Describí cada personaje y cada lugar una sola vez, en español o en inglés. En cada plano elegís quién aparece y dónde, y el prompt repite la misma descripción: así no cambia de un plano a otro. <a href="#p-metodo-personaje" data-r="p-metodo-personaje">Método para personajes consistentes →</a></p>
+          <div id="g-cast"></div><button type="button" class="btn" id="g-addcast">Agregar personaje</button>
+          <div id="g-locs" class="g-locs"></div><button type="button" class="btn" id="g-addloc">Agregar lugar</button>
+        </fieldset>
         <fieldset><legend>Mundo</legend>
-          <label class="fld"><span>Personaje (en inglés, igual en todos los planos)</span><input id="g-subject" placeholder="a young woman in a red shirt and a red cap"></label>
-          <label class="fld"><span>Lugar (en inglés)</span><input id="g-setting" placeholder="a quiet park at dusk with pine trees and a single street lamp"></label>
-          <div class="fld2"><label class="fld"><span>Luz</span><select id="g-light"></select></label><label class="fld"><span>Ánimo (en inglés)</span><input id="g-mood" placeholder="quiet, hopeful"></label></div>
+          <div class="fld2"><label class="fld"><span>Luz</span><select id="g-light"></select></label><label class="fld"><span>Ánimo</span><input id="g-mood" placeholder="tranquilo, esperanzado"></label></div><small class="enh" id="g-mood-en" hidden></small>
           <div class="fld2"><label class="fld"><span>Estilo</span><select id="g-style"></select></label><label class="fld"><span>Formato</span><select id="g-ar"></select></label></div>
         </fieldset>
         <fieldset><legend>Planos</legend><div id="g-shots"></div><button type="button" class="btn" id="g-add">Agregar plano</button></fieldset>
@@ -131,7 +134,7 @@
       <div class="gen-out" id="gen-out" aria-live="polite">
         <div class="gen-tool"><label class="fld"><span>Prompt para</span><select id="g-tool"></select></label><button type="button" class="btn" id="g-copyall">Copiar todo</button></div>
         <p class="g-note" id="g-hint"></p>
-        <details class="llm"><summary>Prompt para pedirle la lista de planos a un LLM</summary><p class="g-note">Pegalo en Claude, ChatGPT o Gemini si querés que él escriba los planos y los prompts.</p><div class="prompt long"><code id="g-llm"></code><button type="button" data-copy>Copiar</button></div></details>
+        <details class="llm"><summary>Prompt para pedirle la lista de planos a un LLM</summary><p class="g-note">Pegalo en Claude, ChatGPT o Gemini si querés que él escriba los planos y los prompts.</p><div id="g-llmbox"></div></details>
         <div id="g-result"></div>
       </div>
     </div>
@@ -166,7 +169,7 @@
             <p><span class="lbl">Qué mirar</span><span id="i-look"></span></p>
             <p id="i-refw" hidden><span class="lbl">Para ver</span><span id="i-ref" class="ref"></span></p>
             <div><span class="lbl">En el prompt</span>
-              <div class="prompt"><code id="i-prompt"></code><button id="b-copy" type="button">Copiar</button></div>
+              <div class="prompt" id="i-pbox" data-pl="en"><div class="ptabs" role="group" aria-label="Idioma del prompt"><button type="button" data-pl="en">Inglés · para pegar</button><button type="button" data-pl="es">Español · para entender</button></div><code class="en" id="i-prompt"></code><code class="es" id="i-prompt-es"></code><button id="b-copy" type="button">Copiar</button></div>
             </div>
             <p class="nextup" id="nextup"></p>
           </section>
