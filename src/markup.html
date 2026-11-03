@@ -1,0 +1,215 @@
+<svg class="svgdefs" aria-hidden="true" focusable="false"><filter id="poster" color-interpolation-filters="sRGB"><feComponentTransfer>
+  <feFuncR type="discrete" tableValues="0 .22 .45 .68 .86 1"/><feFuncG type="discrete" tableValues="0 .22 .45 .68 .86 1"/><feFuncB type="discrete" tableValues="0 .22 .45 .68 .86 1"/></feComponentTransfer></filter></svg>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="#inicio" data-r="inicio"><b>Plano a Plano</b><small>Cine y producción con IA, explicado con animaciones</small></a>
+    <nav class="mainnav" aria-label="Secciones">
+      <a href="#empezar" data-r="empezar" data-nav="empezar">Empezá acá</a>
+      <a href="#glosario" data-r="glosario" data-nav="glosario">Glosario</a>
+      <a href="#produccion" data-r="produccion" data-nav="produccion">Producción</a>
+      <a href="#herramientas" data-r="herramientas" data-nav="herramientas">Herramientas</a>
+      <a href="#estilos" data-r="estilos" data-nav="estilos">Estilos</a>
+      <a href="#generador" data-r="generador" data-nav="generador">Generador</a>
+    </nav>
+    <div class="search" role="search">
+      <input type="search" id="q" placeholder="Buscar término, herramienta, estilo o tema" aria-label="Buscar término, herramienta, estilo o tema" autocomplete="off" aria-controls="qres">
+      <div class="qres" id="qres" hidden></div>
+    </div>
+  </div>
+  <div class="pathbar" id="pathbar" hidden><div class="wrap"><nav class="crumbs" aria-label="Dónde estás"></nav></div></div>
+</header>
+
+<div class="wrap">
+  <section class="view" id="v-home" aria-labelledby="h-home">
+    <div class="hero">
+      <div class="hero-txt">
+        <p class="kicker" id="home-kicker"></p>
+        <h1 id="h-home">Plano a Plano</h1>
+        <p class="sub">Aprendé a hacer video con IA como un director: el lenguaje del cine explicado con animaciones, el paso a paso de producción y prompts listos para cada herramienta.</p>
+        <div class="cta"><a class="btn primary" href="#empezar" data-r="empezar">Empezá acá</a><a class="btn" href="#generador" data-r="generador">Armar prompts</a></div>
+      </div>
+      <div class="hero-media">
+        <div id="hero-stage"></div>
+        <p class="now" id="now" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="sec-h"><h2>Tu primer video, paso a paso</h2><a href="#empezar" data-r="empezar" class="more">Ver la guía completa</a></div>
+    <ol class="quick" id="home-steps"></ol>
+    <div class="sec-h"><h2>Secciones</h2></div>
+    <div class="steps" id="home-secs"></div>
+    <div class="sec-h"><h2>Ir directo a una etapa</h2><a href="#produccion" data-r="produccion" class="more">Ver todas las etapas</a></div>
+    <ol class="quick" id="home-quick"></ol>
+  </section>
+
+  <section class="view" id="v-start" hidden aria-labelledby="h-start">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Empezá acá</span></nav>
+      <h1 id="h-start">Empezá acá</h1>
+      <p id="start-intro"></p>
+    </div>
+    <ol class="guide" id="start-steps"></ol>
+    <section class="gsec"><h2>Para no gastar créditos de más</h2><ul class="tips" id="start-tips"></ul></section>
+    <section class="gsec"><h2>Elegí tu camino</h2><p>Según lo que quieras hacer, estas son las etapas que conviene leer, en orden.</p><div class="paths" id="start-paths"></div></section>
+    <section class="gsec"><h2>Qué hay en cada sección</h2><div class="steps" id="start-secs"></div></section>
+  </section>
+
+  <section class="view" id="v-gloss" hidden aria-labelledby="h-gloss">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Glosario</span></nav>
+      <h1 id="h-gloss">Glosario</h1>
+      <p id="gloss-intro"></p>
+      <div class="cta"><a class="btn" href="#laboratorio" data-r="laboratorio">Practicar en el laboratorio de cámara</a></div>
+    </div>
+    <div class="grid-cards" id="gloss-grid"></div>
+  </section>
+
+  <section class="view" id="v-cat" hidden aria-labelledby="h-cat">
+    <div class="page-head" id="cat-head"></div>
+    <div class="tiles" id="cat-tiles"></div>
+    <div class="chapnav" id="cat-nav"></div>
+  </section>
+
+  <section class="view" id="v-prod" hidden aria-labelledby="h-prod">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Producción</span></nav>
+      <h1 id="h-prod">Producción</h1>
+      <p id="prod-intro"></p>
+    </div>
+    <p class="banner">¿Es tu primera vez? <a href="#empezar" data-r="empezar">Leé primero la guía Empezá acá</a>: te dice qué etapas mirar según lo que quieras hacer.</p>
+    <div class="grid-cards" id="prod-stages"></div>
+  </section>
+
+  <section class="view" id="v-tools" hidden aria-labelledby="h-tools">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Herramientas</span></nav>
+      <h1 id="h-tools">Herramientas</h1>
+      <p id="tools-intro"></p>
+    </div>
+    <p class="banner">¿No sabés cuál usar? Para aprender alcanza con una herramienta de video, una de imagen y un editor: por ejemplo <a href="#h-flow" data-r="h-flow">Google Flow</a> o <a href="#h-kling" data-r="h-kling">Kling</a>, <a href="#h-nanobanana" data-r="h-nanobanana">Nano Banana</a> y <a href="#h-capcut" data-r="h-capcut">CapCut</a>. Más abajo está qué conviene para cada trabajo.</p>
+    <div class="chips" id="tools-filter" role="group" aria-label="Filtrar por tipo"></div>
+    <div class="grid-cards" id="tools-grid"></div>
+    <section class="gsec"><h2>Qué usar para cada trabajo</h2><div class="tbl" id="byjob"></div></section>
+    <section class="gsec"><h2>Qué puede hacer cada una</h2><p>Cada función tiene su animación. Abrila para ver cómo se pide y qué herramientas la tienen.</p><div class="tiles" id="feat-tiles"></div></section>
+    <section class="gsec"><h2>Funciones por herramienta</h2><p id="matrix-note"></p><div class="tbl matrix" id="matrix"></div></section>
+    <details class="gsec more-d"><summary><h2>Ranking independiente</h2><span class="g-note">Para usuarios avanzados: cómo votan miles de personas a ciegas.</span></summary><p id="rank-note"></p><div class="rank" id="rank"></div></details>
+  </section>
+
+  <section class="view" id="v-styles" hidden aria-labelledby="h-styles">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Estilos</span></nav>
+      <h1 id="h-styles">Estilos</h1>
+      <p id="styles-intro"></p>
+    </div>
+    <div class="chips" id="styles-filter" role="group" aria-label="Filtrar por grupo"></div>
+    <div id="styles-groups" class="groups"></div>
+    <section class="gsec" id="stylelock"></section>
+  </section>
+
+  <section class="view" id="v-gen" hidden aria-labelledby="h-gen">
+    <div class="page-head">
+      <nav class="crumbs" aria-label="Ruta"><a href="#inicio" data-r="inicio">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Generador</span></nav>
+      <h1 id="h-gen">Generador de prompts</h1>
+      <p>Escribí la idea, elegí el estilo y los planos, y el prompt sale con la sintaxis de la herramienta que elijas. Cambiá de herramienta y se reescribe solo.</p>
+      <div class="cta jump"><button type="button" class="btn" id="g-jump">Bajar a los prompts</button></div>
+    </div>
+    <div class="gen">
+      <form class="gen-form" id="gen-form" autocomplete="off">
+        <fieldset><legend>Plantillas</legend><div class="go-row" id="gen-presets"></div></fieldset>
+        <fieldset><legend>Idea</legend>
+          <label class="fld"><span>Idea o escena</span><textarea id="g-idea" rows="3" placeholder="Ej.: alguien espera bajo un farol; cuando la luz se enciende, llega la persona que esperaba."></textarea></label>
+          <div class="ai-row" id="gen-ai" hidden><button type="button" class="btn primary" id="g-ai">Proponer planos con Claude</button><button type="button" class="btn" id="g-ai-stop" hidden>Detener</button><span class="g-note" id="g-ai-status" aria-live="polite"></span></div>
+        </fieldset>
+        <fieldset><legend>Mundo</legend>
+          <label class="fld"><span>Personaje (en inglés, igual en todos los planos)</span><input id="g-subject" placeholder="a young woman in a red shirt and a red cap"></label>
+          <label class="fld"><span>Lugar (en inglés)</span><input id="g-setting" placeholder="a quiet park at dusk with pine trees and a single street lamp"></label>
+          <div class="fld2"><label class="fld"><span>Luz</span><select id="g-light"></select></label><label class="fld"><span>Ánimo (en inglés)</span><input id="g-mood" placeholder="quiet, hopeful"></label></div>
+          <div class="fld2"><label class="fld"><span>Estilo</span><select id="g-style"></select></label><label class="fld"><span>Formato</span><select id="g-ar"></select></label></div>
+        </fieldset>
+        <fieldset><legend>Planos</legend><div id="g-shots"></div><button type="button" class="btn" id="g-add">Agregar plano</button></fieldset>
+      </form>
+      <div class="gen-out" id="gen-out" aria-live="polite">
+        <div class="gen-tool"><label class="fld"><span>Prompt para</span><select id="g-tool"></select></label><button type="button" class="btn" id="g-copyall">Copiar todo</button></div>
+        <p class="g-note" id="g-hint"></p>
+        <details class="llm"><summary>Prompt para pedirle la lista de planos a un LLM</summary><p class="g-note">Pegalo en Claude, ChatGPT o Gemini si querés que él escriba los planos y los prompts.</p><div class="prompt long"><code id="g-llm"></code><button type="button" data-copy>Copiar</button></div></details>
+        <div id="g-result"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-player" hidden>
+    <nav class="crumbs" id="crumbs" aria-label="Ruta"></nav>
+    <div class="layout">
+      <aside class="side" id="side">
+        <div class="chap-head" id="chap-head"></div>
+        <div class="panel" id="panel" hidden></div>
+      </aside>
+      <div class="col">
+        <header class="ghead" id="ghead"></header>
+        <nav class="tabs" id="tabs" aria-label="Temas de esta parte"></nav>
+        <div id="player-stage"></div>
+        <div class="controls">
+          <button id="b-prev" type="button">Anterior</button>
+          <button id="b-play" type="button" class="primary">Pausar</button>
+          <button id="b-restart" type="button">Reiniciar</button>
+          <button id="b-next" type="button">Siguiente</button>
+          <button id="b-reset" type="button" hidden>Restablecer controles</button>
+          <div class="vseg" id="vseg" role="group" aria-label="Cómo ver el ejemplo"><button type="button" data-v="simple" aria-pressed="false" title="Figuras simples: se entiende la idea y carga rápido">Simple</button><button type="button" data-v="3d" aria-pressed="true" title="Personajes 3D con movimiento real">3D</button><button type="button" data-v="img" aria-pressed="false" title="Imagen de ejemplo hecha con IA" hidden>Imagen</button></div>
+          <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+          <span class="count" id="count"></span>
+        </div>
+        <div class="below">
+          <section class="info" id="info-ex" aria-live="polite">
+            <div class="eyebrow" id="i-cat"></div>
+            <h2 id="i-es"></h2>
+            <p id="i-what"></p>
+            <p><span class="lbl">Qué mirar</span><span id="i-look"></span></p>
+            <p id="i-refw" hidden><span class="lbl">Para ver</span><span id="i-ref" class="ref"></span></p>
+            <div><span class="lbl">En el prompt</span>
+              <div class="prompt"><code id="i-prompt"></code><button id="b-copy" type="button">Copiar</button></div>
+            </div>
+            <p class="nextup" id="nextup"></p>
+          </section>
+          <section class="info" id="info-g" hidden aria-live="polite"></section>
+          <section class="info" id="info-man" hidden>
+            <div class="eyebrow">Laboratorio</div>
+            <h2 id="m-read"></h2>
+            <p id="m-sub"></p>
+            <div><span class="lbl">Prompt que describe este plano</span>
+              <div class="prompt long"><code id="m-prompt"></code><button id="b-copy2" type="button">Copiar</button></div>
+              <p class="g-note" id="m-formula" style="margin-top:6px"></p>
+            </div>
+            <p class="lbl" style="margin-top:4px">Cómo leerlo</p>
+            <p>El nombre del plano sale de cuánto del personaje entra en el cuadro, y el ángulo sale de la altura de la cámara contra la altura a la que apunta. Mové un control a la vez y fijate qué palabra cambia.</p>
+          </section>
+          <figure class="set" id="setfig">
+            <canvas id="c-set"></canvas>
+            <figcaption>Vista del set: dónde está la cámara, qué encuadra, por dónde se mueve y de dónde vienen las luces. El número abajo a la derecha del monitor es la distancia focal equivalente en 35 mm.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Plano a Plano. Todas las animaciones se dibujan en tu navegador con three.js; ninguna es un clip generado por IA.</p>
+    <p id="foot-src"></p>
+    <p>En el reproductor, las flechas del teclado pasan de tema y la barra espaciadora pausa.</p>
+  </div>
+</footer>
+
+<div id="rig" aria-hidden="true">
+  <div class="stage" id="stage">
+    <canvas id="c-bg"></canvas><canvas id="c-bokeh"></canvas><canvas id="c-mid"></canvas><canvas id="c-fg"></canvas>
+    <div class="gl" id="g-mul"></div><div class="gl" id="g-scr"></div>
+    <canvas id="c-hud"></canvas>
+    <div class="cap" id="cap"></div>
+    <div class="badge" id="badge" hidden></div>
+    <div class="read l" id="tc">00:00:00:00</div>
+    <div class="read r" id="lens"></div>
+    <div class="msg" id="msg" hidden></div>
+    <img class="realimg" id="realimg" alt="" hidden>
+  </div>
+</div>
