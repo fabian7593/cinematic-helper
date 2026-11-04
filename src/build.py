@@ -31,10 +31,10 @@ keys = sorted(f[:-5] for f in os.listdir(ROOT + 'img') if f.endswith('.webp'))
 if 'const REALIMG=new Set([]);' in ui:
     ui = ui.replace('const REALIMG=new Set([]);', 'const REALIMG=new Set(' + repr(keys).replace("'", '"') + ');')
 
-head = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+head = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-        '<title>Plano a Plano</title>\n'
-        '<meta name="description" content="Cine y producción de video con IA explicados con animaciones: glosario de cine, flujo de producción paso a paso, herramientas, biblioteca de estilos y generador de prompts.">\n'
+        '<title>Cinematic Helper</title>\n'
+        '<meta name="description" content="Film language and AI video production explained with animations: film glossary, step-by-step production, tools, style library and prompt generator. In English, Spanish and Portuguese.">\n'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">\n'
         '<style>body{margin:0;font:14px system-ui}[hidden]{display:none!important}img{max-width:100%}</style>\n'
         '<style>' + rd('base.css') + rd('site.css') + '</style>\n</head>\n<body>\n')

@@ -181,25 +181,25 @@ $('#start-tips').innerHTML=START_TIPS.map(x=>'<li>'+esc(x)+'</li>').join('');
 $('#start-paths').innerHTML=PATHS.map(p=>'<div class="path"><h3>'+esc(p.t)+'</h3><p>'+esc(p.s)+'</p><ol>'+p.steps.map(x=>'<li>'+linkA(x[0],x[1])+'</li>').join('')+'</ol></div>').join('');
 $('#start-secs').innerHTML=SECS.map(s=>card(s[0],s[1],'',s[2],s[3])).join('');
 
-function showHome(){mode='page';show('home');setReal(null);mountStage(heroSlot);stageLive=true;cur=HOMEREEL;nowIdx=-1;fitWitness(byId.dolly);queueThumbs(V.home);document.title=_t('Plano a Plano')}
-function showStart(n){pageMode('start');queueThumbs(V.start);document.title=_t('Empezá acá · Plano a Plano');
+function showHome(){mode='page';show('home');setReal(null);mountStage(heroSlot);stageLive=true;cur=HOMEREEL;nowIdx=-1;fitWitness(byId.dolly);queueThumbs(V.home);document.title=_t('Cinematic Helper')}
+function showStart(n){pageMode('start');queueThumbs(V.start);document.title=_t('Empezá acá · Cinematic Helper');
   if(n)requestAnimationFrame(()=>{const el=document.getElementById('empezar-'+n);if(el)el.scrollIntoView({block:'start'})})}
 let glossBuilt=false;
 function showGloss(){pageMode('gloss');
   if(!glossBuilt){glossBuilt=true;$('#gloss-grid').innerHTML=CATS.map((c,i)=>card('c-'+c[0],CAT_THUMB[c[0]],_t('Capítulo ')+pad2(i+1),c[1],CAT_DESC[c[0]],byCat(c[0]).length+_t(' términos'))).join('')}
-  queueThumbs(V.gloss);document.title=_t('Glosario · Plano a Plano')}
+  queueThumbs(V.gloss);document.title=_t('Glosario · Cinematic Helper')}
 function showCat(c){pageMode('cat');const i=CATI[c],list=byCat(c),pv=CATS[i-1],nx=CATS[i+1];
   $('#cat-head').innerHTML='<nav class="crumbs" aria-label="Ruta">'+crumbs([[_t('Inicio'),'inicio'],[_t('Glosario'),'glosario'],[pad2(i+1)+' '+CATN[c],'']])+_t('</nav><span class="num">Capítulo ')+pad2(i+1)+_t(' de ')+CATS.length+'</span><h1 id="h-cat">'+esc(CATN[c])+'</h1><p>'+esc(CAT_DESC[c])+' '+list.length+_t(' términos.</p><div class="cta"><a class="btn primary" href="#')+list[0].id+'" data-r="'+list[0].id+_t('">Empezar con «')+esc(list[0].es)+'»</a></div>';
   $('#cat-tiles').innerHTML=list.map(tile).join('');
   $('#cat-nav').innerHTML=(pv?'<a class="btn" href="#c-'+pv[0]+'" data-r="c-'+pv[0]+'">← '+pad2(i)+' '+esc(pv[1])+'</a>':'<span></span>')+(nx?'<a class="btn" href="#c-'+nx[0]+'" data-r="c-'+nx[0]+'">'+pad2(i+2)+' '+esc(nx[1])+' →</a>':_t('<a class="btn" href="#produccion" data-r="produccion">Seguir con producción →</a>'));
-  queueThumbs(V.cat);document.title=CATN[c]+_t(' · Glosario · Plano a Plano')}
+  queueThumbs(V.cat);document.title=CATN[c]+_t(' · Glosario · Cinematic Helper')}
 
 /* ---------- índices de las secciones ---------- */
 let prodBuilt=false;
 function showProdIndex(){pageMode('prod');
   if(!prodBuilt){prodBuilt=true;$('#prod-intro').textContent=PCH.length+_t(' etapas, en el orden en que se produce un video. Cada etapa tiene sus temas, con animación, plantillas en inglés y prompts para pedirle ayuda a un LLM.');
     $('#prod-stages').innerHTML=PCH.map(c=>{const L=PROD.filter(p=>p.ch===c.id);return card('pc-'+c.id,L[0].demo+(L[0].t0?'@'+L[0].t0:''),_t('Etapa ')+c.num,c.n,c.d,L.length+' temas')}).join('')}
-  queueThumbs(V.prod);document.title=_t('Producción · Plano a Plano')}
+  queueThumbs(V.prod);document.title=_t('Producción · Cinematic Helper')}
 let toolsBuilt=false,toolFilter='all';
 function toolCards(){const L=TOOLS.filter(t=>toolFilter==='all'||t.kind===toolFilter);$('#tools-grid').innerHTML=L.map(t=>card('h-'+t.id,t.demo,KINDN[t.kind]+(t.by?' · '+t.by:''),t.n,clip(t.lead,120),t.ver)).join('');queueThumbs($('#tools-grid'))}
 function showToolsIndex(){pageMode('tools');
@@ -213,7 +213,7 @@ function showToolsIndex(){pageMode('tools');
     if(RANK&&RANK.byJob&&RANK.byJob.length)$('#byjob').outerHTML=tblHTML(RANK.byJob[0],RANK.byJob.slice(1));
     $('#rank-note').textContent=(RANK.note||'')+(RANK.date?_t(' Datos ')+RANK.date+'.':'');
     $('#rank').innerHTML=(RANK.boards||[]).map(b=>{const sub=/más abajo/.test(b.h),tg=sub?'ul':'ol';return '<div class="board'+(sub?' sub':'')+'"><h3>'+esc(b.h)+'</h3><'+tg+'>'+b.rows.map(r=>'<li><span>'+esc(r[0])+'</span><span class="meta">'+esc(r[1])+'</span></li>').join('')+'</'+tg+'></div>'}).join('')+srcHTML(RANK.src)}
-  toolCards();queueThumbs(V.tools);document.title=_t('Herramientas · Plano a Plano')}
+  toolCards();queueThumbs(V.tools);document.title=_t('Herramientas · Cinematic Helper')}
 $('#tools-filter').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;toolFilter=b.dataset.f;$('#tools-filter').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));toolCards()});
 let stylesBuilt=false,styleFilter='all';
 function styleGroups(){$('#styles-groups').innerHTML=STYLE_GROUPS.filter(g=>styleFilter==='all'||g[0]===styleFilter).map(g=>{const L=STYLES.filter(s=>s.g===g[0]);return L.length?'<section class="gsec"><h2>'+esc(g[1])+'</h2><div class="tiles">'+L.map(s=>tileR('e-'+s.id,s.demo,s.n,clip(s.lead,80),'estilo-'+s.id)).join('')+'</div></section>':''}).join('');queueThumbs($('#styles-groups'))}
@@ -221,7 +221,7 @@ function showStylesIndex(){pageMode('styles');
   if(!stylesBuilt){stylesBuilt=true;$('#styles-intro').textContent=STYLES.length+_t(' estilos. Cada uno trae sus rasgos de luz, color, textura y cámara, y un bloque en inglés para pegar al final del prompt, adaptado a cada herramienta y con su traducción al español.');
     $('#styles-filter').innerHTML=[['all',_t('Todos')]].concat(STYLE_GROUPS).map(g=>'<button type="button" data-f="'+g[0]+'" aria-pressed="'+(g[0]===styleFilter)+'">'+esc(g[1])+'</button>').join('');
     const L=STYLE_LOCK;$('#stylelock').innerHTML=_t('<h2>Mantener un estilo en todo el proyecto</h2><p>')+esc(L.lead||'')+'</p><ol class="steps-ol">'+(L.steps||[]).map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>'+noteP(_t('Nombres o rasgos'),L.policy,'g-note')+noteP(_t('Mezclar dos estilos'),L.mix,'g-note')+srcHTML(L.src)}
-  styleGroups();queueThumbs(V.styles);document.title=_t('Estilos · Plano a Plano')}
+  styleGroups();queueThumbs(V.styles);document.title=_t('Estilos · Cinematic Helper')}
 $('#styles-filter').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;styleFilter=b.dataset.f;$('#styles-filter').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));styleGroups()});
 
 /* ---------- reproductor: una parte a la vez, con sus temas en pestañas ---------- */
@@ -258,7 +258,7 @@ function showTerm(id){const d=byId[id];openItem('ex',id);const i=CATI[d.cat],gi=
   $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Glosario'),'glosario'],[pad2(i+1)+' '+CATN[d.cat],'c-'+d.cat],[d.es,'']]);
   $('#i-cat').hidden=true;$('#i-es').textContent=d.es;$('#i-what').textContent=d.what;$('#i-look').textContent=d.look;$('#i-prompt').textContent=d.en;{const es=LANG==='en'?'':_t(ES[d.en]||''),pb=$('#i-pbox');$('#i-prompt-es').textContent=es||'';pb.classList.toggle('bi',!!es);pb.dataset.pl=es?PLANG:'en'}
   $('#i-ref').textContent=d.ref||'';$('#i-refw').hidden=!d.ref;$('#nextup').outerHTML=seqFoot('ex',id).replace('<p class="nextup">','<p class="nextup" id="nextup">');
-  setReal(d.id,_t('Ejemplo de ')+d.es);cur=d;lastEx=d;T=playing?0:d.dur*.45;fitWitness(d);document.title=d.es+_t(' · Plano a Plano');render()}
+  setReal(d.id,_t('Ejemplo de ')+d.es);cur=d;lastEx=d;T=playing?0:d.dur*.45;fitWitness(d);document.title=d.es+_t(' · Cinematic Helper');render()}
 function prodHTML(p){const o=['<h2>'+esc(p.t)+'</h2><p>'+esc(p.lead)+'</p>'];
   if(p.anat)o.push(anatHTML(p.anat));(p.tpl||[]).forEach(x=>o.push(codeBlock(x.h,x.code)));if(p.vary)o.push(varyHTML(p.vary));
   (p.llm||[]).forEach(x=>o.push('<div class="llmb">'+codeBlock(/claude|chatgpt|gemini|llm/i.test(x.h||'')?x.h:(x.h||'Prompt')+_t(' · para Claude, ChatGPT o Gemini'),x.code)+'</div>'));
@@ -266,7 +266,7 @@ function prodHTML(p){const o=['<h2>'+esc(p.t)+'</h2><p>'+esc(p.lead)+'</p>'];
   o.push(noteP(_t('Límite'),p.lim),noteP(_t('Error típico'),p.err),noteP('',p.note,'g-note'),goRow(p.go),srcHTML(p.src));return o.join('')}
 function showProd(id){const p=PBY[id],c=PCHB[p.ch],r='p-'+id;openItem('prod',r);
   $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Producción'),'produccion'],[c.num+' '+c.n,'pc-'+c.id],[p.t,'']]);
-  gInfo.innerHTML=prodHTML(p)+seqFoot('prod',r);playDemo(p.demo,p.t0);document.title=p.t+_t(' · Producción · Plano a Plano')}
+  gInfo.innerHTML=prodHTML(p)+seqFoot('prod',r);playDemo(p.demo,p.t0);document.title=p.t+_t(' · Producción · Cinematic Helper')}
 function toolHTML(t){const o=['<h2>'+esc(t.n)+'</h2>'+((t.by||t.ver)?'<p class="meta">'+esc([t.by,t.ver].filter(Boolean).join(' · '))+'</p>':'')+'<p>'+esc(t.lead)+'</p>'];
   const fk=Object.keys(t.feats||{}).filter(k=>FEATS[k]);
   if(fk.length)o.push('<div>'+lbl(_t('Qué puede hacer · tocá una para verla en el monitor'))+'<div class="go-row feat-row">'+fk.map(k=>'<button type="button" class="go" data-feat="'+k+'" aria-pressed="false">'+esc(FEATS[k].n)+'</button>').join('')+'</div><p class="g-note featline" hidden></p></div>');
@@ -279,13 +279,13 @@ function toolHTML(t){const o=['<h2>'+esc(t.n)+'</h2>'+((t.by||t.ver)?'<p class="
   o.push(srcHTML(t.src));return o.join('')}
 function showTool(id){const t=TBY[id],r='h-'+id;openItem('tool',r);
   $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Herramientas'),'herramientas'],[t.n,'']]);
-  gInfo.innerHTML=toolHTML(t)+seqFoot('tool',r);playDemo(t.demo);document.title=t.n+_t(' · Herramientas · Plano a Plano')}
+  gInfo.innerHTML=toolHTML(t)+seqFoot('tool',r);playDemo(t.demo);document.title=t.n+_t(' · Herramientas · Cinematic Helper')}
 function featHTML(k){const f=FEATS[k],has=TOOLS.filter(t=>t.feats&&k in t.feats);const o=['<h2>'+esc(f.n)+'</h2><p>'+esc(f.d)+'</p>',noteP(_t('Cómo se pide'),f.how)];
   if(f.tpl)o.push(codeBlock(_t('Plantilla'),f.tpl));
   if(has.length)o.push('<div>'+lbl(_t('Quién la tiene'))+'<ul class="has">'+has.map(t=>'<li><a href="#h-'+t.id+'" data-r="h-'+t.id+'">'+esc(t.n)+'</a>'+(t.feats[k]?' <span>'+esc(t.feats[k])+'</span>':'')+'</li>').join('')+'</ul></div>');return o.join('')}
 function showFeat(k){const r='f-'+k;openItem('feat',r);
   $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Herramientas'),'herramientas'],[_t('Funciones'),'herramientas'],[FEATS[k].n,'']]);
-  gInfo.innerHTML=featHTML(k)+seqFoot('feat',r);playDemo(FEATS[k].demo);document.title=FEATS[k].n+_t(' · Herramientas · Plano a Plano')}
+  gInfo.innerHTML=featHTML(k)+seqFoot('feat',r);playDemo(FEATS[k].demo);document.title=FEATS[k].n+_t(' · Herramientas · Cinematic Helper')}
 const PP_ES=[[' in [',' en ['],['[personaje] says:','[personaje] dice:'],['Ambient noise:','Ruido ambiente:'],[' shots, ',' planos, '],['Shot 1:','Plano 1:'],['Shot 2:','Plano 2:'],['Restyle this video: ','Reestilizá este video: '],['Keep the original motion, timing and framing.','Mantené el movimiento, los tiempos y el encuadre originales.'],['A [plano] of [sujeto]','Un [plano] de [sujeto]'],['Style: ','Estilo: '],['This image is the start frame for a video shot, 16:9.','Esta imagen es el frame inicial de un plano de video, 16:9.']];
 if(LANG!=='es')PP_ES.forEach(p=>{p[0]=_tPh(p[0]);p[1]=_tPh(_t(p[1]))});
 const ppES=t=>PP_ES.reduce((a,[x,y])=>a.split(x).join(y),String(t||''));
@@ -299,10 +299,10 @@ function styleHTML(s){const o=['<h2>'+esc(s.n)+'</h2><p>'+esc(s.lead)+'</p>'];
   o.push('<div class="go-row"><a class="go solid" href="#generador" data-gen="style:'+s.id+_t('">Usar este estilo en el generador</a>')+(byId[s.demo]&&CATN[byId[s.demo].cat]?'<a class="go" href="#'+s.demo+'" data-r="'+s.demo+_t('">Ver en el glosario</a>'):'')+'</div>',srcHTML(s.src));return o.join('')}
 function showStyle(id){const s=SBY[id],r='e-'+id;openItem('style',r);
   $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Estilos'),'estilos'],[s.n,'']]);
-  gInfo.innerHTML=styleHTML(s)+seqFoot('style',r);setReal('estilo-'+s.id,_t('Ejemplo de ')+s.n);playDemo(s.demo);document.title=s.n+_t(' · Estilos · Plano a Plano')}
+  gInfo.innerHTML=styleHTML(s)+seqFoot('style',r);setReal('estilo-'+s.id,_t('Ejemplo de ')+s.n);playDemo(s.demo);document.title=s.n+_t(' · Estilos · Cinematic Helper')}
 
 function showLab(){enterPlayer('man');headKey='';show('player');chapHead.innerHTML=_t('<span class="lbl">Laboratorio</span><p>Elegí un estilo y un formato de prompt, y después mové la cámara, el lente y la luz.</p>');
-  $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Glosario'),'glosario'],[_t('Laboratorio'),'']]);cur=MANUAL;T=0;syncPanel();fitWitness(MANUAL);const S=fresh(0);manualFn(0,S,fresh(0));describe();document.title=_t('Laboratorio · Plano a Plano');render()}
+  $('#crumbs').innerHTML=crumbs([[_t('Inicio'),'inicio'],[_t('Glosario'),'glosario'],[_t('Laboratorio'),'']]);cur=MANUAL;T=0;syncPanel();fitWitness(MANUAL);const S=fresh(0);manualFn(0,S,fresh(0));describe();document.title=_t('Laboratorio · Cinematic Helper');render()}
 
 /* ---------- generador ---------- */
 const GV={
@@ -646,7 +646,7 @@ gRes.addEventListener('click',async e=>{const b=e.target.closest('#g-tr');if(!b)
 $('#g-copyall').addEventListener('click',e=>{const t=[...gRes.querySelectorAll('.gblock code.en, .gshot code.en')].map(c=>c.textContent).join('\n\n');const b=e.currentTarget;try{navigator.clipboard.writeText(t).then(()=>{b.textContent=_t('Copiado');setTimeout(()=>b.textContent=_t('Copiar todo'),1400)},()=>{})}catch(err){}});
 $('#g-jump').addEventListener('click',()=>$('#gen-out').scrollIntoView({block:'start'}));
 let genBuilt=false;if(!loadSaved())loadPreset(PRESETS[0]);
-function showGen(){pageMode('gen');if(!genBuilt){genBuilt=true;fillForm()}else{$('#g-tool').value=GS.tool;$('#g-style').value=GS.style}renderGen();document.title=_t('Generador · Plano a Plano')}
+function showGen(){pageMode('gen');if(!genBuilt){genBuilt=true;fillForm()}else{$('#g-tool').value=GS.tool;$('#g-style').value=GS.style}renderGen();document.title=_t('Generador · Cinematic Helper')}
 
 /* proponer planos con Claude, solo dentro de un visor de Claude */
 let sampleFn=null,aiCtl=null;
@@ -702,7 +702,7 @@ function back(){if(pushOK&&history.state&&history.state.d>0){history.back();retu
 const BK=_t('<button type="button" class="bk" aria-label="Volver a la página anterior">← Volver</button>');
 const pathbar=$('#pathbar'),pathnav=pathbar.querySelector('nav');let pbAct=null,pbTick=false;
 function activeCrumbs(){return [...document.querySelectorAll('nav.crumbs')].find(n=>!n.closest('#pathbar')&&n.offsetParent)}
-function setTopH(){document.documentElement.style.setProperty('--toph',(document.querySelector('.topbar').offsetHeight+(pathbar.hidden?0:pathbar.offsetHeight))+'px')}
+function setTopH(){const ub=document.querySelector('.util');document.documentElement.style.setProperty('--utilh',(ub?ub.offsetHeight:0)+'px');document.documentElement.style.setProperty('--toph',(document.querySelector('.topbar').offsetHeight+(pathbar.hidden?0:pathbar.offsetHeight))+'px')}
 function pbCheck(){pbTick=false;const top=document.querySelector('.topbar').offsetHeight;const hide=!pbAct||!pbAct.isConnected||pbAct.getBoundingClientRect().bottom>top;if(pathbar.hidden!==hide){pathbar.hidden=hide;setTopH()}}
 function updBack(){requestAnimationFrame(()=>{document.querySelectorAll('nav.crumbs').forEach(n=>{if(!n.closest('#pathbar')&&!n.querySelector('.bk'))n.insertAdjacentHTML('afterbegin',BK)});
   pbAct=activeCrumbs();pathnav.innerHTML=pbAct?pbAct.innerHTML:'';pbCheck();setTopH()})}

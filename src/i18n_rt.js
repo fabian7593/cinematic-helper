@@ -1,9 +1,9 @@
 /* idiomas: español (original), inglés y portugués. Las traducciones viajan dentro de la página y se aplican al cargar */
 (function(){
-  var LANGS=['es','en','pt'],L='es';
+  var LANGS=['es','en','pt'],L='en'; /* inglés por defecto; la elección queda guardada */
   try{var q=new URLSearchParams(location.search).get('lang');if(q&&LANGS.indexOf(q)>=0){L=q;try{localStorage.setItem('pap.lang',q)}catch(e){}try{window.name='pap.lang='+q}catch(e){}}
     else{var s=null;try{s=localStorage.getItem('pap.lang')}catch(e){}if(!s){var wn=String(window.name||'').match(/pap\.lang=(es|en|pt)/);if(wn)s=wn[1]}
-      if(s&&LANGS.indexOf(s)>=0)L=s;else{var n=String(navigator.language||'es').toLowerCase();L=n.indexOf('pt')===0?'pt':n.indexOf('es')===0?'es':'en'}}}catch(e){}
+      L=s&&LANGS.indexOf(s)>=0?s:'en'}}catch(e){L='en'}
   window.__LANG=L;document.documentElement.lang=L==='pt'?'pt-BR':L;
   function load(D){var M=new Map();if(L==='es'||!D)return M;var T=D[L]||[];for(var i=0;i<D.src.length;i++){if(T[i])M.set(D.src[i],T[i])}return M}
   var M=load(window.__I18N),PM=load(window.__I18N_PH);

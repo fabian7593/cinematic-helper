@@ -1,12 +1,16 @@
-# Plano a Plano
+# Cinematic Helper
 
 Cine y producción de video con IA, explicado con animaciones. En español, inglés y portugués.
 
 *Film language and AI video production, explained with animations. Available in Spanish, English and Portuguese.*
 
-**Sitio:** https://fabian7593.github.io/plano-a-plano/
+**Sitio:** https://fabian7593.github.io/cinematic-helper/
 
-Proyecto open source con [licencia MIT](LICENSE), creado por **Fabian Rosales** · [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/)
+Antes se llamaba *Plano a Plano*.
+
+Proyecto open source con [licencia MIT](LICENSE), creado por **Arcane Coder** (Fabian Rosales) · [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/)
+
+Creado e investigado con [Claude](https://claude.ai), la IA de Anthropic.
 
 Qué incluye:
 
@@ -24,7 +28,7 @@ Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en 
 
 ## Idiomas
 
-El selector de arriba a la derecha cambia entre español, inglés y portugués. También se puede abrir el sitio directo en un idioma con `?lang=es`, `?lang=en` o `?lang=pt`. Si no se elige, se usa el idioma del navegador.
+El sitio abre en inglés. El selector de arriba a la derecha cambia entre inglés, español y portugués, y la elección queda guardada. También se puede abrir directo en un idioma con `?lang=en`, `?lang=es` o `?lang=pt`.
 
 Las traducciones están en `src/i18n/`:
 
@@ -88,7 +92,8 @@ Quedan fuera de la licencia MIT:
 
 ## Créditos
 
-- Creado por Fabian Rosales: [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/).
+- Creado por Arcane Coder (Fabian Rosales): [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/).
+- Creado e investigado con [Claude](https://claude.ai), la IA de Anthropic.
 - Animaciones con [three.js](https://threejs.org/).
 - Personajes y animaciones 3D de [Mixamo](https://www.mixamo.com/) (Adobe).
 - Imágenes de ejemplo generadas con ChatGPT.
