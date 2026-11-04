@@ -392,8 +392,8 @@ body{background:var(--bg)}
 .hdr .brand b{font-size:24px}
 .hdr .brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
 .search{margin-left:auto;position:relative;flex:0 1 360px;min-width:180px;max-width:360px}
-.search .s-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-.search input{width:100%;font:inherit;font-size:14.5px;padding:9px 12px 9px 36px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.search .s-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search input{width:100%;font:inherit;font-size:14.5px;padding:9px 14px 9px 42px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
 .search input:focus{border-color:var(--accent);outline:2px solid var(--accent-soft);outline-offset:0}
 .search-btn{display:none}
 .util .icon-btn{min-width:32px;height:30px;padding:0 6px;border-radius:6px}
@@ -405,7 +405,7 @@ body{background:var(--bg)}
   .menu-btn{padding:0;width:40px}
   .hdr .brand b{font-size:21px}
   .search{display:none;position:absolute;left:0;right:0;top:100%;max-width:none;margin:0;padding:8px max(16px,env(safe-area-inset-left,0px)) 10px;background:var(--panel);border-bottom:1px solid var(--line);z-index:3;box-shadow:var(--shadow)}
-  .search .s-ic{left:calc(max(16px,env(safe-area-inset-left,0px)) + 11px);top:calc(50% - 1px)}
+  .search .s-ic{left:calc(max(16px,env(safe-area-inset-left,0px)) + 14px);top:calc(50% - 1px)}
   .hdr.s-open .search{display:block}
   .search-btn{display:inline-flex;margin-left:auto}
   .hdr.s-open .search-btn{background:var(--accent-soft);color:var(--accent)}
@@ -449,8 +449,8 @@ html.dr-open{overflow:hidden}
 .crumbs .bk{font:inherit;font-size:14.5px;font-weight:600;line-height:1.2;color:var(--accent);background:var(--panel);border:1px solid var(--accent-line);border-radius:999px;padding:7px 15px 7px 12px;margin-right:6px;cursor:pointer}
 .crumbs .bk:hover{background:var(--accent-soft);border-color:var(--accent)}
 .pathbar{background:var(--panel)}
-.pathbar .crumbs{padding:8px 0;font-size:15px}
-.pathbar .crumbs .bk{padding:5px 13px 5px 11px;font-size:14px}
+.pathbar .crumbs{padding:9px 0}
+.pathbar.narrow .crumbs{max-width:1000px;margin:0 auto}
 /* etiquetas sin mayúsculas forzadas */
 .lbl,.gen .lbl,.info .lbl,.gen-form legend,nav.terms h2,.panel legend{font-family:var(--f-body);font-weight:600;font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--muted)}
 .info .eyebrow,.num,.kicker,.eyebrow2{font-family:var(--f-body);font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;color:var(--accent)}
@@ -585,4 +585,18 @@ details.acc.vh{margin-top:0}
   #tools-grid .card .thumb{width:38%;max-width:150px;min-height:88px}
   #tools-grid .card h3{font-size:19px}
   #tools-grid .card .meta{font-size:12px}
+}
+
+/* ===== v7.1: menú fijo a la izquierda en pantallas grandes, sin saltos al abrir ===== */
+html{scrollbar-gutter:stable}
+:root{--side-w:260px}
+@media (min-width:1200px){
+  .menu-btn{border-color:transparent}
+  .menu-btn:hover{border-color:transparent}
+  html.docked .drawer{top:var(--hdrh,100px);bottom:0;width:var(--side-w);transform:none;visibility:visible;transition:none;box-shadow:none;z-index:30;padding-top:0}
+  html.docked .dr-head{display:none}
+  html.docked .scrim{display:none}
+  html.docked #page{padding-left:var(--side-w)}
+  html.docked .pathbar{padding-left:var(--side-w)}
+  html.docked .menu-btn{background:var(--accent-soft);color:var(--accent)}
 }
