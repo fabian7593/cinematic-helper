@@ -7,10 +7,10 @@
 const $=s=>document.querySelector(s);
 const stage=$('#stage'), msg=$('#msg');
 function fail(t){ msg.hidden=false; msg.textContent=t; }
-if(!window.THREE){ fail('No se pudo cargar la librería 3D. Revisá la conexión y recargá la página.'); return; }
+if(!window.THREE){ fail(_t('No se pudo cargar la librería 3D. Revisá la conexión y recargá la página.')); return; }
 const V3=THREE.Vector3;
 let R;
-try{ R=new THREE.WebGLRenderer({antialias:true,alpha:true}); }catch(e){ fail('Este navegador no pudo iniciar WebGL, que hace falta para las animaciones.'); return; }
+try{ R=new THREE.WebGLRenderer({antialias:true,alpha:true}); }catch(e){ fail(_t('Este navegador no pudo iniciar WebGL, que hace falta para las animaciones.')); return; }
 R.setPixelRatio(1); R.shadowMap.enabled=true; R.shadowMap.type=THREE.PCFSoftShadowMap; R.shadowMap.autoUpdate=false;
 
 /* ---------- utilidades ---------- */
@@ -260,7 +260,7 @@ const frFill=new THREE.Mesh(new THREE.PlaneGeometry(1,1),basic('#ffd24a',{transp
 const pathGeo=new THREE.BufferGeometry(); pathGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(64*3),3));
 const pathLine=new THREE.Line(pathGeo,new THREE.LineBasicMaterial({color:0xff5a4f})); pathLine.frustumCulled=false; gGiz.add(pathLine);
 const axisLine=new THREE.Mesh(new THREE.BoxGeometry(7,.02,.05),basic('#ff5a4f')); axisLine.position.set(0,.03,0); gGiz.add(axisLine);
-const lgz={}; ['Key','Fill','Rim'].forEach(n=>{const g=new THREE.Group();M(new THREE.SphereGeometry(.16,12,8),basic('#ffd24a'),0,0,0,g,true);
+const lgz={}; [_t('Key'),_t('Fill'),_t('Rim')].forEach(n=>{const g=new THREE.Group();M(new THREE.SphereGeometry(.16,12,8),basic('#ffd24a'),0,0,0,g,true);
   const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));const ln=new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xffd24a}));ln.frustumCulled=false;gGiz.add(ln);gGiz.add(g);lgz[n]={g,ln,pos:new V3()}});
 L1(gGiz);
 
@@ -283,7 +283,7 @@ const SH={wide:{p:[0,1.5,5.2],t:[0,1.15,0],fov:36},a:{p:[.65,1.55,1.7],t:[-.8,1.
 const fov2mm=f=>12/Math.tan(f*PI/360), mm2fov=mm=>2*Math.atan(12/mm)*180/PI;
 
 /* ---------- catálogo ---------- */
-const CATS=[['encuadre','Encuadre'],['angulo','Ángulo'],['composicion','Composición'],['mov','Movimiento de cámara'],['lente','Lente y exposición'],['tiempo','Tiempo'],['luz','Luz'],['color','Color'],['estilo','Estilos y referencias'],['edicion','Edición'],['direccion','Dirección y estructura'],['ia','Métodos de IA']];
+const CATS=[['encuadre',_t('Encuadre')],['angulo',_t('Ángulo')],['composicion',_t('Composición')],['mov',_t('Movimiento de cámara')],['lente',_t('Lente y exposición')],['tiempo',_t('Tiempo')],['luz',_t('Luz')],['color',_t('Color')],['estilo',_t('Estilos y referencias')],['edicion',_t('Edición')],['direccion',_t('Dirección y estructura')],['ia',_t('Métodos de IA')]];
 const D=[]; const add=o=>D.push(o);
 const ANG={p:[0,1.5,3.6],t:[0,1.15,0],fov:38};
 const angK=t=>t<1.6?ss(t/1.6):t<5.4?1:1-ss((t-5.4)/1.6);

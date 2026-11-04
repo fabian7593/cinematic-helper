@@ -14,8 +14,16 @@ old = "function loop(now){const dt=Math.min(.1,(now-last)/1000||0);last=now;if(p
 assert tail.count(old) == 1
 tail = tail.replace(old, '')
 
-b64 = lambda f: base64.b64encode(open(D + 'models/' + f, 'rb').read()).decode()
-rigs = '<script>window.__RIGS={a:"' + b64('mujer.glb') + '",b:"' + b64('ninja.glb') + '"};</script>\n'
+# Personajes 3D de Mixamo: los .glb no se publican en el repositorio (las condiciones de Adobe
+# no permiten distribuir los archivos sueltos). Si tenés los .glb en src/models/ se usan;
+# si no, se reutilizan los que ya vienen dentro del index.html actual.
+if os.path.exists(D + 'models/mujer.glb') and os.path.exists(D + 'models/ninja.glb'):
+    b64 = lambda f: base64.b64encode(open(D + 'models/' + f, 'rb').read()).decode()
+    rigs = '<script>window.__RIGS={a:"' + b64('mujer.glb') + '",b:"' + b64('ninja.glb') + '"};</script>\n'
+else:
+    old_html = open(ROOT + 'index.html', encoding='utf-8').read()
+    i = old_html.index('<script>window.__RIGS=')
+    rigs = old_html[i:old_html.index('</script>', i) + len('</script>')] + '\n'
 
 # las imágenes que existen en img/ activan el botón "Imagen" de cada ejemplo
 ui = rd('site_ui.js')
@@ -32,7 +40,12 @@ head = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
         '<style>' + rd('base.css') + rd('site.css') + '</style>\n</head>\n<body>\n')
 # traducciones al español de los prompts (pestaña Español)
 es = '<script>window.__ES=' + rd('es.json').replace('</', '<\\/') + ';</script>\n'
-body = (rd('markup.html') + rigs + es + eng + rd('demos-v1.js') + rd('demos-v2.js') + rd('demos-v3.js') + rd('demos-v4.js')
-        + rd('data-prod.js') + rd('data-tools.js') + rd('data-styles.js') + tail + ui)
+# idiomas: español (original), inglés y portugués; el selector está arriba a la derecha
+q = lambda f: rd('i18n/' + f).replace('</', '<\\/')
+i18n = ('<script>window.__I18N=' + q('dict.json') + ';window.__I18N_OVR=' + q('ovr.json') + ';window.__I18N_PH=' + q('ph.json') + ';</script>\n'
+        '<script>' + rd('i18n_rt.js') + '</script>\n')
+walk = "\nif(window.__LANG!=='es'){[D,PROD_CH,PROD,TOOLS,FEATS,SYNTAX,RANK,STYLE_GROUPS,STYLES,STYLE_LOCK,STYLE_TOOLFMT].forEach(o=>{try{_tWalk(o)}catch(e){}})}\n"
+body = (rd('markup.html') + i18n + rigs + es + eng + rd('demos-v1.js') + rd('demos-v2.js') + rd('demos-v3.js') + rd('demos-v4.js')
+        + rd('data-prod.js') + rd('data-tools.js') + rd('data-styles.js') + walk + tail + ui)
 open(ROOT + 'index.html', 'w', encoding='utf-8').write(head + body + '\n</body>\n</html>\n')
 print('index.html', len(head + body) // 1024, 'KB ·', len(keys), 'imágenes')

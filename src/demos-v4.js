@@ -12,7 +12,7 @@ function cardsHud(head,items,k,pick,cover){return (c,w,h)=>{if(cover>0){c.fillSt
     c.fillStyle=on?'rgba(255,90,79,.18)':'rgba(30,33,40,.95)';c.fillRect(x,y,bw,hs[i]);c.strokeStyle=on?'#ff5a4f':'rgba(255,255,255,.25)';c.lineWidth=on?2:1;c.strokeRect(x+.5,y+.5,bw-1,hs[i]-1);
     mono(c,fs,600);c.fillStyle=on?'#ff5a4f':'#8c93a1';c.fillText(String(i+1),x+pad,y+pad);mono(c,fs);c.fillStyle='#e8ebf0';let left=Math.floor(s.length*kk);
     L[i].forEach((l,j)=>{if(left<=0)return;c.fillText(l.slice(0,left),x+pad+fs*2.2,y+pad+j*fs*1.4);left-=l.length+1});
-    if(on){c.font='600 '+fs*.85+'px "IBM Plex Mono",monospace';c.textAlign='right';c.fillStyle='#ff5a4f';c.fillText('ELEGIDA',x+bw-pad,y+pad);c.textAlign='left'}y+=hs[i]+gap});c.globalAlpha=1}}
+    if(on){c.font='600 '+fs*.85+'px "IBM Plex Mono",monospace';c.textAlign='right';c.fillStyle='#ff5a4f';c.fillText(_t('ELEGIDA'),x+bw-pad,y+pad);c.textAlign='left'}y+=hs[i]+gap});c.globalAlpha=1}}
 /* página de guion con formato estándar */
 function scriptHud(lines,k,cover){return (c,w,h)=>{if(cover<=.01)return;c.globalAlpha=Math.min(1,cover);const pw=Math.min(w*.5,h*.95*.78),ph=h*.9,x=w*.05,y=h*.05,fs=Math.max(10,pw*.034);
   c.fillStyle='#f5f2ea';c.fillRect(x,y,pw,ph);c.fillStyle='rgba(0,0,0,.25)';c.fillRect(x+pw,y+6,6,ph);mono(c,fs);let yy=y+fs*2,left=Math.floor(lines.reduce((a,l)=>a+l.t.length,0)*clamp(k,0,1));
@@ -30,11 +30,11 @@ function irisHud(t){return (c,w,h)=>{const g=c.createRadialGradient(w/2,h/2,h*.3
 function leakHud(t){return (c,w,h)=>{c.save();c.globalCompositeOperation='screen';const x=w*(1.05+.12*Math.sin(t*.9)),g=c.createRadialGradient(x,h*.3,0,x,h*.3,w*.55);g.addColorStop(0,'rgba(255,140,40,.55)');g.addColorStop(.5,'rgba(255,60,30,.18)');g.addColorStop(1,'rgba(255,60,30,0)');c.fillStyle=g;c.fillRect(0,0,w,h);c.restore();
   const r=w*.05;c.fillStyle='#000';[[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(q=>{c.beginPath();c.moveTo(q[0],q[1]);c.lineTo(q[0]+q[2]*r,q[1]);c.quadraticCurveTo(q[0],q[1],q[0],q[1]+q[3]*r);c.closePath();c.fill()})}}
 function camcorderHud(t){return (c,w,h)=>{const fs=fpx(w,.034);c.font='700 '+fs+'px "IBM Plex Mono",monospace';c.textBaseline='top';c.shadowColor='rgba(0,0,0,.7)';c.shadowBlur=2;c.fillStyle='#ffb02e';c.textAlign='right';
-  c.fillText('08 14 2003',w*.95,h*.82);c.fillText('4:31:'+String(10+Math.floor(t)%50)+' PM',w*.95,h*.82+fs*1.15);c.textAlign='left';c.fillText('▶ '+(Math.floor(t*2)%2?'':'●'),w*.05,h*.06);c.shadowBlur=0}}
+  c.fillText('08 14 2003',w*.95,h*.82);c.fillText('4:31:'+String(10+Math.floor(t)%50)+_t(' PM'),w*.95,h*.82+fs*1.15);c.textAlign='left';c.fillText('▶ '+(Math.floor(t*2)%2?'':'●'),w*.05,h*.06);c.shadowBlur=0}}
 function gridHud(c,w,h){c.save();c.strokeStyle='rgba(255,92,205,.55)';c.lineWidth=Math.max(1,w/700);const hy=h*.62;for(let i=-12;i<=12;i++){c.beginPath();c.moveTo(w/2+i*w*.02,hy);c.lineTo(w/2+i*w*.22,h);c.stroke()}for(let j=0;j<9;j++){const k=Math.pow((j+((T*.6)%1))/9,2.2),y=hy+(h-hy)*k;c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke()}c.restore()}
 function boardHud(n,txt,arrow,sketch){return (c,w,h)=>{const b=Math.max(8,w*.016);c.fillStyle=sketch?'#f2efe6':'#111';c.fillRect(0,0,w,b);c.fillRect(0,h-b*3.2,w,b*3.2);c.fillRect(0,0,b,h);c.fillRect(w-b,0,b,h);
   c.strokeStyle=sketch?'#222':'#ffd24a';c.lineWidth=Math.max(2,w/400);c.strokeRect(b,b,w-2*b,h-b*4.2);c.font='600 '+fpx(w,.026)+'px "Barlow Condensed","Arial Narrow",sans-serif';c.textBaseline='middle';c.fillStyle=sketch?'#222':'#fff';c.textAlign='left';
-  c.fillText((sketch?'PANEL ':'FRAME ')+n,b*1.4,h-b*1.6);c.textAlign='right';c.fillText(txt,w-b*1.4,h-b*1.6);if(!arrow)return;
+  c.fillText((sketch?_t('PANEL '):_t('FRAME '))+n,b*1.4,h-b*1.6);c.textAlign='right';c.fillText(txt,w-b*1.4,h-b*1.6);if(!arrow)return;
   c.strokeStyle='#ff3b30';c.fillStyle='#ff3b30';c.lineWidth=Math.max(3,w/220);const ah=w*.022,arr=(x0,y0,x1,y1)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();const a=Math.atan2(y1-y0,x1-x0);c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-ah*Math.cos(a-.45),y1-ah*Math.sin(a-.45));c.lineTo(x1-ah*Math.cos(a+.45),y1-ah*Math.sin(a+.45));c.closePath();c.fill()};
   const cx=w/2,cy=(h-b*3.2)/2;if(arrow==='in'){[[.12,.14],[.88,.14],[.12,.72],[.88,.72]].forEach(p=>arr(w*p[0],h*p[1],w*(p[0]+(.5-p[0])*.3),h*(p[1]+(.43-p[1])*.3)))}
   else if(arrow==='right')arr(w*.3,cy,w*.7,cy);else if(arrow==='up')arr(w*.9,h*.66,w*.9,h*.16);else if(arrow==='orbit'){c.beginPath();c.ellipse(cx,h*.7,w*.3,h*.06,0,.2,PI-.2);c.stroke();arr(cx-w*.27,h*.72,cx-w*.3,h*.69)}}}
@@ -50,8 +50,8 @@ add({id:'idea',cat:'x',es:'De la premisa a la idea',en:'Give me 10 short film id
   what:'Se generan muchas ideas cortas, se elige una y se convierte en imagen. La IA propone; la elección es tuya.',
   look:'Tres ideas aparecen escritas, se elige la segunda y el plano la muestra.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:t>8.2?lerp(.2,2.3,ss((t-8.2)/.6)):.2}));S.A.x=LAMP[0]+.8;S.A.z=LAMP[1]+.3;S.A.ry=-.6;S.A.headYaw=t>8.6?-.3:.2*Math.sin(t);S.A.wave=t>9?pp(t-9,2,.2):0;
-    setCam(S,{p:[1.2,1.5,1.7],t:[3.4,1.35,-2.8],fov:40});const cov=t<6.4?1:1-ss((t-6.4)/.8);S.cap=t<5.2?'1. Muchas ideas':t<6.6?'2. Elegir una':'3. Verla';
-    S.hud=cardsHud('IDEAS',IDEAS,t/4.6,t>5.2?1:-1,cov)}});
+    setCam(S,{p:[1.2,1.5,1.7],t:[3.4,1.35,-2.8],fov:40});const cov=t<6.4?1:1-ss((t-6.4)/.8);S.cap=t<5.2?'1. Muchas ideas':t<6.6?_t('2. Elegir una'):'3. Verla';
+    S.hud=cardsHud(_t('IDEAS'),IDEAS,t/4.6,t>5.2?1:-1,cov)}});
 add({id:'beats',cat:'x',es:'Estructura de la historia',en:'setup, inciting incident, rising conflict, climax, resolution',dur:12.5,
   what:'Cada historia corta sube de tensión hasta un clímax y se resuelve. La curva de abajo marca en qué parte va.',
   look:'Planteamiento de día y en calma, el detonante cambia la luz, el conflicto llega con lluvia, el clímax es el farol que se enciende y la resolución es el amanecer.',
@@ -61,7 +61,7 @@ add({id:'beats',cat:'x',es:'Estructura de la historia',en:'setup, inciting incid
     else if(i===2){S.look=mk(Object.assign({},LOOKS.night,{fogD:.03}));walkX(S.A,l,3,-1.2,LAMP[0]-.2);S.A.z=lerp(.4,LAMP[1]+.4,ss(l/3));setCam(S,{p:[S.A.x+.6+.06*Math.sin(t*9),1.4+.04*Math.sin(t*7),S.A.z+2.4],t:[S.A.x,1.3,S.A.z],fov:36});S.hud=rainHud(t)}
     else if(i===3){S.look=mk(Object.assign({},LOOKS.night,{lamp:lerp(.2,3,ss(l/.5))}));S.A.x=LAMP[0]-.2;S.A.z=LAMP[1]+.4;S.A.ry=.3;S.A.headYaw=.4;setCam(S,{p:[S.A.x+Math.sin(.6)*1.5,1.6,S.A.z+Math.cos(.6)*1.5],t:[S.A.x,1.55,S.A.z],fov:32})}
     else{S.look=mk(Object.assign({},LOOKS.golden,{sunP:[8,1.5,-4]}));S.A.x=LAMP[0]-.2;S.A.z=LAMP[1]+.4;S.A.ry=-.4;S.A.wave=pp(l,2.3,.2);setCam(S,{p:[0,2.6,7],t:[2,1,-2],fov:40})}
-    const names=['Planteamiento','Detonante','Conflicto','Clímax','Resolución'];S.cap=names[Math.max(0,i)];const prev=S.hud;
+    const names=[_t('Planteamiento'),_t('Detonante'),_t('Conflicto'),_t('Clímax'),_t('Resolución')];S.cap=names[Math.max(0,i)];const prev=S.hud;
     S.hud=hudAll(prev,(c,w,h)=>{const x0=w*.06,x1=w*.94,yb=h*.93,ht=h*.16,X=v=>x0+(x1-x0)*v/12.5,Y=v=>yb-ht*v,pts=[[0,.12],[2.5,.3],[5,.5],[8,.78],[10.2,1],[11,.35],[12.5,.15]];
       c.fillStyle='rgba(0,0,0,.5)';c.fillRect(x0-10,yb-ht-14,x1-x0+20,ht+22);c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=Math.max(2,w/450);c.beginPath();pts.forEach((p,j)=>j?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();
       let v=0;for(let j=0;j<pts.length-1;j++)if(t>=pts[j][0]&&t<=pts[j+1][0])v=lerp(pts[j][1],pts[j+1][1],(t-pts[j][0])/(pts[j+1][0]-pts[j][0]));c.fillStyle='#ff5a4f';c.beginPath();c.arc(X(t),Y(v),Math.max(4,w*.007),0,PI*2);c.fill()})}});
@@ -70,7 +70,7 @@ add({id:'script',cat:'x',es:'Guion de una escena',en:'Write the scene in screenp
   what:'El guion dice lugar y hora, lo que se ve, quién habla y qué dice. Una página en este formato dura más o menos un minuto en pantalla.',
   look:'La página se escribe con su formato: encabezado de escena, acción, personaje y diálogo. Después la misma escena se ve en el monitor.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:t>8.6?lerp(.2,2.3,ss((t-8.6)/.5)):.2}));S.A.x=LAMP[0]+.8;S.A.z=LAMP[1]+.3;S.A.ry=-.6;S.A.talk=t>7.4&&t<8.6?1:0;S.A.headYaw=t>8.8?-.2:.1;
-    setCam(S,{p:[1.2,1.5,1.7],t:[3.4,1.35,-2.8],fov:40});S.post.css=t<6.4?{filter:'brightness(.55) saturate(.6)'}:null;const cov=t<6.2?1:1-ss((t-6.2)/.6);S.cap=t<6.2?'La página':'La escena';S.hud=scriptHud(SCRIPT,t/5.6,cov)}});
+    setCam(S,{p:[1.2,1.5,1.7],t:[3.4,1.35,-2.8],fov:40});S.post.css=t<6.4?{filter:'brightness(.55) saturate(.6)'}:null;const cov=t<6.2?1:1-ss((t-6.2)/.6);S.cap=t<6.2?_t('La página'):_t('La escena');S.hud=scriptHud(SCRIPT,t/5.6,cov)}});
 const CSCRIPT=[{n:'Acto 1 · cálido',look:Object.assign({},LOOKS.golden),sw:['#f7b56d','#a18a5b','#b4482f']},{n:'Acto 2 · frío',look:Object.assign({},LOOKS.blue,{lamp:.2}),sw:['#131f45','#56648f','#7482b3']},
   {n:'Clímax · rojo',look:{skyTop:'#120406',skyBot:'#3a0c12',fog:'#2a0a10',fogD:.035,hemi:.12,hemiSky:'#ff4a4a',hemiGnd:'#100406',sun:1.3,sunC:'#ff2a2a',sunP:[-4,2,2.6],fill:.6,fillC:'#ff8a3a',ground:'#2a1416',foliage:'#1e0c10',lamp:1.2,win:1},sw:['#3a0c12','#ff2a2a','#ff8a3a']},
   {n:'Final · pastel',look:{skyTop:'#9ec3e6',skyBot:'#f8d9c4',fog:'#f2dccc',fogD:.016,hemi:.85,hemiSky:'#fff0e6',hemiGnd:'#b9a69a',sun:.7,sunC:'#ffe0c8',sunP:[6,3,5],ground:'#c9b8a0',foliage:'#9fb59a'},sw:['#9ec3e6','#f8d9c4','#9fb59a']}];
@@ -87,15 +87,15 @@ add({id:'storyboard',cat:'x',es:'Storyboard',en:'storyboard panel, rough pencil 
   what:'El storyboard dibuja cada plano antes de generar: encuadre, ángulo y hacia dónde se mueve la cámara. Con IA, cada cuadro se vuelve el frame inicial del plano.',
   look:'Cuatro paneles en boceto con su número, el tipo de plano y la flecha del movimiento. Al final el último panel pasa a frame terminado.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:2}));S.A.x=-1;S.A.ry=PI/2;S.A.headYaw=0;const fin=t>=8.8,i=fin?3:Math.floor(t/2.2),l=fin?2.2:t-i*2.2,b=BOARDS[i];b.cam(S,l);
-    S.tt=fin?null:0;S.post.css=fin?null:{filter:'grayscale(1) url(#poster) contrast(1.5) brightness(1.2)'};S.cap=fin?'Del boceto al frame':'Panel '+b.n+' de 4';S.hud=boardHud(b.n,b.txt,fin?null:b.a,!fin)}});
+    S.tt=fin?null:0;S.post.css=fin?null:{filter:'grayscale(1) url(#poster) contrast(1.5) brightness(1.2)'};S.cap=fin?_t('Del boceto al frame'):_t('Panel ')+b.n+_t(' de 4');S.hud=boardHud(b.n,b.txt,fin?null:b.a,!fin)}});
 const IMGP='Film still, a person in a red shirt standing under a street lamp in a park at blue hour, soft haze, 35mm, shallow depth of field, 16:9';
 add({id:'imagegen',cat:'x',es:'Generar la imagen',en:IMGP,dur:10.5,
   what:'Para un plano con personaje se genera primero la imagen: varias variantes del mismo prompt, se elige una y esa es el frame inicial del video.',
   look:'Después del prompt salen cuatro variantes, cada una con detalles distintos. Se elige una y queda marcada como frame inicial.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:2}));S.A.x=LAMP[0]+.7;S.A.z=LAMP[1]+.3;S.A.ry=-.5;S.A.headYaw=0;S.tt=0;const V=[{s:'#b4482f',h:null,c:[1.2,1.5,1.7]},{s:'#b4482f',h:'#2a2a2a',c:[.6,1.3,2.2]},{s:'#c0392b',h:null,c:[1.8,1.7,1.2]},{s:'#9a3324',h:'#c0392b',c:[1,1.4,2.6]}];
     const g=t<2.4?0:t<3.4?ss((t-2.4)):1,vi=t<3.4?1:t<7.4?Math.floor((t-3.4))%4:1,v=V[vi];S.A.shirt=v.s;S.A.hat=v.h;setCam(S,{p:v.c,t:[3.4,1.35,-2.8],fov:40});if(g<1)S.post.css={filter:'blur('+(14*(1-g)).toFixed(1)+'px)'};
-    S.cap=t<2.4?'El prompt de imagen':t<7.4?'Variante '+(vi+1)+' de 4':'Elegida: frame inicial';if(t>=7.4){S.badge='Frame inicial';S.badgeKind='ok'}
-    S.hud=hudAll(noiseHud(t<2.4?1:1-g),t<2.9?typeHud(IMGP,t/2,t<2.4?1:1-ss((t-2.4)/.5)):null,t>=7.4?frameHud('IMAGEN',true):null)}});
+    S.cap=t<2.4?_t('El prompt de imagen'):t<7.4?_t('Variante ')+(vi+1)+_t(' de 4'):_t('Elegida: frame inicial');if(t>=7.4){S.badge=_t('Frame inicial');S.badgeKind='ok'}
+    S.hud=hudAll(noiseHud(t<2.4?1:1-g),t<2.9?typeHud(IMGP,t/2,t<2.4?1:1-ss((t-2.4)/.5)):null,t>=7.4?frameHud(_t('IMAGEN'),true):null)}});
 add({id:'upscale',cat:'x',es:'Reescalado',en:'upscale to 4K, add fine detail, keep the original motion and colors',dur:9,
   what:'Las IA de video entregan muchas veces 720p o 1080p. El reescalado lleva el clip a 4K y recupera detalle sin cambiar el movimiento.',
   look:'La línea separa el original de baja resolución, a la derecha, del resultado reescalado, a la izquierda.',
@@ -105,7 +105,7 @@ add({id:'lipsync',cat:'x',es:'Lip sync y avatar',en:'The person looks into the c
   what:'Con una foto o un clip y un audio, la IA mueve la boca y la cara al ritmo de la voz. Así se hacen los avatares que hablan.',
   look:'Primero la foto quieta con la pista de voz. Después habla: la boca sigue las sílabas y la cabeza se mueve apenas.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.golden,{soft:1}));const live=t>=2.5,l=t-2.5;S.A.ry=0;S.A.headYaw=live?.08*Math.sin(t*1.7):0;S.A.nod=live?.05*Math.sin(t*2.3):0;
-    const syl=live?(Math.sin(l*11)>-.2&&(l%2.2)<1.7?1:0):0;S.A.talk=syl;if(!live)S.tt=0;setCam(S,{p:[.15,1.62,1.05],t:[0,1.58,0],fov:30});S.cap=live?'Habla con la voz del audio':'Foto + audio';
+    const syl=live?(Math.sin(l*11)>-.2&&(l%2.2)<1.7?1:0):0;S.A.talk=syl;if(!live)S.tt=0;setCam(S,{p:[.15,1.62,1.05],t:[0,1.58,0],fov:30});S.cap=live?_t('Habla con la voz del audio'):_t('Foto + audio');
     const txt='We leave at dawn.',sub=live?txt.slice(0,Math.floor(clamp(l/2.2,0,1)*txt.length)):'';
     S.hud=(c,w,h)=>{const x0=w*.1,x1=w*.9,y=h*.86,N=80,bw=(x1-x0)/N,ph=live?clamp(l/6.5,0,1):0;c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x0-8,y-h*.06,x1-x0+16,h*.12);
       for(let k=0;k<N;k++){const a=(k%27<20)?.2+.8*hsh(k*1.7):.05;c.fillStyle=k/N<ph?'#ffd24a':'rgba(255,255,255,.45)';c.fillRect(x0+k*bw,y-a*h*.04,bw*.6,a*h*.08)}
@@ -114,34 +114,34 @@ add({id:'extend',cat:'x',es:'Extender un clip',en:'Extend the video: continue fr
   what:'La extensión toma el último frame de un clip y genera la continuación. Sirve para alargar un plano sin cortar.',
   look:'El primer bloque es el clip original. En la marca empieza la extensión y el personaje sigue caminando sin salto.',
   fn(t,S){S.look=mk(LOOKS.blue);S.A.x=lerp(-3,LAMP[0]-.3,t/10);S.A.z=lerp(.4,LAMP[1]+.5,ss(t/10));S.A.ry=2.2;S.A.walk=t*6;S.A.amp=1;S.A.headYaw=0;S.look.lamp=t>8.6?lerp(.3,2.2,ss((t-8.6)/.6)):.3;
-    setCam(S,{p:[S.A.x+.6,1.45,S.A.z+3.2],t:[S.A.x,1.25,S.A.z],fov:38});S.cap=t<5?'Clip original · 5 s':'Extensión · +5 s';if(t>=5){S.badge='Continúa desde el último frame';S.badgeKind='ok'}
-    S.hud=tlHud([[0,5,'Clip','#8d95a3'],[5,10,'Extensión','#5fd398',1].map((x,j)=>j===4?undefined:x)].map(b=>b.length>3?b:b),10,t,[5])}});
+    setCam(S,{p:[S.A.x+.6,1.45,S.A.z+3.2],t:[S.A.x,1.25,S.A.z],fov:38});S.cap=t<5?_t('Clip original · 5 s'):_t('Extensión · +5 s');if(t>=5){S.badge=_t('Continúa desde el último frame');S.badgeKind='ok'}
+    S.hud=tlHud([[0,5,_t('Clip'),'#8d95a3'],[5,10,_t('Extensión'),'#5fd398',1].map((x,j)=>j===4?undefined:x)].map(b=>b.length>3?b:b),10,t,[5])}});
 (function(){const d=D[D.length-1];d.fn=function(t,S){S.look=mk(LOOKS.blue);S.A.x=lerp(-3,LAMP[0]-.3,t/10);S.A.z=lerp(.4,LAMP[1]+.5,ss(t/10));S.A.ry=2.2;S.A.walk=t*6;S.A.amp=1;S.A.headYaw=0;S.look.lamp=t>8.6?lerp(.3,2.2,ss((t-8.6)/.6)):.3;
-  setCam(S,{p:[S.A.x+.6,1.45,S.A.z+3.2],t:[S.A.x,1.25,S.A.z],fov:38});S.cap=t<5?'Clip original · 5 s':'Extensión · +5 s';if(t>=5){S.badge='Sigue desde el último frame';S.badgeKind='ok'}
-  const bl=[[0,5,'Clip','#8d95a3']];if(t>=5){const b=[5,10,'Extensión','#5fd398'];b.grow=true;bl.push(b)}S.hud=tlHud(bl,10,t,[5])}})();
+  setCam(S,{p:[S.A.x+.6,1.45,S.A.z+3.2],t:[S.A.x,1.25,S.A.z],fov:38});S.cap=t<5?_t('Clip original · 5 s'):_t('Extensión · +5 s');if(t>=5){S.badge=_t('Sigue desde el último frame');S.badgeKind='ok'}
+  const bl=[[0,5,_t('Clip'),'#8d95a3']];if(t>=5){const b=[5,10,_t('Extensión'),'#5fd398'];b.grow=true;bl.push(b)}S.hud=tlHud(bl,10,t,[5])}})();
 const KF=[{p:[-2,3,9],t:[1,1,-1],fov:42},{p:[4.5,1.6,2.5],t:[LAMP[0],1.3,LAMP[1]],fov:38},{p:[LAMP[0]+.4,.35,LAMP[1]+2.4],t:[LAMP[0],2.2,LAMP[1]],fov:40},{p:[LAMP[0]+Math.sin(-.4)*1,1.64,LAMP[1]+.4+Math.cos(-.4)*1],t:[LAMP[0]+.1,1.64,LAMP[1]+.4],fov:30}];
 add({id:'keyframes',cat:'x',es:'Varios keyframes',en:'Keyframe 1 at 0s: wide shot. Keyframe 2 at 3s: side view. Keyframe 3 at 6s: low angle. Keyframe 4 at 9s: close-up. Smooth camera move through all of them.',dur:10.5,
   what:'Algunas herramientas aceptan más de dos imágenes clave por clip. La IA pasa por cada una en el momento indicado y arma el recorrido.',
   look:'Las marcas amarillas son los keyframes. La cámara pasa por cada uno: general, lateral, contrapicado y primer plano.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:2}));S.A.x=LAMP[0]+.1;S.A.z=LAMP[1]+.4;S.A.ry=-.4;S.A.headYaw=0;const tm=[0,3,6,9],i=Math.min(2,Math.floor(t/3)),k=t>=9?1:ss((t-tm[i])/3);
-    camLerp(S,KF[t>=9?2:i],KF[t>=9?3:i+1],k);S.cap=t>=9?'Keyframe 4':'Hacia el keyframe '+(i+2);S.hud=tlHud([[0,10.5,'Clip','#8d95a3']],10.5,t,tm)}});
+    camLerp(S,KF[t>=9?2:i],KF[t>=9?3:i+1],k);S.cap=t>=9?_t('Keyframe 4'):_t('Hacia el keyframe ')+(i+2);S.hud=tlHud([[0,10.5,_t('Clip'),'#8d95a3']],10.5,t,tm)}});
 add({id:'newangle',cat:'x',es:'Otro ángulo del mismo plano',en:'Generate the same scene from a low angle, keep the action, timing and lighting.',dur:9,
   what:'Algunas herramientas de video a video regeneran el mismo plano desde otra posición de cámara, con la misma acción y la misma luz.',
   look:'A la izquierda el original a la altura de los ojos. A la derecha la misma acción desde abajo y girando.',
   fn(t,S,S2){[S,S2].forEach(s=>{s.look=mk(LOOKS.golden);s.A.wave=pp(t,4.5,.2);s.A.headYaw=.2*Math.sin(t)});setCam(S,{p:[0,1.45,3.8],t:[0,1.2,0],fov:36});const a=-.6+t*.12;setCam(S2,{p:[Math.sin(a)*2.6,.35,Math.cos(a)*2.6],t:[0,1.35,0],fov:40});
-    S.post.split=true;S.hud=twoLabels('Original','Otro ángulo')}});
+    S.post.split=true;S.hud=twoLabels(_t('Original'),_t('Otro ángulo'))}});
 add({id:'regionedit',cat:'x',es:'Editar una zona del video',en:'Change the shirt to yellow. Keep the face, the motion and the background unchanged.',dur:9,
   what:'La edición por zona cambia solo una parte del video, por ejemplo la ropa, y deja igual todo lo demás.',
   look:'Se marca la camisa, la marca sigue al personaje y solo ahí cambia el color. La cara, el fondo y el movimiento no se tocan.',
-  fn(t,S){S.look=mk(LOOKS.day);S.A.dance=.6;S.A.headYaw=0;setCam(S,{p:[.3,1.35,3.4],t:[0,1.15,0],fov:36});const k=ss((t-4)/1.2);S.A.shirt=mixC('#b4482f','#f2c230',k);S.cap=t<2?'El clip original':t<4?'Marcás la zona':'Solo cambia lo marcado';
+  fn(t,S){S.look=mk(LOOKS.day);S.A.dance=.6;S.A.headYaw=0;setCam(S,{p:[.3,1.35,3.4],t:[0,1.15,0],fov:36});const k=ss((t-4)/1.2);S.A.shirt=mixC('#b4482f','#f2c230',k);S.cap=t<2?_t('El clip original'):t<4?_t('Marcás la zona'):_t('Solo cambia lo marcado');
     S.hud=(c,w,h)=>{if(t<2)return;const a=project(new V3(S.A.x-.36,1.5,S.A.z),cam,w,h),b=project(new V3(S.A.x+.36,.78,S.A.z),cam,w,h),x=Math.min(a[0],b[0]),y=Math.min(a[1],b[1]),ww=Math.abs(b[0]-a[0]),hh=Math.abs(b[1]-a[1]);
       if(t<4){c.fillStyle='rgba(255,90,79,.28)';c.fillRect(x,y,ww,hh)}c.save();c.strokeStyle='#ff5a4f';c.setLineDash([7,5]);c.lineWidth=Math.max(2,w/400);c.strokeRect(x,y,ww,hh);c.restore()}}});
 let presetCache=null;
 add({id:'presetreel',cat:'x',es:'Presets de cámara',en:'camera motion presets: crash zoom, dolly zoom, orbit, FPV drone, crane up, whip pan',dur:12,cuts:true,
   what:'Algunas plataformas traen movimientos de cámara listos para elegir en vez de escribirlos. Cada preset es un término del glosario.',
   look:'Seis presets seguidos, dos segundos cada uno, con su nombre en inglés tal como aparece en las herramientas.',
-  fn(t,S,S2){if(!presetCache)presetCache=[['crashzoom','Crash zoom'],['dollyzoom','Dolly zoom'],['orbit','Orbit'],['fpv','FPV drone'],['crane','Crane up'],['whip','Whip pan']].map(x=>[D.find(d=>d.id===x[0]),x[1]]);
-    const i=Math.floor(t/2)%6,p=presetCache[i];p[0].fn(p[0].dur*.2+(t%2)*p[0].dur/3,S,S2);S.cap='Preset: '+p[1];S.badge=(i+1)+' / 6';S.badgeKind=''}});
+  fn(t,S,S2){if(!presetCache)presetCache=[['crashzoom',_t('Crash zoom')],['dollyzoom',_t('Dolly zoom')],['orbit',_t('Orbit')],['fpv',_t('FPV drone')],['crane',_t('Crane up')],['whip',_t('Whip pan')]].map(x=>[D.find(d=>d.id===x[0]),x[1]]);
+    const i=Math.floor(t/2)%6,p=presetCache[i];p[0].fn(p[0].dur*.2+(t%2)*p[0].dur/3,S,S2);S.cap=_t('Preset: ')+p[1];S.badge=(i+1)+' / 6';S.badgeKind=''}});
 
 /* ---------- biblioteca de estilos ---------- */
 add({id:'anime90',cat:'x',es:'Anime de los 90',en:'1990s hand-drawn cel anime, painted backgrounds, muted film palette, soft grain, animated on twos',dur:8,
@@ -245,4 +245,4 @@ add({id:'fight',cat:'direccion',es:'Coreografía de pelea',en:'fight choreograph
     S.B.act=t<2.4?['punch',.25+t]:t<4.7?['roundhouse',.3+(t-2.4)*.85]:t<7.4?['kick',.7+(t-4.7)*.85]:['boxing',t];
     S.A.act=t<7.4?['boxing',t]:['armada',.1+(t-7.4)*.6];const i=t<3.3?0:t<6.6?1:2;
     if(i===0)setCam(S,{p:[0,1.35,4.6],t:[0,1.05,0],fov:36});else if(i===1)setCam(S,{p:[-2,1.62,.75],t:[.6,1.25,0],fov:34});else{const a=.6+(t-6.6)*.18;setCam(S,{p:[Math.sin(a)*3,.35,Math.cos(a)*3],t:[0,1.2,0],fov:40})}
-    S.cap=['Plano 1: general','Plano 2: sobre el hombro','Plano 3: contrapicado'][i];S.hud=strip([3.3,6.6],10,t)}});
+    S.cap=[_t('Plano 1: general'),_t('Plano 2: sobre el hombro'),_t('Plano 3: contrapicado')][i];S.hud=strip([3.3,6.6],10,t)}});

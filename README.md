@@ -1,8 +1,12 @@
 # Plano a Plano
 
-Cine y producción de video con IA, explicado con animaciones.
+Cine y producción de video con IA, explicado con animaciones. En español, inglés y portugués.
+
+*Film language and AI video production, explained with animations. Available in Spanish, English and Portuguese.*
 
 **Sitio:** https://fabian7593.github.io/plano-a-plano/
+
+Proyecto open source con [licencia MIT](LICENSE), creado por **Fabian Rosales** · [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/)
 
 Qué incluye:
 
@@ -16,7 +20,19 @@ Qué incluye:
   - traduce del español al inglés;
   - sugiere el plano siguiente.
 
-Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en español, para entender qué dice.
+Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en español (o portugués), para entender qué dice.
+
+## Idiomas
+
+El selector de arriba a la derecha cambia entre español, inglés y portugués. También se puede abrir el sitio directo en un idioma con `?lang=es`, `?lang=en` o `?lang=pt`. Si no se elige, se usa el idioma del navegador.
+
+Las traducciones están en `src/i18n/`:
+
+- `dict.json`: cada texto en español con su versión en inglés y en portugués;
+- `ovr.json`: correcciones puntuales, que ganan sobre `dict.json`;
+- `ph.json`: los marcadores entre corchetes de las plantillas de prompt, como `[sujeto]` → `[subject]`.
+
+`src/i18n_rt.js` aplica la traducción al cargar la página.
 
 ## Cómo está armado
 
@@ -28,7 +44,7 @@ Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en 
   - motor 3D;
   - demos;
   - datos de producción, herramientas y estilos;
-  - los modelos `.glb`.
+  - traducciones.
 
 Necesita conexión a internet para cargar three.js y las fuentes desde CDN.
 
@@ -53,14 +69,26 @@ El proyecto del generador se guarda en el navegador de cada persona.
 
    Ese comando vuelve a escribir `index.html` y registra las imágenes que haya en `img/`.
 
+Los personajes 3D no están como archivos sueltos en el repositorio, porque las condiciones de Mixamo no permiten distribuirlos así. El build reutiliza los que ya vienen dentro de `index.html`. Si querés cambiarlos, descargalos de Mixamo y guardalos como `src/models/mujer.glb` y `src/models/ninja.glb`; esa carpeta está en `.gitignore`.
+
 Para agregar una imagen, guardala en `img/` como `.webp` con el nombre del término o del estilo. Por ejemplo, `img/dolly.webp` o `img/estilo-noir.webp`. Después corré el build.
 
 ## Publicar en GitHub Pages
 
 En **Settings → Pages**, elegí **Deploy from a branch**, rama `main` y carpeta `/ (root)`.
 
+## Licencia
+
+El código y los textos del sitio están bajo la [licencia MIT](LICENSE): podés usarlos, copiarlos, modificarlos y publicarlos, siempre que mantengas el aviso de copyright.
+
+Quedan fuera de la licencia MIT:
+
+- los personajes y animaciones 3D de [Mixamo](https://www.mixamo.com/) (Adobe), que van dentro de `index.html` y se usan bajo las condiciones de Adobe;
+- [three.js](https://threejs.org/) (licencia MIT propia) y las fuentes de Google Fonts (SIL Open Font License), que se cargan desde CDN.
+
 ## Créditos
 
+- Creado por Fabian Rosales: [GitHub](https://github.com/fabian7593) · [LinkedIn](https://www.linkedin.com/in/frosales-softdev/).
 - Animaciones con [three.js](https://threejs.org/).
 - Personajes y animaciones 3D de [Mixamo](https://www.mixamo.com/) (Adobe).
 - Imágenes de ejemplo generadas con ChatGPT.

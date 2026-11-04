@@ -17,17 +17,17 @@ function vhsHud(t){return (c,w,h)=>{c.save();c.fillStyle='rgba(0,0,0,.16)';const
   const by=((t*.23)%1)*h*1.2-h*.1,bh=h*.06,gr=c.createLinearGradient(0,by,0,by+bh);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.5,'rgba(255,255,255,.2)');gr.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=gr;c.fillRect(0,by,w,bh);
   const f=Math.floor(t*24);for(let i=0;i<40;i++){c.fillStyle='rgba(255,255,255,'+(.15+.3*hsh(i+f*3)).toFixed(2)+')';c.fillRect(hsh(i*7+f)*w,by+hsh(i*3)*bh,w*.02*hsh(i+5),1.5)}
   const vw=Math.min(w,h*4/3),x0=(w-vw)/2,fs=fpx(w,.028);c.font='500 '+fs+'px "IBM Plex Mono",monospace';c.textBaseline='top';c.shadowColor='rgba(0,0,0,.8)';c.shadowBlur=3;
-  c.textAlign='left';c.fillStyle='#fff';c.fillText('PLAY',x0+vw*.05,h*.06);if(Math.floor(t*2)%2===0){c.fillStyle='#ff3b30';c.fillText('REC',x0+vw*.05,h*.06+fs*1.3)}
-  c.fillStyle='#fff';c.textAlign='right';c.fillText('OCT 15 1994',x0+vw*.95,h*.84);c.fillText('11:47:'+String(Math.floor(t)%60).padStart(2,'0')+' PM',x0+vw*.95,h*.84+fs*1.25);c.restore()}}
+  c.textAlign='left';c.fillStyle='#fff';c.fillText(_t('PLAY'),x0+vw*.05,h*.06);if(Math.floor(t*2)%2===0){c.fillStyle='#ff3b30';c.fillText(_t('REC'),x0+vw*.05,h*.06+fs*1.3)}
+  c.fillStyle='#fff';c.textAlign='right';c.fillText(_t('OCT 15 1994'),x0+vw*.95,h*.84);c.fillText('11:47:'+String(Math.floor(t)%60).padStart(2,'0')+_t(' PM'),x0+vw*.95,h*.84+fs*1.25);c.restore()}}
 const symHud=(c,w,h)=>{c.save();c.strokeStyle='rgba(255,255,255,.4)';c.setLineDash([6,6]);c.lineWidth=Math.max(1,w/1000);c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.stroke();c.restore()};
 const vpHud=(c,w,h)=>{c.save();c.strokeStyle='rgba(255,90,79,.6)';c.lineWidth=Math.max(1,w/900);c.beginPath();[[0,0],[w,0],[0,h],[w,h],[0,h*.5],[w,h*.5]].forEach(p=>{c.moveTo(p[0],p[1]);c.lineTo(w/2,h*.5)});c.stroke();c.restore()};
 function beatHud(t,bpm,cuts,total){return (c,w,h)=>{const bt=60/bpm,ph=(t%bt)/bt,r=w*.022*(1+.6*(1-ph)),cx=w*.07,cy=h*.68;c.fillStyle='rgba(255,90,79,'+(.35+.6*(1-ph)).toFixed(2)+')';c.beginPath();c.arc(cx,cy,r,0,PI*2);c.fill();
-  label(c,w,'TIEMPO '+(Math.floor(t/bt)%4+1),cx+w*.05,cy-fpx(w,.024)/2,'left');strip(cuts,total,t)(c,w,h);
+  label(c,w,_t('TIEMPO ')+(Math.floor(t/bt)%4+1),cx+w*.05,cy-fpx(w,.024)/2,'left');strip(cuts,total,t)(c,w,h);
   const x0=w*.04,x1=w*.96,y=h*.8;c.fillStyle='rgba(255,255,255,.9)';for(let b=0;b<=total+1e-6;b+=bt){const x=x0+(x1-x0)*b/total;c.fillRect(x-1,y-13,2,9)}}}
 const safeHud=(c,w,h)=>{const vw=h*9/16,x0=(w-vw)/2;c.save();c.fillStyle='rgba(255,59,48,.25)';c.fillRect(x0,0,vw,h*.1);c.fillRect(x0,h*.78,vw,h*.22);c.fillRect(x0+vw*.82,h*.3,vw*.18,h*.48);
   c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<4;i++){c.beginPath();c.arc(x0+vw*.91,h*(.38+i*.1),vw*.035,0,PI*2);c.fill()}
   c.fillRect(x0+vw*.05,h*.83,vw*.5,h*.018);c.fillRect(x0+vw*.05,h*.87,vw*.65,h*.014);c.fillRect(x0+vw*.05,h*.9,vw*.4,h*.014);
-  c.strokeStyle='rgba(95,211,152,.95)';c.setLineDash([5,4]);c.lineWidth=2;c.strokeRect(x0+vw*.06,h*.12,vw*.74,h*.64);c.restore();label(c,w,'Zona segura',x0+vw*.09,h*.13,'left',.02)};
+  c.strokeStyle='rgba(95,211,152,.95)';c.setLineDash([5,4]);c.lineWidth=2;c.strokeRect(x0+vw*.06,h*.12,vw*.74,h*.64);c.restore();label(c,w,_t('Zona segura'),x0+vw*.09,h*.13,'left',.02)};
 function noiseHud(a){return (c,w,h)=>{if(a<=.01)return;c.fillStyle='rgba(120,120,124,'+(a*.55).toFixed(2)+')';c.fillRect(0,0,w,h);c.globalAlpha=Math.min(1,a*1.4);const sz=Math.max(80,w/6),f=Math.floor(T*24),ox=-hsh(f)*sz,oy=-hsh(f+7)*sz;
   for(let y=oy;y<h;y+=sz)for(let x=ox;x<w;x+=sz)c.drawImage(noise,x,y,sz,sz);c.globalAlpha=1}}
 function typeHud(txt,k,cover){return (c,w,h)=>{if(cover>0){c.fillStyle='rgba(12,13,17,'+cover.toFixed(2)+')';c.fillRect(0,0,w,h)}if(cover<.05)return;c.globalAlpha=Math.min(1,cover*1.2);
@@ -52,7 +52,7 @@ add({id:'western',cat:'estilo',es:'Western',en:'western, dusty desert, harsh mid
   ref:'El bueno, el malo y el feo (1966), Los imperdonables (1992)',alias:'spaghetti western duelo',
   fn(t,S){S.look=mk(Object.assign({},PAL[0].look,{sun:1.45,sunP:[1.2,7,2],sunC:'#fff0d4',hemi:.75}));S.A.x=-3.2;S.A.ry=PI/2;S.A.headYaw=0;S.A.hat='#6b4a2e';S.A.shirt='#8a5a3a';S.B.vis=true;S.B.x=3.2;S.B.ry=-PI/2;S.B.headYaw=0;S.B.hat='#2b2018';S.B.shirt='#4a4a52';
     const i=t<4?0:t<6.5?1:2;if(i===0)setCam(S,{p:[0,.4,10],t:[0,1.3,0],fov:30});else if(i===1)setCam(S,{p:[-3.2+.46,1.655,0],t:[-3.2,1.655,0],fov:20});else setCam(S,{p:[3.2-.46,1.655,0],t:[3.2,1.655,0],fov:20});
-    S.post.mask=2.39;S.post.css={filter:'sepia(.3) saturate(.85) contrast(1.18)'};S.post.grain=.35;S.cap=['El duelo','Los ojos de A','Los ojos de B'][i]}});
+    S.post.mask=2.39;S.post.css={filter:'sepia(.3) saturate(.85) contrast(1.18)'};S.post.grain=.35;S.cap=[_t('El duelo'),_t('Los ojos de A'),_t('Los ojos de B')][i]}});
 add({id:'scifi',cat:'estilo',es:'Ciencia ficción',en:'science fiction, sterile white futuristic set, perfect symmetry, cool clean light, slow push-in',dur:8,
   what:'Futuro, tecnología y espacio. Una de sus caras más reconocibles es el set blanco, frío y perfectamente ordenado.',
   look:'Todo es blanco y simétrico, la luz no tiene calidez y la cámara avanza sin prisa. El único color fuerte es el traje.',
@@ -127,7 +127,7 @@ add({id:'dayfornight',cat:'estilo',es:'Noche americana',en:'day for night, shot 
   look:'A la izquierda de la línea, la toma como se filmó. A la derecha, corregida: azul, oscura y con poco color. Las sombras duras delatan que hay sol.',
   ref:'Mad Max: Furia en el camino (2015)',alias:'day for night',
   fn(t,S){walkX(S.A,t,9,-2.6,2.6);setCam(S,{p:[.6,1.45,4.2],t:[S.A.x*.5,1.2,0],fov:36});S.post.grade=[{op:'multiply',c:'#2f4a8a',a:1},{op:'saturation',c:'#808080',a:.5},{op:'multiply',c:'#9aa6c0',a:.6}];S.post.gradeBase=[];S.post.wipe=lerp(.3,.7,pp(t,9,.05));
-    S.hud=(c,w,h)=>{const x=w*S.post.wipe;c.fillStyle='#fff';c.fillRect(x-1,0,2,h);label(c,w,'Filmado de día',x-w*.015,h*.86,'right',.022);label(c,w,'Corregido a noche',x+w*.015,h*.86,'left',.022)}}});
+    S.hud=(c,w,h)=>{const x=w*S.post.wipe;c.fillStyle='#fff';c.fillRect(x-1,0,2,h);label(c,w,_t('Filmado de día'),x-w*.015,h*.86,'right',.022);label(c,w,_t('Corregido a noche'),x+w*.015,h*.86,'left',.022)}}});
 add({id:'stopmotion',cat:'estilo',es:'Stop motion',en:'stop-motion animation, handmade miniature set, choppy 10 fps, slight frame-to-frame jitter, tilt-shift look',dur:8,
   what:'Animación cuadro a cuadro de muñecos reales. Se reconoce por el movimiento entrecortado y la escala de maqueta.',
   look:'El personaje se mueve a saltitos porque hay pocos cuadros por segundo, y cada cuadro tiembla un poco. El desenfoque arriba y abajo achica el set.',
@@ -199,7 +199,7 @@ add({id:'bloom',cat:'lente',es:'Halación / bloom',en:'soft bloom, halation arou
   look:'Las luces del fondo y el farol se abren en un halo suave. Sin él la imagen se ve más dura y más digital.',
   alias:'halation glow resplandor',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.night,{lamp:2.6}));S.props.lights=true;S.A.x=LAMP[0]+.85;S.A.z=LAMP[1]-.25;S.A.ry=-.75;setCam(S,{p:[1.2,1.5,.6],t:[3.4,1.6,-3.6],fov:40});
-    const k=t<3?0:t<4?ss(t-3):t<7?1:1-ss(t-7);S.post.bloom=.85*k;S.cap=k<.5?'Sin bloom':'Con bloom'}});
+    const k=t<3?0:t<4?ss(t-3):t<7?1:1-ss(t-7);S.post.bloom=.85*k;S.cap=k<.5?_t('Sin bloom'):_t('Con bloom')}});
 add({id:'reveal',cat:'mov',es:'Plano de revelación',en:'reveal shot, the camera slides out from behind a wall to reveal the subject',dur:8,
   what:'La cámara empieza tapada por algo del primer término y se mueve para descubrir al sujeto o el lugar.',
   look:'La pared llena el cuadro y el movimiento lateral destapa al personaje a través de la puerta. La información llega con el movimiento.',
@@ -212,21 +212,21 @@ add({id:'kuleshov',cat:'edicion',es:'Efecto Kuleshov',en:'reaction shot intercut
   fn(t,S){S.props.mug=true;S.props.table=[1.6,1.4];S.B.vis=true;S.B.x=-3;S.B.z=3;S.B.ry=PI*.75;S.B.wave=1;S.A.headYaw=0;S.A.nod=0;
     const i=Math.floor(t/1.67)%6,face={p:[0,1.65,.95],t:[0,1.64,0],fov:30};
     if(i===1)setCam(S,{p:[1.08,1.15,.88],t:[1.65,.84,1.45],fov:24});else if(i===4)setCam(S,{p:[-1.5,1.55,.8],t:[-3,1.3,3],fov:34});else setCam(S,face);
-    S.cap=['Cara neutra','+ una taza','= antojo','Cara neutra','+ alguien que saluda','= alegría'][i]}});
+    S.cap=[_t('Cara neutra'),_t('+ una taza'),'= antojo',_t('Cara neutra'),_t('+ alguien que saluda'),_t('= alegría')][i]}});
 add({id:'screendir',cat:'edicion',es:'Dirección de pantalla',en:'consistent screen direction: the character exits frame right and enters the next shot from frame left',dur:9,
   what:'Si un personaje sale del cuadro por la derecha, en el plano siguiente debe entrar por la izquierda para que siga yendo hacia el mismo lado.',
   look:'Primero la versión correcta, donde sigue avanzando. Después la incorrecta: entra por el lado por donde salió y parece que se devuelve.',
   alias:'screen direction continuidad dirección',
   fn(t,S){const i=t<3?0:t<6?1:2,l=i===0?t:i===1?t-3:t-6;
-    if(i===0){walkX(S.A,l,3,-1.2,4.4);setCam(S,{p:[0,1.4,4.6],t:[0,1.15,0],fov:38});S.cap='Plano 1: sale por la derecha'}
-    else{const ok=i===1;walkX(S.A,l,3,ok?-4.4:4.4,ok?1.2:-1.2);S.A.z=-3;setCam(S,{p:[0,1.4,1.4],t:[0,1.15,-3],fov:38});S.badge=ok?'Correcto':'Incorrecto';S.badgeKind=ok?'ok':'bad';S.cap=ok?'Plano 2: entra por la izquierda':'Plano 2: entra por la derecha'}}});
+    if(i===0){walkX(S.A,l,3,-1.2,4.4);setCam(S,{p:[0,1.4,4.6],t:[0,1.15,0],fov:38});S.cap=_t('Plano 1: sale por la derecha')}
+    else{const ok=i===1;walkX(S.A,l,3,ok?-4.4:4.4,ok?1.2:-1.2);S.A.z=-3;setCam(S,{p:[0,1.4,1.4],t:[0,1.15,-3],fov:38});S.badge=ok?_t('Correcto'):_t('Incorrecto');S.badgeKind=ok?'ok':'bad';S.cap=ok?_t('Plano 2: entra por la izquierda'):_t('Plano 2: entra por la derecha')}}});
 add({id:'beatcut',cat:'edicion',es:'Corte al ritmo',en:'fast cuts synced to the beat of the music',dur:8,
   what:'Los cortes caen justo en los tiempos de la música. Es la base del videoclip y de mucho contenido para redes.',
   look:'Mirá el círculo que late con la música. En la primera mitad cada corte cae en un tiempo y se siente limpio; en la segunda llegan un poco tarde y molestan aunque no sepas por qué.',
   alias:'beat sync edición al beat cortes al ritmo',
   fn(t,S){const off=t>=4;S.A.dance=1;S.props.lights=true;S.look=mk(Object.assign({},LOOKS.blue,{lamp:2,sun:.7,sunC:'#ff5aa0',sunP:[2,3,4],fill:.6,fillC:'#5ad1ff',fillP:[-3,2,3]}));const cuts=[];for(let c=1;c<8;c++)cuts.push(c+(c>=4?.22:0));
     let n=0;cuts.forEach(c=>{if(t>=c)n++});const V=[SH.wide,{p:[1.4,.5,2.3],t:[0,1.3,0],fov:32},{p:[-.6,1.6,1.2],t:[0,1.55,0],fov:30},{p:[0,3.6,3],t:[0,1,0],fov:38}];setCam(S,V[n%4]);
-    S.badge=off?'Fuera del tiempo':'En el tiempo';S.badgeKind=off?'bad':'ok';S.hud=beatHud(t,120,cuts,8)}});
+    S.badge=off?_t('Fuera del tiempo'):_t('En el tiempo');S.badgeKind=off?'bad':'ok';S.hud=beatHud(t,120,cuts,8)}});
 add({id:'safezone',cat:'composicion',es:'Zona segura en vertical',en:'vertical 9:16 video, subject centered, key action kept away from the top and bottom edges',dur:7,
   what:'En Reels, TikTok y Shorts la interfaz tapa la parte de arriba, la de abajo y la columna derecha. Lo importante va en el rectángulo del centro.',
   look:'Las zonas rojas quedan debajo de botones y textos de la app. La cara y la acción tienen que caer dentro del recuadro verde.',
@@ -242,14 +242,14 @@ add({id:'t2v',cat:'ia',es:'Texto a video',en:T2V,dur:13,
   fn(t,S){S.look=mk(LOOKS.golden);const g=t<3.6?0:t<5.4?ss((t-3.6)/1.8):1,tw=t>=9.2,lt=tw?t-9.2:Math.max(0,t-3.6);
     walkX(S.A,lt,6,-2.4,2.4);S.A.z=.4;if(tw){S.A.shirt='#2f6fb4';S.A.hat='#2a2a2a'}setCam(S,{p:[S.A.x+.3,1.35,5.4],t:[S.A.x,1.15,0],fov:36});
     if(g<1)S.post.css={filter:'blur('+(14*(1-g)).toFixed(1)+'px)'};
-    S.cap=t<3.6?'1. El prompt':t<5.4?'2. La IA genera desde el ruido':tw?'4. Otra generación, mismo prompt':'3. El clip';if(tw){S.badge='El personaje cambió';S.badgeKind='bad'}
+    S.cap=t<3.6?_t('1. El prompt'):t<5.4?_t('2. La IA genera desde el ruido'):tw?_t('4. Otra generación, mismo prompt'):_t('3. El clip');if(tw){S.badge=_t('El personaje cambió');S.badgeKind='bad'}
     S.hud=hudAll(noiseHud(t<3.6?1:1-g),t<4.2?typeHud(T2V,t/3.2,t<3.6?1:1-ss((t-3.6)/.6)):null)}});
 add({id:'i2v',cat:'ia',es:'Imagen a video',en:'Use the image as the first frame. The person turns toward the camera and waves, slow push-in.',dur:9,
   what:'Primero se genera o se pinta la imagen y después la IA la anima. El personaje, la ropa y el lugar quedan fijados por la imagen.',
   look:'Los primeros segundos son una foto quieta: la imagen de referencia. Después cobra vida sin cambiar de ropa ni de lugar, porque la imagen manda.',
   alias:'image to video i2v',
   fn(t,S){S.look=mk(LOOKS.golden);const still=t<3,lt=still?0:t-3,k=ss(lt/6);S.A.ry=lerp(.9,0,ss(lt/1.5));S.A.headYaw=lerp(.6,0,ss(lt/1.5));S.A.wave=still?0:pp(lt,6,.25);
-    setCam(S,{p:[.4,1.45,lerp(4.4,2.6,k)],t:[0,1.3,0],fov:34});S.tt=still?0:null;S.cap=still?'La imagen de referencia':'La IA la anima';S.hud=frameHud(still?'IMAGEN':'VIDEO',still)}});
+    setCam(S,{p:[.4,1.45,lerp(4.4,2.6,k)],t:[0,1.3,0],fov:34});S.tt=still?0:null;S.cap=still?_t('La imagen de referencia'):_t('La IA la anima');S.hud=frameHud(still?_t('IMAGEN'):'VIDEO',still)}});
 add({id:'v2v',cat:'ia',es:'Video a video',en:'Restyle this video as a neon night scene, keep the original motion and framing / Change the shirt to yellow',dur:10,
   what:'Se sube un video y la IA le cambia el estilo, el lugar o el vestuario. El movimiento y el encuadre se conservan.',
   look:'La línea separa el original, a la derecha, del resultado, a la izquierda. Los dos se mueven igual porque el movimiento viene del original.',
@@ -257,26 +257,26 @@ add({id:'v2v',cat:'ia',es:'Video a video',en:'Restyle this video as a neon night
   fn(t,S,S2){const ph=t<5?0:1;[S,S2].forEach(s=>{s.A.dance=.8;setCam(s,{p:[.5,1.35,3.6],t:[0,1.2,0],fov:36})});S.look=mk(Object.assign({},LOOKS.day,{hemi:.9,sun:.6}));S.A.shirt='#8d929b';
     if(ph===0){S2.look=mk({skyTop:'#070512',skyBot:'#1c1038',fog:'#150c2b',fogD:.03,hemi:.14,hemiSky:'#6a4dff',hemiGnd:'#0b0616',sun:1.25,sunC:'#ff2e88',sunP:[-4,2.2,2.6],fill:1.05,fillC:'#18d5e6',fillP:[4,1.8,1.6],ground:'#1c1830',foliage:'#1a2440',lamp:1.5,win:1});S2.props.lights=true;S2.A.shirt='#20202a';S2.A.hat='#18d5e6'}
     else{S2.look=S.look;S2.A.shirt='#f2c230'}
-    S.post.wipeMix=lerp(.3,.7,.5+.5*Math.sin(t*1.3));S.cap=ph===0?'Cambio de estilo':'Cambio de vestuario';S.hud=twoLabels('Resultado','Original')}});
+    S.post.wipeMix=lerp(.3,.7,.5+.5*Math.sin(t*1.3));S.cap=ph===0?_t('Cambio de estilo'):_t('Cambio de vestuario');S.hud=twoLabels(_t('Resultado'),_t('Original'))}});
 add({id:'motiontransfer',cat:'ia',es:'Transferencia de movimiento',en:'motion control: character image + reference video; the character performs the same dance, single subject, full body, steady camera, no cuts',dur:8,
   what:'Se le da a la IA una imagen del personaje y un video de alguien haciendo el movimiento. El personaje copia el movimiento con su propio aspecto.',
   look:'A la izquierda, la referencia grabada en un cuarto cualquiera. A la derecha, el personaje en su mundo con el mismo baile. La referencia funciona mejor con un solo cuerpo entero, cámara quieta y sin cortes.',
   alias:'motion control kling baile dance motion transfer',
   fn(t,S,S2){[S,S2].forEach(s=>{s.A.dance=1;s.A.headYaw=0;setCam(s,{p:[0,1.05,4.3],t:[0,1.0,0],fov:36})});
     S.look=mk(Object.assign({},LOOKS.highkey,{skyTop:'#c9ccd2',skyBot:'#dcdfe4',fog:'#d6d9de',ground:'#b9bcc2'}));S.props.set=false;S.A.shirt='#7d828c';
-    S2.look=mk(LOOKS.golden);S2.A.vis=false;S2.B.vis=true;S2.B.x=0;S2.B.z=0;S2.B.ry=0;S2.B.dance=1;S2.B.headYaw=0;S.post.split=true;S.hud=twoLabels('Video de referencia','Personaje animado')},
+    S2.look=mk(LOOKS.golden);S2.A.vis=false;S2.B.vis=true;S2.B.x=0;S2.B.z=0;S2.B.ry=0;S2.B.dance=1;S2.B.headYaw=0;S.post.split=true;S.hud=twoLabels(_t('Video de referencia'),_t('Personaje animado'))},
   fnS(t,S,S2){[S,S2].forEach(s=>{s.A.dance=1;s.A.headYaw=0;setCam(s,{p:[0,1.05,4.3],t:[0,1.0,0],fov:36})});
     S.look=mk(Object.assign({},LOOKS.highkey,{skyTop:'#c9ccd2',skyBot:'#dcdfe4',fog:'#d6d9de',ground:'#b9bcc2'}));S.props.set=false;S.A.shirt='#7d828c';
-    S2.look=mk(LOOKS.golden);S2.A.shirt='#c0392b';S2.A.hat='#f2c230';S.post.split=true;S.hud=twoLabels('Video de referencia','Personaje animado')}});
+    S2.look=mk(LOOKS.golden);S2.A.shirt='#c0392b';S2.A.hat='#f2c230';S.post.split=true;S.hud=twoLabels(_t('Video de referencia'),_t('Personaje animado'))}});
 add({id:'elements',cat:'ia',es:'Referencias combinadas',en:'Character reference + location reference + object reference: the person walks to the table and picks up the yellow mug',dur:10,
   what:'Se suben referencias separadas del personaje, del lugar y de un objeto, y la IA las junta en un mismo plano. Kling las llama elementos.',
   look:'Primero cada referencia sola, sobre fondo neutro o vacía. Después el plano final, donde aparecen las tres sin cambiar.',
   alias:'elements elementos ingredientes referencias',
   fn(t,S){const i=t<1.6?0:t<3.2?1:t<4.8?2:3;
-    if(i===0){S.look=mk(LOOKS.highkey);S.props.set=false;S.A.ry=.5;setCam(S,{p:[0,1.2,4.6],t:[0,1,0],fov:34});S.cap='Referencia 1: personaje'}
-    else if(i===1){S.A.vis=false;setCam(S,{p:[2,2.6,9],t:[-2,1,-4],fov:44});S.cap='Referencia 2: lugar'}
-    else if(i===2){S.look=mk(LOOKS.highkey);S.props.set=false;S.A.vis=false;S.props.mug=true;S.props.table=[0,0];setCam(S,{p:[.5,1.15,.9],t:[.05,.84,.05],fov:26});S.cap='Referencia 3: objeto'}
-    else{const l=t-4.8;S.props.mug=true;S.props.table=[.9,.2];S.A.x=lerp(-2.4,.35,ss(l/3.2));S.A.walk=S.A.x*3.7;S.A.amp=l<3.2?1:0;S.A.ry=PI/2;S.A.headYaw=0;S.A.wave=l>3.6?.35:0;setCam(S,{p:[.2,1.5,4.6],t:[-.2,1.05,0],fov:38});S.cap='Resultado: las tres en un plano'}
+    if(i===0){S.look=mk(LOOKS.highkey);S.props.set=false;S.A.ry=.5;setCam(S,{p:[0,1.2,4.6],t:[0,1,0],fov:34});S.cap=_t('Referencia 1: personaje')}
+    else if(i===1){S.A.vis=false;setCam(S,{p:[2,2.6,9],t:[-2,1,-4],fov:44});S.cap=_t('Referencia 2: lugar')}
+    else if(i===2){S.look=mk(LOOKS.highkey);S.props.set=false;S.A.vis=false;S.props.mug=true;S.props.table=[0,0];setCam(S,{p:[.5,1.15,.9],t:[.05,.84,.05],fov:26});S.cap=_t('Referencia 3: objeto')}
+    else{const l=t-4.8;S.props.mug=true;S.props.table=[.9,.2];S.A.x=lerp(-2.4,.35,ss(l/3.2));S.A.walk=S.A.x*3.7;S.A.amp=l<3.2?1:0;S.A.ry=PI/2;S.A.headYaw=0;S.A.wave=l>3.6?.35:0;setCam(S,{p:[.2,1.5,4.6],t:[-.2,1.05,0],fov:38});S.cap=_t('Resultado: las tres en un plano')}
     S.badge=i<3?(i+1)+' / 3':''}});
 add({id:'startend',cat:'ia',es:'Frame inicial y final',en:'Start frame: wide shot of the person under the street lamp. End frame: close-up of the face. Slow push-in between them.',dur:9,
   what:'Se le dan a la IA dos imágenes, la primera y la última, y ella inventa el movimiento del medio.',
@@ -284,7 +284,7 @@ add({id:'startend',cat:'ia',es:'Frame inicial y final',en:'Start frame: wide sho
   alias:'start frame end frame first last keyframes interpolación',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.blue,{lamp:2}));S.A.x=LAMP[0]+.7;S.A.z=LAMP[1]+.3;S.A.ry=-.5;S.A.headYaw=0;
     const A0={p:[S.A.x-2.2,1.5,S.A.z+6.5],t:[S.A.x,1.25,S.A.z],fov:38},B0={p:[S.A.x+Math.sin(-.5)*.9,1.64,S.A.z+Math.cos(-.5)*.9],t:[S.A.x,1.64,S.A.z],fov:30};
-    const k=t<1.8?0:t<7.2?ss((t-1.8)/5.4):1;camLerp(S,A0,B0,k);S.cap=t<1.8?'Frame inicial':t<7.2?'La IA genera el movimiento':'Frame final';
+    const k=t<1.8?0:t<7.2?ss((t-1.8)/5.4):1;camLerp(S,A0,B0,k);S.cap=t<1.8?_t('Frame inicial'):t<7.2?_t('La IA genera el movimiento'):_t('Frame final');
     S.hud=(c,w,h)=>{const x0=w*.1,x1=w*.9,y=h*.9;c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x0-10,y-14,x1-x0+20,28);c.fillStyle='#ffd24a';c.fillRect(x0-4,y-8,8,16);c.fillRect(x1-4,y-8,8,16);c.fillStyle='rgba(255,255,255,.35)';c.fillRect(x0+6,y-2,x1-x0-12,4);c.fillStyle='#ff5a4f';c.fillRect(x0+6,y-2,(x1-x0-12)*k,4)}}});
 add({id:'multishot',cat:'ia',es:'Varios planos en un prompt',en:'9s, 3 shots, 16:9. Shot 1: wide establishing shot of the park at dusk. Shot 2: medium tracking shot as the person walks to the lamp. Shot 3: close-up of the face as the lamp turns on.',dur:9,
   what:'Algunas herramientas, como Seedance o el Multi-Shot de Kling, generan varios planos seguidos con un solo prompt. Se escribe la duración, el número de planos y cada plano por separado.',
@@ -294,33 +294,33 @@ add({id:'multishot',cat:'ia',es:'Varios planos en un prompt',en:'9s, 3 shots, 16
     if(i===0){S.A.x=-3;S.A.ry=PI/2;setCam(S,{p:[1,3,12],t:[-1,1,-3],fov:42})}
     else if(i===1){const k=ss((t-3)/3);S.A.x=lerp(-1.6,LAMP[0]-.3,k);S.A.z=lerp(0,LAMP[1]+.4,k);S.A.ry=2.1;S.A.walk=t*6;S.A.amp=1;S.A.headYaw=0;setCam(S,{p:[S.A.x+.4,1.4,S.A.z+2.6],t:[S.A.x,1.25,S.A.z],fov:38})}
     else{S.A.x=LAMP[0]-.3;S.A.z=LAMP[1]+.4;S.A.ry=.3;S.A.headYaw=.3;setCam(S,{p:[S.A.x+Math.sin(.6)*.95,1.64,S.A.z+Math.cos(.6)*.95],t:[S.A.x,1.64,S.A.z],fov:30})}
-    S.cap='Shot '+(i+1)+' de 3';S.hud=hudAll(strip([3,6],9,t),(c,w,h)=>label(c,w,'9s · 3 shots · 16:9',w*.97,h*.03,'right',.022))}});
+    S.cap='Shot '+(i+1)+_t(' de 3');S.hud=hudAll(strip([3,6],9,t),(c,w,h)=>label(c,w,'9s · 3 shots · 16:9',w*.97,h*.03,'right',.022))}});
 add({id:'motion3',cat:'ia',es:'Sujeto, cámara y entorno',en:'Subject motion: the person walks forward. Camera motion: slow push-in. Scene motion: leaves falling, dust floating.',dur:12,
   what:'Un clip tiene tres fuentes de movimiento: el sujeto, la cámara y el entorno. Runway pide las tres por separado y las demás herramientas también responden mejor así.',
   look:'Primero se mueve solo el personaje, después solo la cámara, después solo el entorno y al final las tres cosas juntas. Si el prompt no menciona una, la IA la decide sola.',
   alias:'subject motion camera motion scene motion runway',
   fn(t,S){const i=Math.floor(t/3)%4,l=t%3,sub=i===0||i===3,camM=i===1||i===3,env=i===2||i===3;S.look=mk(Object.assign({},LOOKS.golden,{fogD:env?.02+.012*Math.sin(t*1.5):.013}));
     if(sub){S.A.x=lerp(-1,1,l/3);S.A.walk=S.A.x*3.7;S.A.amp=1;S.A.ry=PI/2;S.A.headYaw=0}else S.A.headYaw=0;
-    const k=camM?ss(l/3):0;setCam(S,{p:[0,1.4,lerp(5,3,k)],t:[0,1.2,0],fov:36});S.cap=['Solo el sujeto','Solo la cámara','Solo el entorno','Las tres juntas'][i];if(env)S.hud=hudAll(dustHud(t),leavesHud(t))}});
+    const k=camM?ss(l/3):0;setCam(S,{p:[0,1.4,lerp(5,3,k)],t:[0,1.2,0],fov:36});S.cap=[_t('Solo el sujeto'),_t('Solo la cámara'),_t('Solo el entorno'),_t('Las tres juntas')][i];if(env)S.hud=hudAll(dustHud(t),leavesHud(t))}});
 add({id:'charsheet',cat:'ia',es:'Hoja de personaje',en:'character reference sheet, full body, front view, three-quarter view, profile and back view, same outfit, neutral white background',dur:10,
   what:'La ficha visual del personaje: el mismo cuerpo y la misma ropa desde varios ángulos, sobre fondo neutro. Es la referencia que se reutiliza en cada plano.',
   look:'El personaje gira y se detiene de frente, en tres cuartos, de perfil y de espaldas. Fondo blanco, luz pareja y nada que distraiga.',
   alias:'character sheet turnaround model sheet ficha',
   fn(t,S){S.look=mk(LOOKS.highkey);S.props.set=false;S.A.hat='#c0392b';S.A.headYaw=0;const st=[0,PI/4,PI/2,PI],i=Math.floor(t/2.5)%4,l=t%2.5,nx=i===3?2*PI:st[i+1];
-    S.A.ry=l<1.9?st[i]:lerp(st[i],nx,ss((l-1.9)/.6));setCam(S,{p:[0,1.0,4.4],t:[0,.95,0],fov:34});S.cap=['Frente','Tres cuartos','Perfil','Espalda'][i]}});
+    S.A.ry=l<1.9?st[i]:lerp(st[i],nx,ss((l-1.9)/.6));setCam(S,{p:[0,1.0,4.4],t:[0,.95,0],fov:34});S.cap=[_t('Frente'),_t('Tres cuartos'),_t('Perfil'),_t('Espalda')][i]}});
 add({id:'consistency',cat:'ia',es:'Consistencia de personaje',en:'the same person in the same red shirt and red cap in every shot',dur:12,
   what:'Que el personaje se vea igual en todos los planos: cara, ropa, colores y accesorios.',
   look:'Primero cuatro planos con el mismo vestuario. Después los mismos cuatro planos generados sin referencia: la camisa y la gorra cambian y parece otra persona.',
   alias:'character consistency continuidad',
   fn(t,S){conv(S);S.B.vis=false;S.A.x=0;S.A.ry=0;S.A.headYaw=0;const bad=t>=6,i=Math.floor((t%6)/1.5);const V=[SH.wide,{p:[.4,1.45,2],t:[0,1.35,0],fov:38},{p:[2,1.5,.4],t:[0,1.45,0],fov:32},{p:[0,1.64,.95],t:[0,1.62,0],fov:30}];setCam(S,V[i]);
     const shirts=['#b4482f','#2f6fb4','#b4482f','#3f8a4a'],hats=['#c0392b',null,'#2a2a2a','#c0392b'];S.A.shirt=bad?shirts[i]:'#b4482f';S.A.hat=bad?hats[i]:'#c0392b';
-    S.badge=bad?'Inconsistente':'Consistente';S.badgeKind=bad?'bad':'ok';S.cap='Plano '+(i+1)}});
+    S.badge=bad?_t('Inconsistente'):_t('Consistente');S.badgeKind=bad?'bad':'ok';S.cap=_t('Plano ')+(i+1)}});
 add({id:'drift',cat:'ia',es:'Deriva y morphing',en:'keep the same person, the same red shirt and the same cap from the first frame to the last',dur:9,
   what:'El personaje o un objeto se transforma poco a poco dentro del mismo clip. Pasa más en clips largos porque los errores pequeños se acumulan.',
   look:'Es un solo plano sin cortes: la camisa pasa de roja a azul y la gorra desaparece. Para evitarlo, clips cortos, una imagen de referencia y la misma descripción en cada prompt.',
   alias:'morphing drift identity drift',
   fn(t,S){walkX(S.A,t,9,-2.6,2.6);const k=ss((t-2)/5);S.A.shirt=mixC('#b4482f','#2f6fb4',k);S.A.hat=k<.55?'#c0392b':null;setCam(S,{p:[S.A.x*.5,1.45,4.2],t:[S.A.x,1.2,0],fov:36});
-    S.badge=k>.15?'Deriva':'';S.badgeKind='bad';S.cap=k<.1?'Segundo 0':k<.9?'Cambia sin cortar':'Ya parece otra persona'}});
+    S.badge=k>.15?_t('Deriva'):'';S.badgeKind='bad';S.cap=k<.1?_t('Segundo 0'):k<.9?_t('Cambia sin cortar'):_t('Ya parece otra persona')}});
 
 /* referencias y sinónimos para términos que ya estaban */
 const EXTRA={golden:{ref:'La La Land (2016), Llámame por tu nombre (2017)'},bluehour:{ref:'Drive (2011), Moonlight (2016)'},
@@ -378,9 +378,9 @@ add({id:'audiolayers',cat:'edicion',es:'Capas de sonido',en:'music, dialogue, so
   what:'El audio de un video se arma en capas: música, voz, efectos y la mezcla que las equilibra.',
   look:'Las pistas se suman una por una. En la mezcla final la música baja cuando hay voz, para que se entienda.',
   alias:'audio mezcla sonido capas',
-  fn(t,S){conv(S);S.A.talk=t>=2.5&&t<7.5?1:0;setCam(S,SH.wide);const n=t<2.5?1:t<5?2:t<7.5?3:4;S.cap=['Música','+ voz','+ efectos','Mezcla final'][n-1];
+  fn(t,S){conv(S);S.A.talk=t>=2.5&&t<7.5?1:0;setCam(S,SH.wide);const n=t<2.5?1:t<5?2:t<7.5?3:4;S.cap=[_t('Música'),_t('+ voz'),'+ efectos',_t('Mezcla final')][n-1];
     S.hud=(c,w,h)=>{const x0=w*.04,x1=w*.96,y0=h*.55,rh=h*.09,bx=x0+w*.13,N=56,bw=(x1-bx)/N,f=Math.floor(t*14);c.fillStyle='rgba(8,9,12,.74)';c.fillRect(x0-8,y0-10,x1-x0+16,rh*4+14);
-      const names=['Música','Voz','Efectos','Mezcla'],cols=['#8c9bff','#ffd24a','#5fd398','#ff5a4f'];
+      const names=[_t('Música'),_t('Voz'),_t('Efectos'),_t('Mezcla')],cols=['#8c9bff','#ffd24a','#5fd398','#ff5a4f'];
       for(let r=0;r<4;r++){const on=r<n,y=y0+r*rh+rh/2;c.globalAlpha=on?1:.22;label(c,w,names[r],x0,y-fpx(w,.02)/2,'left',.02);c.fillStyle=cols[r];
         for(let i=0;i<N;i++){const k=i+f,talk=Math.sin(k*.22)>-.1,mus=.3+.45*hsh(k*1.3),voc=talk?.25+.65*hsh(k+50):.04,sfx=k%13===0?.95:k%13===1?.5:.03;
           let a=r===0?mus:r===1?voc:r===2?sfx:Math.min(1,mus*(talk?.45:1)+voc*.9+sfx*.8);if(r===3&&n<4)a=.05;const hh=Math.max(1,a*rh*.42);c.fillRect(bx+i*bw,y-hh,bw*.62,hh*2)}}
@@ -389,23 +389,23 @@ add({id:'textlogo',cat:'ia',es:'Texto y logos',en:'leave the sign blank, add the
   what:'La IA deforma letras y logos y los cambia entre cuadros. El texto que tiene que leerse se agrega en la edición.',
   look:'Primero el letrero como lo dejaría la IA: letras que tiemblan y cambian. Después el mismo letrero puesto en la edición: quieto y legible.',
   alias:'texto letrero logo tipografía',
-  fn(t,S){S.A.x=-5.4;S.A.z=-5.9;S.A.ry=.5;setCam(S,{p:[-3.4+.3*Math.sin(t*.4),1.8,-1.4],t:[-6.7,1.9,-7],fov:40});const ai=t<4;S.badge=ai?'Generado por la IA':'Agregado en la edición';S.badgeKind=ai?'bad':'ok';
+  fn(t,S){S.A.x=-5.4;S.A.z=-5.9;S.A.ry=.5;setCam(S,{p:[-3.4+.3*Math.sin(t*.4),1.8,-1.4],t:[-6.7,1.9,-7],fov:40});const ai=t<4;S.badge=ai?_t('Generado por la IA'):_t('Agregado en la edición');S.badgeKind=ai?'bad':'ok';
     S.hud=(c,w,h)=>{const P=project(new V3(-6.8,2.62,-6.95),cam,w,h);if(P[2]>1)return;const sw=w*.21,sh=w*.06,x=P[0]-sw/2,y=P[1]-sh/2;c.fillStyle='#f4ead2';c.fillRect(x,y,sw,sh);c.strokeStyle='#3a2a1e';c.lineWidth=Math.max(2,w/300);c.strokeRect(x,y,sw,sh);
-      const txt='CAFÉ LUNA',f=Math.floor(t*8);c.font='700 '+(sh*.6)+'px "Barlow Condensed","Arial Narrow",sans-serif';c.textBaseline='middle';c.fillStyle='#3a2a1e';
-      if(ai){const gl='CAFELUNAÉOQ8RBG';c.textAlign='left';const wd=c.measureText(txt).width;let cx=P[0]-wd/2;for(let i=0;i<txt.length;i++){let ch=txt[i];const cw=c.measureText(ch).width;if(ch!==' '&&hsh(i*7+f)<.35)ch=gl[Math.floor(hsh(i+f*3)*gl.length)];
+      const txt=_t('CAFÉ LUNA'),f=Math.floor(t*8);c.font='700 '+(sh*.6)+'px "Barlow Condensed","Arial Narrow",sans-serif';c.textBaseline='middle';c.fillStyle='#3a2a1e';
+      if(ai){const gl=_t('CAFELUNAÉOQ8RBG');c.textAlign='left';const wd=c.measureText(txt).width;let cx=P[0]-wd/2;for(let i=0;i<txt.length;i++){let ch=txt[i];const cw=c.measureText(ch).width;if(ch!==' '&&hsh(i*7+f)<.35)ch=gl[Math.floor(hsh(i+f*3)*gl.length)];
         c.save();c.translate(cx,P[1]+(hsh(i+f)-.5)*sh*.14);c.rotate((hsh(i*3+f)-.5)*.4);c.scale(1+(hsh(i+f*5)-.5)*.35,1);c.fillText(ch,0,0);c.restore();cx+=cw}}
       else{c.textAlign='center';c.fillText(txt,P[0],P[1])}}}});
 add({id:'pipeline',cat:'ia',es:'Flujo de producción',en:'idea, script, style guide, storyboard, audio, images, video, upscale, edit',dur:13.5,
   what:'Las etapas de un video con IA de principio a fin. Lo que se decide en cada una se arrastra a todas las siguientes.',
   look:'Abajo se marca la etapa. El mismo plano pasa de idea en texto a boceto, a imagen quieta, a video y a montaje.',
   alias:'workflow flujo etapas producción',
-  fn(t,S){const st=['Idea','Guion','Guía de estilo','Storyboard','Audio','Imágenes','Video','Reescalado','Edición'],i=Math.min(8,Math.floor(t/1.5)),l=t-i*1.5;
+  fn(t,S){const st=[_t('Idea'),_t('Guion'),_t('Guía de estilo'),_t('Storyboard'),_t('Audio'),_t('Imágenes'),'Video',_t('Reescalado'),_t('Edición')],i=Math.min(8,Math.floor(t/1.5)),l=t-i*1.5;
     S.look=mk(Object.assign({},LOOKS.blue,{lamp:2}));S.A.x=LAMP[0]+.8;S.A.z=LAMP[1]+.3;S.A.ry=-.6;S.A.headYaw=0;setCam(S,{p:[1.2,1.5,1.6],t:[3.4,1.35,-2.8],fov:40});
     if(i>=6){S.A.wave=pp(i===6?l:l+.75,1.5,.2);S.A.headYaw=.15*Math.sin(t*1.3)}else S.tt=0;
     const css={filter:''};if(i===2)css.filter='saturate(.35)';if(i===3)css.filter='grayscale(1) url(#poster) contrast(1.4)';if(i===4)css.filter='saturate(.6) brightness(.75)';if(i===7)css.filter='blur('+(4*(1-ss(l/1.2))).toFixed(1)+'px)';S.post.css=css;
     S.cap=(i+1)+'. '+st[i];
     S.hud=(c,w,h)=>{const mono=fs=>{c.font='500 '+fs+'px "IBM Plex Mono",monospace';c.textBaseline='top';c.textAlign='center';c.fillStyle='#e8ebf0'};
-      if(i<=1){c.fillStyle='rgba(12,13,17,.93)';c.fillRect(0,0,w,h);const fs=fpx(w,.026);mono(fs);const L=i===0?['Alguien espera bajo un farol','y la luz se enciende.']:['EXT. PARQUE – ANOCHECER','Una persona espera junto al farol.','La luz se enciende. Saluda.'];L.forEach((x,j)=>c.fillText(x,w/2,h*.36+j*fs*1.6))}
+      if(i<=1){c.fillStyle='rgba(12,13,17,.93)';c.fillRect(0,0,w,h);const fs=fpx(w,.026);mono(fs);const L=i===0?[_t('Alguien espera bajo un farol'),_t('y la luz se enciende.')]:[_t('EXT. PARQUE – ANOCHECER'),_t('Una persona espera junto al farol.'),_t('La luz se enciende. Saluda.')];L.forEach((x,j)=>c.fillText(x,w/2,h*.36+j*fs*1.6))}
       if(i===2)swatches(['#1b2440','#56648f','#ffd9a0','#b4482f','#e9e3d0'])(c,w,h);
       if(i===4){const y=h*.62,N=70,bw=w*.8/N;c.fillStyle='#ffd24a';for(let k=0;k<N;k++){const a=.15+.8*hsh(k+Math.floor(t*14));c.fillRect(w*.1+k*bw,y-a*h*.08,bw*.6,a*h*.16)}}
       if(i===5){const lw=Math.max(3,w/240);c.strokeStyle='rgba(255,210,74,.95)';c.lineWidth=lw;c.strokeRect(lw/2,lw/2,w-lw,h-lw)}

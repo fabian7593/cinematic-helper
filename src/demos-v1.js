@@ -14,9 +14,9 @@ add({id:'insert',cat:'encuadre',es:'Plano detalle',en:'insert shot',dur:6,what:'
 add({id:'ots',cat:'encuadre',es:'Over the shoulder',en:'over-the-shoulder shot',dur:6,what:'La cámara mira por encima del hombro de un personaje hacia el otro.',look:'El hombro y la nuca de uno enmarcan al que habla. Es el plano clásico de conversación.',
   fn(t,S){conv(S);setCam(S,SH.ots);S.A.talk=1}});
 add({id:'pov',cat:'encuadre',es:'Plano subjetivo',en:'POV shot',dur:6,what:'Lo que ve el personaje con sus propios ojos.',look:'En la vista del set la cámara ocupa el lugar de la cabeza del personaje A.',
-  fn(t,S){conv(S);S.A.vis=false;S.B.talk=1;setCam(S,{p:[-.7,1.6+.012*Math.sin(t*3.1),.02*Math.sin(t*1.7)],t:[.8+.0,1.55,.06*Math.sin(t*.9)],fov:50});S.cap='Lo que ve el personaje A'}});
+  fn(t,S){conv(S);S.A.vis=false;S.B.talk=1;setCam(S,{p:[-.7,1.6+.012*Math.sin(t*3.1),.02*Math.sin(t*1.7)],t:[.8+.0,1.55,.06*Math.sin(t*.9)],fov:50});S.cap=_t('Lo que ve el personaje A')}});
 add({id:'establishing',cat:'encuadre',es:'Establishing shot',en:'establishing shot',dur:7,what:'Vista amplia del lugar al abrir una escena.',look:'Antes de entrar a la casa, se muestra la casa. Le dice al espectador dónde y cuándo estamos.',
-  fn(t,S){const k=ss(t/7);S.A.vis=false;setCam(S,{p:[1.5-1.2*k,2.7-.3*k,9.5-2*k],t:[-5.6,1.7,-8],fov:42});S.cap='Ext. casa, día'}});
+  fn(t,S){const k=ss(t/7);S.A.vis=false;setCam(S,{p:[1.5-1.2*k,2.7-.3*k,9.5-2*k],t:[-5.6,1.7,-8],fov:42});S.cap=_t('Ext. casa, día')}});
 
 /* ÁNGULO */
 add({id:'eye',cat:'angulo',es:'A nivel de ojos',en:'eye-level shot',dur:7,what:'La cámara está a la altura de los ojos del personaje.',look:'Es el ángulo neutro: no opina sobre el personaje.',
@@ -62,7 +62,7 @@ add({id:'dollyzoom',cat:'mov',es:'Dolly zoom',en:'dolly zoom',dur:6,what:'La cá
   fn(t,S){const d=lerp(7,1.9,pp(t,6,.05)),f=2*Math.atan(1.1/ d)*180/PI;setCam(S,{p:[0,1.42,d],t:[0,1.38,0],fov:f})}});
 add({id:'rack',cat:'mov',es:'Rack focus',en:'rack focus',dur:7,what:'El foco pasa de un objeto a otro dentro del mismo plano.',look:'Primero está nítida la planta de adelante y después el personaje. La cámara no se mueve.',
   fn(t,S){S.props.fg=true;setCam(S,{p:[-.25,1.5,3.2],t:[0,1.42,0],fov:26});const k=t<2?0:t<3?ss(t-2):t<5.6?1:1-ss((t-5.6)/1.2);
-    S.post.blur={fg:lerp(0,11,k),mid:lerp(7,0,k),bg:lerp(13,7,k)};S.cap=k<.5?'Foco en la planta':'Foco en el personaje'}});
+    S.post.blur={fg:lerp(0,11,k),mid:lerp(7,0,k),bg:lerp(13,7,k)};S.cap=k<.5?_t('Foco en la planta'):_t('Foco en el personaje')}});
 
 /* LENTE */
 add({id:'focal',cat:'lente',es:'Distancia focal',en:'16mm wide-angle lens / 85mm lens',dur:12,what:'Define cuánto abarca el lente. Gran angular abarca mucho y exagera el espacio; teleobjetivo abarca poco y aplana.',look:'El personaje mide lo mismo en los cuatro lentes porque la cámara se aleja. Mirá cómo el fondo se acerca y se agranda.',
@@ -72,7 +72,7 @@ add({id:'aperture',cat:'lente',es:'Apertura',en:'f/1.8 aperture',dur:10,what:'El
   fn(t,S){S.props.fg=true;setCam(S,{p:[-.25,1.5,3.2],t:[0,1.42,0],fov:26});const N=['f/1.8','f/4','f/8','f/16'],B=[14,7,3,0],G=[11,5.5,2,0];
     const i=Math.floor(t/2.5)%4,l=t-i*2.5,p=(i+3)%4,k=ss(l/.7);S.post.blur={fg:lerp(G[p],G[i],k),mid:0,bg:lerp(B[p],B[i],k)};S.cap=N[i];S.lensNote=N[i]}});
 add({id:'dof',cat:'lente',es:'Profundidad de campo',en:'shallow depth of field / deep focus',dur:8,what:'Cuánta parte de la imagen está en foco, de adelante hacia atrás.',look:'Con poca profundidad el fondo se disuelve y el personaje se separa. Con mucha, el lugar se lee completo.',
-  fn(t,S){setCam(S,{p:[.2,1.52,2.6],t:[0,1.45,0],fov:28});const k=t<3?1:t<4?1-ss(t-3):t<7?0:ss(t-7);S.post.blur={fg:0,mid:0,bg:13*k};S.cap=k>.5?'Shallow depth of field':'Deep focus'}});
+  fn(t,S){setCam(S,{p:[.2,1.52,2.6],t:[0,1.45,0],fov:28});const k=t<3?1:t<4?1-ss(t-3):t<7?0:ss(t-7);S.post.blur={fg:0,mid:0,bg:13*k};S.cap=k>.5?'Shallow depth of field':_t('Deep focus')}});
 add({id:'bokeh',cat:'lente',es:'Bokeh',en:'soft bokeh background',dur:7,what:'La forma que toman las luces desenfocadas del fondo.',look:'Cada punto de luz se convierte en un disco suave a medida que el fondo sale de foco.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.night,{fill:1.15,fillC:'#ffd9b0',fillP:[1.5,1.2,3],lamp:0,hemi:.3}));S.props.lights=true;setCam(S,{p:[.15,1.6,1.3],t:[0,1.6,0],fov:30});
     S.post.blur={fg:0,mid:0,bg:15*pp(t,7,.1)};S.post.bokeh=true}});
@@ -80,9 +80,9 @@ add({id:'fps',cat:'lente',es:'Cuadros por segundo',en:'24 fps',dur:12,what:'Cuá
   fn(t,S){const i=Math.floor(t/4)%3;setCam(S,{p:[0,1.4,6],t:[0,1.1,0],fov:36});walkX(S.A,t,2.2,-4,4);S.post.fps=[12,24,0][i];S.cap=['12 fps: entrecortado','24 fps: cine','60 fps: fluido'][i]}});
 add({id:'shutter',cat:'lente',es:'Velocidad de obturación',en:'natural motion blur, 24 fps film look',dur:12,what:'Cuánto tiempo se expone cada cuadro. Controla el barrido del movimiento.',look:'A 1/500 cada cuadro sale congelado y el movimiento se ve nervioso. A 1/48 hay un barrido natural. A 1/12 todo se embarra.',
   fn(t,S){const i=Math.floor(t/4)%3;setCam(S,{p:[0,1.4,4.4],t:[0,1.15,0],fov:36});walkX(S.A,t,2.6,-3.2,3.2);S.A.wave=1;S.A.waveF=15;
-    S.post.fps=24;S.post.sub=14;S.post.shutter=[.04,.5,2][i];S.cap=['1/500 s: nítido y entrecortado','1/48 s: regla de 180°','1/12 s: barrido'][i]}});
+    S.post.fps=24;S.post.sub=14;S.post.shutter=[.04,.5,2][i];S.cap=[_t('1/500 s: nítido y entrecortado'),_t('1/48 s: regla de 180°'),'1/12 s: barrido'][i]}});
 add({id:'aspect',cat:'lente',es:'Relación de aspecto',en:'16:9 / 9:16 / 2.39:1 aspect ratio',dur:12.5,what:'La forma del cuadro: ancho dividido entre alto.',look:'El mismo plano recortado a cada formato. Fijate qué se pierde en vertical y qué gana el panorámico.',
-  fn(t,S){conv(S);setCam(S,SH.wide);const R=[[16/9,'16:9, YouTube'],[2.39,'2.39:1, cine panorámico'],[4/3,'4:3, TV clásica'],[1,'1:1, cuadrado'],[9/16,'9:16, Reels y TikTok']];const i=Math.floor(t/2.5)%5;S.post.mask=R[i][0];S.cap=R[i][1];S.A.talk=1}});
+  fn(t,S){conv(S);setCam(S,SH.wide);const R=[[16/9,'16:9, YouTube'],[2.39,_t('2.39:1, cine panorámico')],[4/3,_t('4:3, TV clásica')],[1,'1:1, cuadrado'],[9/16,_t('9:16, Reels y TikTok')]];const i=Math.floor(t/2.5)%5;S.post.mask=R[i][0];S.cap=R[i][1];S.A.talk=1}});
 add({id:'anamorphic',cat:'lente',es:'Anamórfico',en:'anamorphic lens, horizontal lens flare',dur:8,what:'Lente de cine panorámico que comprime la imagen a lo ancho.',look:'Tres señales: cuadro muy ancho, bokeh ovalado y destellos horizontales azules sobre las luces.',
   fn(t,S){S.look=mk(Object.assign({},LOOKS.night,{fill:1.15,fillC:'#ffd9b0',fillP:[1.5,1.2,3],lamp:0,hemi:.3}));S.props.lights=true;const x=.5*Math.sin(t/8*PI*2);
     setCam(S,{p:[x,1.58,1.9],t:[x*.4,1.56,0],fov:30});S.post.blur={fg:0,mid:0,bg:12};S.post.bokeh=true;S.post.anam=true;S.post.mask=2.39}});
@@ -91,9 +91,9 @@ add({id:'anamorphic',cat:'lente',es:'Anamórfico',en:'anamorphic lens, horizonta
 add({id:'key',cat:'luz',es:'Key light',en:'key light from the left',dur:6,what:'La luz principal sobre el sujeto.',look:'Una sola luz a 45° modela la cara: un lado iluminado y el otro en sombra.',
   fn(t,S){const k=t<1.2?0:ss((t-1.2)/.6);S.look=mk(Object.assign({},LOOKS.studio,{sun:1.35*k,hemi:.06}));S.props.set=false;S.props.lg=true;setCam(S,LC(t));S.cap=k<.5?'Key light apagada':'Key light encendida'}});
 add({id:'fill',cat:'luz',es:'Fill light',en:'soft fill light',dur:7,what:'Luz de relleno, más débil, que suaviza las sombras que deja la principal.',look:'El lado oscuro de la cara recupera detalle sin perder el volumen.',
-  fn(t,S){const k=t<2.5?0:t<3.2?ss((t-2.5)/.7):1;S.look=mk(Object.assign({},LOOKS.studio,{fill:.62*k}));S.props.set=false;S.props.lg=true;setCam(S,LC(t));S.cap=k<.5?'Sin fill':'Con fill'}});
+  fn(t,S){const k=t<2.5?0:t<3.2?ss((t-2.5)/.7):1;S.look=mk(Object.assign({},LOOKS.studio,{fill:.62*k}));S.props.set=false;S.props.lg=true;setCam(S,LC(t));S.cap=k<.5?_t('Sin fill'):_t('Con fill')}});
 add({id:'rim',cat:'luz',es:'Rim light / contraluz',en:'rim light, backlight',dur:7,what:'Luz desde atrás que dibuja un borde brillante en la silueta.',look:'Aparece una línea de luz en hombros y cabeza que separa al personaje del fondo oscuro.',
-  fn(t,S){const k=t<2.5?0:t<3.2?ss((t-2.5)/.7):1;S.look=mk(Object.assign({},LOOKS.studio,{sun:.8,rim:2.4*k}));S.props.set=false;S.props.lg=true;setCam(S,LC(t));S.cap=k<.5?'Sin rim':'Con rim'}});
+  fn(t,S){const k=t<2.5?0:t<3.2?ss((t-2.5)/.7):1;S.look=mk(Object.assign({},LOOKS.studio,{sun:.8,rim:2.4*k}));S.props.set=false;S.props.lg=true;setCam(S,LC(t));S.cap=k<.5?_t('Sin rim'):_t('Con rim')}});
 add({id:'highkey',cat:'luz',es:'High-key',en:'high-key lighting',dur:6,what:'Todo iluminado y con pocas sombras.',look:'Poco contraste y fondo claro. Es el look de comedia y comerciales.',
   fn(t,S){S.look=mk(LOOKS.highkey);S.props.set=false;S.props.lg=true;setCam(S,LC(t))}});
 add({id:'lowkey',cat:'luz',es:'Low-key',en:'low-key lighting, deep shadows',dur:6,what:'Mucha sombra y mucho contraste, casi sin relleno.',look:'Media cara desaparece en negro. Drama, suspenso, noir.',
@@ -125,60 +125,60 @@ add({id:'palette',cat:'color',es:'Paleta de color',en:'color palette: desaturate
     S.A.shirt=mixC(PAL[p].a,PAL[i].a,k);S.B.shirt=mixC(PAL[p].b,PAL[i].b,k);S.cap=PAL[i].n;S.hud=swatches(PAL[i].sw)}});
 add({id:'temp',cat:'color',es:'Temperatura de color',en:'warm color temperature / cool color temperature',dur:9,what:'Qué tan cálida (naranja) o fría (azul) es la luz. Se mide en kelvin.',look:'La misma escena pasa de luz de bombillo a luz de día y a sombra azul. Los números bajos son cálidos.',
   fn(t,S){const u=pp(t,9,.04)*(KELV.length-1),i=Math.min(KELV.length-2,Math.floor(u)),k=u-i;const col=mixC(KELV[i][1],KELV[i+1][1],k),K=Math.round(lerp(KELV[i][0],KELV[i+1][0],k)/100)*100;
-    S.look=mk({sunC:col,hemiSky:col,sun:1,skyBot:mixC('#cfe0ee',col,.5),fog:mixC('#cfe0ee',col,.5)});setCam(S,{p:[.8,1.45,3.2],t:[0,1.25,0],fov:36});S.cap=K+' K'}});
+    S.look=mk({sunC:col,hemiSky:col,sun:1,skyBot:mixC('#cfe0ee',col,.5),fog:mixC('#cfe0ee',col,.5)});setCam(S,{p:[.8,1.45,3.2],t:[0,1.25,0],fov:36});S.cap=K+_t(' K')}});
 add({id:'complementary',cat:'color',es:'Colores complementarios',en:'teal and orange color scheme',dur:6,what:'Dos colores opuestos en el círculo cromático. El clásico es teal and orange.',look:'El personaje naranja salta contra el fondo azul verdoso. Los opuestos dan el máximo contraste.',
   fn(t,S){S.look=mk({skyTop:'#0c3440',skyBot:'#2f7d86',fog:'#2a6f78',fogD:.018,hemi:.5,hemiSky:'#59c2c9',hemiGnd:'#0f3038',sun:1.15,sunC:'#ff9a3c',sunP:[4,3,4],ground:'#1f5961',foliage:'#1c6a70'});
     S.A.shirt='#ff8a2a';setCam(S,{p:[.6*Math.sin(t*PI/3),1.45,3.4],t:[0,1.25,0],fov:36});S.hud=wheel([28,205])}});
 add({id:'analogous',cat:'color',es:'Análogos / monocromático',en:'analogous color scheme / monochromatic blue',dur:10,what:'Análogos son colores vecinos en el círculo. Monocromático es un solo tono en varias intensidades.',look:'Las dos opciones dan armonía y atmósfera en vez de contraste.',
   fn(t,S){const an=mk({skyTop:'#b8452c',skyBot:'#ffc15a',fog:'#f2a24e',fogD:.016,hemi:.5,hemiSky:'#ffd08a',hemiGnd:'#8a3a1c',sun:1.1,sunC:'#ff9d4a',sunP:[-5,3,3],ground:'#b5642f',foliage:'#c9862f'});
     const mo=mk({skyTop:'#0f2247',skyBot:'#6f93d6',fog:'#5578bf',fogD:.018,hemi:.6,hemiSky:'#9db8ee',hemiGnd:'#14254a',sun:.9,sunC:'#bcd0ff',sunP:[-5,3,3],ground:'#28427a',foliage:'#1b3566'});
-    const k=t<4?0:t<5?ss(t-4):t<9?1:1-ss(t-9);S.look=mixLook(an,mo,k);S.A.shirt=mixC('#ffd23f','#9db8ee',k);setCam(S,{p:[.5,1.45,3.6],t:[0,1.2,0],fov:36});S.cap=k<.5?'Análogos':'Monocromático';S.hud=wheel(k<.5?[8,30,52]:[220])}});
+    const k=t<4?0:t<5?ss(t-4):t<9?1:1-ss(t-9);S.look=mixLook(an,mo,k);S.A.shirt=mixC('#ffd23f','#9db8ee',k);setCam(S,{p:[.5,1.45,3.6],t:[0,1.2,0],fov:36});S.cap=k<.5?_t('Análogos'):_t('Monocromático');S.hud=wheel(k<.5?[8,30,52]:[220])}});
 add({id:'grading',cat:'color',es:'Color grading',en:'cinematic color grade',dur:8,what:'El ajuste de color final que unifica todos los planos y les da el look.',look:'A la izquierda de la línea, la imagen plana como sale de cámara. A la derecha, corregida.',
   fn(t,S){conv(S);setCam(S,SH.wide);S.post.grade=GR.teal;S.post.gradeBase=GR.flat;S.post.wipe=lerp(.12,.88,pp(t,8,.05));
     S.hud=(c,w,h)=>{const x=w*S.post.wipe;c.fillStyle='#fff';c.fillRect(x-1,0,2,h);c.font='500 '+Math.max(12,w*.021)+'px "IBM Plex Mono",monospace';c.textBaseline='bottom';c.shadowColor='rgba(0,0,0,.9)';c.shadowBlur=4;
-      c.textAlign='right';c.fillText('Sin corregir',x-10,h*.88);c.textAlign='left';c.fillText('Con grading',x+10,h*.88);c.shadowBlur=0}}});
+      c.textAlign='right';c.fillText(_t('Sin corregir'),x-10,h*.88);c.textAlign='left';c.fillText(_t('Con grading'),x+10,h*.88);c.shadowBlur=0}}});
 add({id:'lut',cat:'color',es:'LUT',en:'teal and orange LUT / black and white film look',dur:9,what:'Un preset de color que se aplica de un golpe en el editor.',look:'El mismo plano con tres LUT distintos. Son un punto de partida, no el grading completo.',
-  fn(t,S){conv(S);setCam(S,SH.wide);const i=Math.floor(t/3)%3;S.post.grade=[GR.teal,GR.noir,GR.vint][i];S.cap='LUT: '+['teal and orange','blanco y negro','vintage cálido'][i]}});
+  fn(t,S){conv(S);setCam(S,SH.wide);const i=Math.floor(t/3)%3;S.post.grade=[GR.teal,GR.noir,GR.vint][i];S.cap=_t('LUT: ')+['teal and orange',_t('blanco y negro'),_t('vintage cálido')][i]}});
 
 /* EDICIÓN */
 function strip(cuts,total,now,labels){return (c,w,h)=>{const x0=w*.04,x1=w*.96,y=h*.8,bh=Math.max(8,h*.03);c.fillStyle='rgba(0,0,0,.55)';c.fillRect(x0-8,y-10,x1-x0+16,bh+20);
   let prev=0;cuts.concat([total]).forEach((ct,i)=>{c.fillStyle=i%2?'#c9ced8':'#8d95a3';c.fillRect(x0+(x1-x0)*prev/total,y,(x1-x0)*(ct-prev)/total-2,bh);prev=ct});
   c.fillStyle='#ff5a4f';c.fillRect(x0+(x1-x0)*now/total-1,y-6,2,bh+12)}}
 add({id:'cut',cat:'edicion',es:'Corte',en:'hard cut',dur:6,what:'El paso directo de un plano al siguiente, sin transición.',look:'De plano general a primer plano en un instante. En la vista del set la cámara salta de lugar.',
-  fn(t,S){conv(S);S.A.talk=1;const i=t<3?0:1;setCam(S,i?SH.a:SH.wide);S.cap='Plano '+(i+1)}});
+  fn(t,S){conv(S);S.A.talk=1;const i=t<3?0:1;setCam(S,i?SH.a:SH.wide);S.cap=_t('Plano ')+(i+1)}});
 add({id:'matchcut',cat:'edicion',es:'Match cut',en:'match cut',dur:7,what:'Un corte que une dos planos por una forma o un movimiento parecido.',look:'La cabeza y la luna ocupan el mismo lugar y tamaño en el cuadro, así que el ojo las conecta.',
   fn(t,S){if(t<3.5){const k=t/3.5;setCam(S,{p:[0,1.632,1.0-.06*k],t:[0,1.632,0],fov:30});S.A.headYaw=0}
     else{const k=(t-3.5)/3.5;S.look=mk(Object.assign({},LOOKS.night,{lamp:0}));S.props.moon=true;setCam(S,{p:[0,1.5,6],t:[0,16,-18.5],fov:30-1.6*k})}}});
 add({id:'jumpcut',cat:'edicion',es:'Jump cut',en:'jump cut',dur:5.4,what:'Un corte brusco dentro de la misma acción y con el mismo encuadre.',look:'La cámara no cambia, pero el personaje salta de lugar: se nota que falta tiempo en medio.',
   fn(t,S){const i=Math.floor(t/.9)%6;setCam(S,{p:[0,1.4,5],t:[0,1.1,0],fov:36});S.A.x=[-1.7,-.5,.8,1.8,.2,-1.0][i];S.A.wave=[0,.7,0,1,.3,0][i];S.A.headYaw=[.3,-.2,0,.4,-.4,.1][i];S.A.ry=[.3,0,-.3,.2,0,-.2][i]}});
 add({id:'jlcut',cat:'edicion',es:'J-cut / L-cut',en:'J-cut, L-cut',dur:12,what:'En el J-cut el audio del plano siguiente entra antes que su imagen. En el L-cut el audio del plano anterior sigue sobre la imagen nueva.',look:'Abajo, la pista de video y la de audio. El corte de una no coincide con el de la otra, y por eso el diálogo fluye.',
-  fn(t,S){conv(S);const J=t<6,l=J?t:t-6,vc=J?3.6:2.4,ac=J?2.2:3.8;const onB=l>=vc,spB=l>=ac;setCam(S,onB?SH.b:SH.a);S.A.talk=spB?0:1;S.B.talk=spB?1:0;S.cap=J?'J-cut: primero se oye, después se ve':'L-cut: se sigue oyendo al anterior';
+  fn(t,S){conv(S);const J=t<6,l=J?t:t-6,vc=J?3.6:2.4,ac=J?2.2:3.8;const onB=l>=vc,spB=l>=ac;setCam(S,onB?SH.b:SH.a);S.A.talk=spB?0:1;S.B.talk=spB?1:0;S.cap=J?_t('J-cut: primero se oye, después se ve'):_t('L-cut: se sigue oyendo al anterior');
     S.hud=(c,w,h)=>{const x0=w*.14,x1=w*.96,bh=Math.max(10,h*.035),y=h*.74;c.fillStyle='rgba(0,0,0,.6)';c.fillRect(w*.02,y-8,w*.96,bh*2+22);c.font='500 '+Math.max(11,w*.019)+'px "IBM Plex Mono",monospace';c.fillStyle='#e9ecf1';c.textBaseline='middle';c.textAlign='left';
-      c.fillText('Video',w*.035,y+bh/2);c.fillText('Audio',w*.035,y+bh*1.5+6);const X=s=>x0+(x1-x0)*s/6;
+      c.fillText('Video',w*.035,y+bh/2);c.fillText(_t('Audio'),w*.035,y+bh*1.5+6);const X=s=>x0+(x1-x0)*s/6;
       c.fillStyle='#b4482f';c.fillRect(X(0),y,X(vc)-X(0)-1,bh);c.fillRect(X(0),y+bh+6,X(ac)-X(0)-1,bh);c.fillStyle='#2f7f86';c.fillRect(X(vc),y,X(6)-X(vc),bh);c.fillRect(X(ac),y+bh+6,X(6)-X(ac),bh);
       c.fillStyle='#fff';c.fillRect(X(l)-1,y-4,2,bh*2+14)}}});
 add({id:'cutaway',cat:'edicion',es:'Cutaway / B-roll',en:'cutaway shot, B-roll',dur:8,what:'Un plano de apoyo que se inserta sobre la acción principal.',look:'El personaje sigue hablando mientras se muestra la taza. Sirve para ilustrar y para esconder cortes.',
-  fn(t,S){S.props.mug=true;S.A.talk=1;const b=t>=3&&t<5;setCam(S,b?{p:[1.25,1.2,1.25],t:[.85,.82,.3],fov:24}:{p:[-.1,1.42,2.3],t:[0,1.34,0],fov:36});S.cap=b?'Cutaway':'Plano principal'}});
+  fn(t,S){S.props.mug=true;S.A.talk=1;const b=t>=3&&t<5;setCam(S,b?{p:[1.25,1.2,1.25],t:[.85,.82,.3],fov:24}:{p:[-.1,1.42,2.3],t:[0,1.34,0],fov:36});S.cap=b?_t('Cutaway'):_t('Plano principal')}});
 add({id:'fade',cat:'edicion',es:'Fundido / disolvencia',en:'dissolve, fade to black',dur:10,what:'Transiciones graduales: una imagen se mezcla con la siguiente, o se va a negro.',look:'Primero una disolvencia entre dos planos y después un fundido a negro. Suelen indicar paso de tiempo.',
   fn(t,S,S2){setCam(S,{p:[0,1.3,6.4],t:[0,1.05,0],fov:38});setCam(S2,{p:[0,1.63,1.0],t:[0,1.63,0],fov:30});
-    if(t<2.5){S.cap='Plano 1'}else if(t<4){S.post.mix=ss((t-2.5)/1.5);S.cap='Dissolve'}else if(t<6){S.post.mix=1;S.cap='Plano 2'}else if(t<7){S.post.mix=1;S.post.fade=ss(t-6);S.cap='Fade to black'}
-    else if(t<8){S.post.fade=1-ss(t-7);S.cap='Fade in'}else{S.cap='Plano 1'}}});
+    if(t<2.5){S.cap=_t('Plano 1')}else if(t<4){S.post.mix=ss((t-2.5)/1.5);S.cap=_t('Dissolve')}else if(t<6){S.post.mix=1;S.cap=_t('Plano 2')}else if(t<7){S.post.mix=1;S.post.fade=ss(t-6);S.cap='Fade to black'}
+    else if(t<8){S.post.fade=1-ss(t-7);S.cap='Fade in'}else{S.cap=_t('Plano 1')}}});
 const ASLS=[SH.wide,SH.a,SH.b,SH.ots,SH.hi,SH.lo];
 add({id:'asl',cat:'edicion',es:'Duración media de plano (ASL)',en:'fast-paced editing / long take',dur:34,what:'El promedio de segundos que dura cada plano. Es la medida del ritmo.',look:'El mismo diálogo cortado a tres ritmos reales. La barra de abajo marca cada corte.',
-  fn(t,S){conv(S);S.A.talk=1;const P=[[12,10,'Hollywood 1930-1960: un plano cada 10 s'],[12,4,'Después del 2000: cada 4 s'],[10,1.7,'Videoclip: cada 1.7 s']];let i=0,l=t;while(i<2&&l>=P[i][0]){l-=P[i][0];i++}
+  fn(t,S){conv(S);S.A.talk=1;const P=[[12,10,_t('Hollywood 1930-1960: un plano cada 10 s')],[12,4,_t('Después del 2000: cada 4 s')],[10,1.7,_t('Videoclip: cada 1.7 s')]];let i=0,l=t;while(i<2&&l>=P[i][0]){l-=P[i][0];i++}
     const n=Math.floor(l/P[i][1]);setCam(S,ASLS[(n+i*2)%ASLS.length]);S.cap=P[i][2];const cuts=[];for(let c=P[i][1];c<P[i][0]-.01;c+=P[i][1])cuts.push(c);S.hud=strip(cuts,P[i][0],l)}});
 add({id:'axis',cat:'edicion',es:'Regla de los 180° (eje)',en:'shot / reverse shot',dur:12,what:'Entre dos personajes hay una línea imaginaria. Todas las cámaras se quedan del mismo lado.',look:'Bien hecho, uno mira a la derecha y el otro a la izquierda. Al cruzar la línea roja, los dos miran al mismo lado y parece que ya no se hablan.',
   fn(t,S){conv(S);S.props.axis=true;const i=Math.floor(t/3)%4;setCam(S,[SH.a,SH.b,SH.a,SH.bx][i]);S.A.talk=i%2?0:1;S.B.talk=i%2?1:0;
-    if(i===1){S.badge='Correcto';S.badgeKind='ok'}if(i===3){S.badge='Eje cruzado';S.badgeKind='bad'}S.cap=['A mira a la derecha','B mira a la izquierda','A mira a la derecha','B también mira a la derecha'][i]}});
+    if(i===1){S.badge=_t('Correcto');S.badgeKind='ok'}if(i===3){S.badge=_t('Eje cruzado');S.badgeKind='bad'}S.cap=[_t('A mira a la derecha'),_t('B mira a la izquierda'),_t('A mira a la derecha'),_t('B también mira a la derecha')][i]}});
 add({id:'raccord',cat:'edicion',es:'Continuidad / raccord',en:'consistent wardrobe and props across shots',dur:10,what:'Que ropa, objetos, luz y posiciones coincidan entre un plano y el siguiente.',look:'En el primer corte la gorra cambia de color: error de continuidad. En el segundo coincide.',
   fn(t,S){S.props.mug=true;const i=Math.floor(t/2.5)%4,cu=i%2===1;S.A.hat=(i===1)?'#2b6cc0':'#c0392b';setCam(S,cu?{p:[.25,1.64,1.15],t:[0,1.66,0],fov:30}:{p:[.4,1.45,3.8],t:[.2,1.15,0],fov:36});
-    S.cap=cu?'Primer plano':'Plano general';if(cu){S.badge=i===1?'Error de continuidad':'Continuidad correcta';S.badgeKind=i===1?'bad':'ok'}}});
+    S.cap=cu?_t('Primer plano'):_t('Plano general');if(cu){S.badge=i===1?_t('Error de continuidad'):_t('Continuidad correcta');S.badgeKind=i===1?'bad':'ok'}}});
 
 /* ESTRUCTURA */
 add({id:'frame',cat:'direccion',es:'Frame / cuadro',en:'24 fps',dur:10,what:'Una sola imagen fija. El video es una fila de cuadros que pasan rápido.',look:'A 3 cuadros por segundo se ven las imágenes sueltas. A 24, el ojo las funde en movimiento.',
-  fn(t,S){const slow=t<5;setCam(S,{p:[0,1.4,5.2],t:[0,1.1,0],fov:36});walkX(S.A,t,5,-3,3);S.post.fps=slow?3:24;S.cap=slow?'3 cuadros por segundo, cuadro '+(Math.floor(t*3)+1):'24 cuadros por segundo'}});
+  fn(t,S){const slow=t<5;setCam(S,{p:[0,1.4,5.2],t:[0,1.1,0],fov:36});walkX(S.A,t,5,-3,3);S.post.fps=slow?3:24;S.cap=slow?_t('3 cuadros por segundo, cuadro ')+(Math.floor(t*3)+1):_t('24 cuadros por segundo')}});
 add({id:'take',cat:'direccion',es:'Plano y toma',en:'single continuous shot',dur:9,what:'El plano es lo que se ve entre dos cortes. La toma es cada intento de filmar o generar ese plano.',look:'Tres tomas del mismo plano: mismo encuadre, pequeñas diferencias. En IA, cada generación es una toma.',
   fn(t,S){const i=Math.floor(t/3)%3,l=t-i*3;setCam(S,{p:[0,1.4,6],t:[0,1.1,0],fov:38});const stop=[0,.9,-.6][i],sp=[1.7,1.9,1.3][i],k=clamp(l/sp,0,1);
-    S.A.x=lerp(-4.5,stop,k);S.A.ry=k<1?PI/2:0;S.A.walk=S.A.x*3.7;S.A.amp=k<1?1:0;S.A.headYaw=0;S.A.wave=k<1?0:[1,0,.8][i]*ss((l-sp)/.3);if(k>=1&&i===1)S.A.headYaw=.5*Math.sin((l-sp)*4);S.cap='Toma '+(i+1)}});
+    S.A.x=lerp(-4.5,stop,k);S.A.ry=k<1?PI/2:0;S.A.walk=S.A.x*3.7;S.A.amp=k<1?1:0;S.A.headYaw=0;S.A.wave=k<1?0:[1,0,.8][i]*ss((l-sp)/.3);if(k>=1&&i===1)S.A.headYaw=.5*Math.sin((l-sp)*4);S.cap=_t('Toma ')+(i+1)}});
 
 /* ---------- lienzos ---------- */

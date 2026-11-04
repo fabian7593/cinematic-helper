@@ -346,3 +346,26 @@ legend small{font-size:12px;letter-spacing:0;text-transform:none;font-weight:500
 :root[data-theme="dark"] .b-char,:root[data-theme="dark"] .c-char[aria-pressed="true"]{background:#1d2a45;color:#b9cdf5;border-color:#34507f}
 :root[data-theme="dark"] .b-loc,:root[data-theme="dark"] .c-loc[aria-pressed="true"]{background:#173323;color:#b5dfc4;border-color:#2f6a46}
 :root[data-theme="dark"] .b-prod,:root[data-theme="dark"] .c-prod[aria-pressed="true"]{background:#3a2a10;color:#f0cf98;border-color:#7a5418}
+
+/* barra superior: open source, redes e idioma */
+.util{background:var(--bg);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.util-in{display:flex;align-items:center;justify-content:space-between;gap:6px 14px;min-height:34px;flex-wrap:wrap;padding-block:3px}
+.util-l{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.util-l .os{font-weight:600;color:var(--accent)}
+.util a{color:var(--ink);text-decoration:none}
+.util a:hover{text-decoration:underline}
+.util-r{display:flex;align-items:center;gap:12px;margin-left:auto}
+.soc{display:inline-flex;align-items:center;gap:5px}
+.lang{display:inline-flex;align-items:center;gap:5px;color:var(--ink)}
+.lang select{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:3px 6px;cursor:pointer;max-width:130px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.credit{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.credit p{margin:4px 0}
+.cr-by b{color:var(--ink)}
+.cr-links{display:flex;flex-wrap:wrap;gap:6px 16px}
+.cr-links a{display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none;font-weight:500}
+.cr-links a:hover{text-decoration:underline}
+.cr-3p{font-size:12.5px}
+@media (max-width:600px){.util-in{flex-wrap:nowrap;gap:8px}.util-l .by{display:none}.soc span{display:none}.util-r{gap:9px;flex:none}}
+@media (max-width:400px){.lang svg{display:none}.lang select{font-size:12.5px;padding:2px 4px}}
+@media (max-width:340px){.util-l .os,.util-l .dot{display:none}}

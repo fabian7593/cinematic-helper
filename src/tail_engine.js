@@ -128,7 +128,7 @@ function drawSet(S){
   W.forEach((w,i)=>{a.setXYZ(n++,o.x,o.y,o.z);a.setXYZ(n++,w.x,w.y,w.z);const w2=W[(i+1)%4];a.setXYZ(n++,w.x,w.y,w.z);a.setXYZ(n++,w2.x,w2.y,w2.z)});a.needsUpdate=true;
   fwd.set(0,0,-Dd).applyQuaternion(q).add(o);frFill.position.copy(fwd);frFill.quaternion.copy(q);frFill.scale.set(hw*2,hh*2,1);
   pathLine.visible=showPath;axisLine.visible=S.props.axis;
-  const L=S.look,fx=S.A.x,fz=S.A.z;[['Key',L.sunP,L.sun],['Fill',L.fillP,L.fill],['Rim',L.rimP,L.rim]].forEach(e=>{const z=lgz[e[0]],on=S.props.lg&&e[2]>.05;z.g.visible=z.ln.visible=on;if(on){const k=2.7/Math.hypot(e[1][0],e[1][1],e[1][2]);z.pos.set(fx+e[1][0]*k,Math.max(.15,1.3+e[1][1]*k),fz+e[1][2]*k);z.g.position.copy(z.pos);const la=z.ln.geometry.attributes.position;la.setXYZ(0,z.pos.x,z.pos.y,z.pos.z);la.setXYZ(1,fx,1.3,fz);la.needsUpdate=true}});
+  const L=S.look,fx=S.A.x,fz=S.A.z;[[_t('Key'),L.sunP,L.sun],[_t('Fill'),L.fillP,L.fill],[_t('Rim'),L.rimP,L.rim]].forEach(e=>{const z=lgz[e[0]],on=S.props.lg&&e[2]>.05;z.g.visible=z.ln.visible=on;if(on){const k=2.7/Math.hypot(e[1][0],e[1][1],e[1][2]);z.pos.set(fx+e[1][0]*k,Math.max(.15,1.3+e[1][1]*k),fz+e[1][2]*k);z.g.position.copy(z.pos);const la=z.ln.geometry.attributes.position;la.setXYZ(0,z.pos.x,z.pos.y,z.pos.z);la.setXYZ(1,fx,1.3,fz);la.needsUpdate=true}});
   /* luz de trabajo para que el set se lea aunque la escena sea oscura */
   hemi.intensity=clamp(L.hemi,.5,.62);hemi.color.set('#ffffff');hemi.groundColor.set('#8a8f98');scene.fog.density=0;sun.intensity=Math.min(L.sun,.5);fillL.intensity=Math.min(L.fill,.25);rimL.intensity=Math.min(L.rim,.25);
   gBg.visible=gMid.visible=gFg.visible=true;moon.visible=false;cone.visible=cone2.visible=false;gDoor.visible=false;
@@ -136,7 +136,7 @@ function drawSet(S){
   xSet.drawImage(R.domElement,0,GH-H2,W2,H2,0,0,W2,H2);
   xSet.font='600 '+Math.round(W2*.036)+'px "Barlow Condensed","Arial Narrow",sans-serif';xSet.textAlign='center';xSet.textBaseline='bottom';xSet.lineWidth=3;xSet.strokeStyle='rgba(0,0,0,.75)';xSet.fillStyle='#fff';
   const lab=(v,txt,dy)=>{const s=project(v,wcam,W2,H2);if(s[2]<1){xSet.strokeText(txt,s[0],s[1]-dy);xSet.fillText(txt,s[0],s[1]-dy)}};
-  lab(cam.position,'CÁMARA',W2*.03);['Key','Fill','Rim'].forEach(k=>{if(lgz[k].g.visible)lab(lgz[k].pos,k.toUpperCase(),W2*.022)});
+  lab(cam.position,_t('CÁMARA'),W2*.03);[_t('Key'),_t('Fill'),_t('Rim')].forEach(k=>{if(lgz[k].g.visible)lab(lgz[k].pos,k.toUpperCase(),W2*.022)});
 }
 
 /* ---------- bucle ---------- */
@@ -218,51 +218,51 @@ const ORDER={encuadre:['ews','wide','full','cowboy','medium','mcu','closeup','ec
 const byId=Object.fromEntries(D.map(d=>[d.id,d]));
 const order=CATS.flatMap(c=>{const l=ORDER[c[0]].map(id=>byId[id]).filter(Boolean);D.forEach(d=>{if(d.cat===c[0]&&l.indexOf(d)<0)l.push(d)});return l});
 /* ---------- interfaz: modo manual ---------- */
-const FMT_OPTS=[['generic','Genérico'],['kling','Kling'],['veo','Veo en Flow'],['runway','Runway'],['seedance','Seedance'],['mjv','Midjourney Video'],['img','Imagen para el frame inicial']];
+const FMT_OPTS=[['generic',_t('Genérico')],['kling',_t('Kling')],['veo',_t('Veo en Flow')],['runway',_t('Runway')],['seedance',_t('Seedance')],['mjv','Midjourney Video'],['img',_t('Imagen para el frame inicial')]];
 const CTRL=[
- ['Estilo y formato del prompt',[
-  {k:'style',l:'Estilo',opts:Object.keys(STY).map(k=>[k,STY[k].n])},
-  {k:'fmt',l:'Formato del prompt',opts:FMT_OPTS}],
-  'El estilo carga una combinación de luz, color y textura que después podés ajustar. El formato reordena el prompt según la herramienta.'],
- ['Cámara',[
-  {k:'dist',l:'Distancia al sujeto',min:.5,max:30,log:true,f:v=>v.toFixed(1)+' m'},
-  {k:'height',l:'Altura de la cámara',min:.1,max:8,step:.05,f:v=>v.toFixed(2)+' m'},
-  {k:'aim',l:'Altura a la que apunta',min:0,max:2.5,step:.05,f:v=>v.toFixed(2)+' m'},
-  {k:'orbit',l:'Posición alrededor del sujeto',min:-180,max:180,step:1,f:v=>v+'°'},
-  {k:'shift',l:'Sujeto en el cuadro',min:-1,max:1,step:.02,f:v=>v<-.2?'a la izquierda':v>.2?'a la derecha':'al centro'},
-  {k:'roll',l:'Inclinación del horizonte',min:-45,max:45,step:1,f:v=>v+'°'},
-  {k:'move',l:'Movimiento',opts:[['none','Ninguno: cámara fija'],['dolly','Dolly in / out'],['zoom','Zoom'],['dollyzoom','Dolly zoom'],['truck','Tracking lateral'],['orbit','Órbita'],['crane','Grúa'],['pan','Paneo'],['tilt','Tilt'],['handheld','Cámara en mano']]}]],
- ['Lente y exposición',[
-  {k:'mm',l:'Distancia focal',min:12,max:200,log:true,f:v=>Math.round(v)+' mm'},
-  {k:'fstop',l:'Apertura',opts:[[1.4,'f/1.4'],[2,'f/2'],[2.8,'f/2.8'],[4,'f/4'],[5.6,'f/5.6'],[8,'f/8'],[11,'f/11'],[16,'f/16'],[22,'f/22']],num:true},
-  {k:'focus',l:'Foco en',opts:[['subject','El sujeto'],['fg','El primer término'],['bg','El fondo']]},
-  {k:'fg',l:'Planta en primer término',check:true},
-  {k:'lights',l:'Luces de fondo (para ver el bokeh)',check:true},
-  {k:'shutter',l:'Velocidad de obturación',opts:[[12,'1/12 s'],[24,'1/24 s'],[48,'1/48 s'],[100,'1/100 s'],[250,'1/250 s'],[1000,'1/1000 s']],num:true},
-  {k:'fps',l:'Cuadros por segundo',opts:[[12,'12'],[24,'24'],[30,'30'],[60,'60']],num:true},
-  {k:'ev',l:'Exposición',min:-2,max:2,step:.1,f:v=>(v>0?'+':'')+v.toFixed(1)+' EV'},
-  {k:'aspect',l:'Relación de aspecto',opts:[[0,'16:9'],[2.39,'2.39:1'],[1.3333,'4:3'],[1,'1:1'],[.5625,'9:16']],num:true}],
-  'El barrido de movimiento se ve cuando el fondo está nítido. Con desenfoque de fondo, el monitor muestra solo el desenfoque.'],
- ['Luz',[
-  {k:'amb',l:'Ambiente',opts:[['day','Día'],['golden','Golden hour'],['blue','Blue hour'],['night','Noche'],['sil','Atardecer a contraluz'],['studio','Estudio oscuro'],['highkey','Estudio blanco']]},
-  {k:'keyInt',l:'Key: intensidad',min:0,max:2,step:.05,f:v=>v.toFixed(2)},
-  {k:'keyAz',l:'Key: de dónde viene',min:-180,max:180,step:5,f:v=>v+'°'},
-  {k:'keyEl',l:'Key: altura',min:5,max:88,step:1,f:v=>v+'°'},
-  {k:'hard',l:'Luz dura (apagado: suave)',check:true},
-  {k:'kelvin',l:'Temperatura de color',min:2500,max:10000,step:100,f:v=>v+' K'},
-  {k:'fill',l:'Fill: intensidad',min:0,max:1.5,step:.05,f:v=>v.toFixed(2)},
-  {k:'rim',l:'Rim: intensidad',min:0,max:3,step:.05,f:v=>v.toFixed(2)},
-  {k:'lamp',l:'Farol (luz práctica)',min:0,max:3.5,step:.1,f:v=>v.toFixed(1)},
-  {k:'fog',l:'Niebla',min:0,max:.09,step:.002,f:v=>Math.round(v/.09*100)+' %'}]],
- ['Color y textura',[
-  {k:'lut',l:'LUT',opts:[['none','Ninguno'],['teal','Teal and orange'],['noir','Blanco y negro'],['vint','Vintage cálido']]},
-  {k:'sat',l:'Saturación',min:-1,max:1,step:.05,f:v=>(v>0?'+':'')+Math.round(v*100)},
-  {k:'con',l:'Contraste',min:-1,max:1,step:.05,f:v=>(v>0?'+':'')+Math.round(v*100)},
-  {k:'vig',l:'Viñeta',min:0,max:1,step:.05,f:v=>Math.round(v*100)+' %'},
-  {k:'grain',l:'Grano',min:0,max:1,step:.05,f:v=>Math.round(v*100)+' %'}]],
- ['Sujeto',[
-  {k:'action',l:'Acción',opts:[['idle','De pie'],['walk','Caminando'],['talk','Hablando'],['wave','Saludando'],['dance','Bailando']]},
-  {k:'second',l:'Segundo personaje',check:true}]]];
+ [_t('Estilo y formato del prompt'),[
+  {k:'style',l:_t('Estilo'),opts:Object.keys(STY).map(k=>[k,STY[k].n])},
+  {k:'fmt',l:_t('Formato del prompt'),opts:FMT_OPTS}],
+  _t('El estilo carga una combinación de luz, color y textura que después podés ajustar. El formato reordena el prompt según la herramienta.')],
+ [_t('Cámara'),[
+  {k:'dist',l:_t('Distancia al sujeto'),min:.5,max:30,log:true,f:v=>v.toFixed(1)+' m'},
+  {k:'height',l:_t('Altura de la cámara'),min:.1,max:8,step:.05,f:v=>v.toFixed(2)+' m'},
+  {k:'aim',l:_t('Altura a la que apunta'),min:0,max:2.5,step:.05,f:v=>v.toFixed(2)+' m'},
+  {k:'orbit',l:_t('Posición alrededor del sujeto'),min:-180,max:180,step:1,f:v=>v+'°'},
+  {k:'shift',l:_t('Sujeto en el cuadro'),min:-1,max:1,step:.02,f:v=>v<-.2?_t('a la izquierda'):v>.2?_t('a la derecha'):_t('al centro')},
+  {k:'roll',l:_t('Inclinación del horizonte'),min:-45,max:45,step:1,f:v=>v+'°'},
+  {k:'move',l:_t('Movimiento'),opts:[['none',_t('Ninguno: cámara fija')],['dolly','Dolly in / out'],['zoom',_t('Zoom')],['dollyzoom',_t('Dolly zoom')],['truck',_t('Tracking lateral')],['orbit',_t('Órbita')],['crane',_t('Grúa')],['pan',_t('Paneo')],['tilt',_t('Tilt')],['handheld',_t('Cámara en mano')]]}]],
+ [_t('Lente y exposición'),[
+  {k:'mm',l:_t('Distancia focal'),min:12,max:200,log:true,f:v=>Math.round(v)+' mm'},
+  {k:'fstop',l:_t('Apertura'),opts:[[1.4,'f/1.4'],[2,'f/2'],[2.8,'f/2.8'],[4,'f/4'],[5.6,'f/5.6'],[8,'f/8'],[11,'f/11'],[16,'f/16'],[22,'f/22']],num:true},
+  {k:'focus',l:_t('Foco en'),opts:[['subject',_t('El sujeto')],['fg',_t('El primer término')],['bg',_t('El fondo')]]},
+  {k:'fg',l:_t('Planta en primer término'),check:true},
+  {k:'lights',l:_t('Luces de fondo (para ver el bokeh)'),check:true},
+  {k:'shutter',l:_t('Velocidad de obturación'),opts:[[12,'1/12 s'],[24,'1/24 s'],[48,'1/48 s'],[100,'1/100 s'],[250,'1/250 s'],[1000,'1/1000 s']],num:true},
+  {k:'fps',l:_t('Cuadros por segundo'),opts:[[12,'12'],[24,'24'],[30,'30'],[60,'60']],num:true},
+  {k:'ev',l:_t('Exposición'),min:-2,max:2,step:.1,f:v=>(v>0?'+':'')+v.toFixed(1)+_t(' EV')},
+  {k:'aspect',l:_t('Relación de aspecto'),opts:[[0,'16:9'],[2.39,'2.39:1'],[1.3333,'4:3'],[1,'1:1'],[.5625,'9:16']],num:true}],
+  _t('El barrido de movimiento se ve cuando el fondo está nítido. Con desenfoque de fondo, el monitor muestra solo el desenfoque.')],
+ [_t('Luz'),[
+  {k:'amb',l:_t('Ambiente'),opts:[['day',_t('Día')],['golden',_t('Golden hour')],['blue',_t('Blue hour')],['night',_t('Noche')],['sil','Atardecer a contraluz'],['studio',_t('Estudio oscuro')],['highkey',_t('Estudio blanco')]]},
+  {k:'keyInt',l:_t('Key: intensidad'),min:0,max:2,step:.05,f:v=>v.toFixed(2)},
+  {k:'keyAz',l:_t('Key: de dónde viene'),min:-180,max:180,step:5,f:v=>v+'°'},
+  {k:'keyEl',l:_t('Key: altura'),min:5,max:88,step:1,f:v=>v+'°'},
+  {k:'hard',l:_t('Luz dura (apagado: suave)'),check:true},
+  {k:'kelvin',l:_t('Temperatura de color'),min:2500,max:10000,step:100,f:v=>v+_t(' K')},
+  {k:'fill',l:_t('Fill: intensidad'),min:0,max:1.5,step:.05,f:v=>v.toFixed(2)},
+  {k:'rim',l:_t('Rim: intensidad'),min:0,max:3,step:.05,f:v=>v.toFixed(2)},
+  {k:'lamp',l:_t('Farol (luz práctica)'),min:0,max:3.5,step:.1,f:v=>v.toFixed(1)},
+  {k:'fog',l:_t('Niebla'),min:0,max:.09,step:.002,f:v=>Math.round(v/.09*100)+' %'}]],
+ [_t('Color y textura'),[
+  {k:'lut',l:_t('LUT'),opts:[['none',_t('Ninguno')],['teal','Teal and orange'],['noir',_t('Blanco y negro')],['vint',_t('Vintage cálido')]]},
+  {k:'sat',l:_t('Saturación'),min:-1,max:1,step:.05,f:v=>(v>0?'+':'')+Math.round(v*100)},
+  {k:'con',l:_t('Contraste'),min:-1,max:1,step:.05,f:v=>(v>0?'+':'')+Math.round(v*100)},
+  {k:'vig',l:_t('Viñeta'),min:0,max:1,step:.05,f:v=>Math.round(v*100)+' %'},
+  {k:'grain',l:_t('Grano'),min:0,max:1,step:.05,f:v=>Math.round(v*100)+' %'}]],
+ [_t('Sujeto'),[
+  {k:'action',l:_t('Acción'),opts:[['idle',_t('De pie')],['walk',_t('Caminando')],['talk',_t('Hablando')],['wave',_t('Saludando')],['dance',_t('Bailando')]]},
+  {k:'second',l:_t('Segundo personaje'),check:true}]]];
 const panel=$('#panel'),ctlEls={};
 CTRL.forEach(g=>{const fs=document.createElement('fieldset'),lg=document.createElement('legend');lg.textContent=g[0];fs.appendChild(lg);
   g[1].forEach(it=>{const id='m-'+it.k,w=document.createElement('div');w.className='ctl'+(it.check?' check':'');let inp;
@@ -277,14 +277,14 @@ CTRL.forEach(g=>{const fs=document.createElement('fieldset'),lg=document.createE
   if(g[2]){const h=document.createElement('p');h.className='hint';h.textContent=g[2];fs.appendChild(h)}
   panel.appendChild(fs)});
 function syncPanel(){for(const k in ctlEls){const it=ctlEls[k],v=MAN[k];if(it.check)it.inp.checked=!!v;else if(it.opts)it.inp.value=String(v);else{it.inp.value=it.log?Math.log(v):v;if(it.out)it.out.textContent=it.f(v)}}}
-const FMT_NOTE={generic:'Formato genérico: plano, movimiento, lente, luz y color, en ese orden.',kling:'Kling: sujeto + movimiento + escena + lenguaje de cámara + luz + atmósfera.',veo:'Veo: cinematografía + sujeto + acción + contexto + estilo y ambiente, con el audio aparte.',
-  runway:'Runway: movimiento del sujeto + de cámara + del entorno + estilo.',seedance:'Seedance: duración, planos y formato primero; después estilo, escena y plano por plano.',mjv:'Midjourney Video: solo el movimiento. La imagen de partida ya trae personaje, lugar y luz.',img:'Imagen para el frame inicial: lo que se ve, sin instrucciones, con la relación de aspecto al final.'};
+const FMT_NOTE={generic:_t('Formato genérico: plano, movimiento, lente, luz y color, en ese orden.'),kling:_t('Kling: sujeto + movimiento + escena + lenguaje de cámara + luz + atmósfera.'),veo:_t('Veo: cinematografía + sujeto + acción + contexto + estilo y ambiente, con el audio aparte.'),
+  runway:_t('Runway: movimiento del sujeto + de cámara + del entorno + estilo.'),seedance:_t('Seedance: duración, planos y formato primero; después estilo, escena y plano por plano.'),mjv:_t('Midjourney Video: solo el movimiento. La imagen de partida ya trae personaje, lugar y luz.'),img:_t('Imagen para el frame inicial: lo que se ve, sin instrucciones, con la relación de aspecto al final.')};
 const STYLE_BASE={lut:'none',sat:0,con:0,vig:0,grain:0,fog:0,lamp:0,fill:0,rim:0,lights:false,roll:0,ev:0,aspect:0,hard:true,fps:24,shutter:48};
 function applyStyle(v){Object.assign(MAN,STYLE_BASE);const pr=(STY[v]&&STY[v].man)||{};if(pr.amb)Object.assign(MAN,{amb:pr.amb},AMB[pr.amb]);Object.assign(MAN,pr);MAN.style=v;syncPanel()}
 function describe(){const m=MAN,i=manInfo,H=i.H,sty=STY[m.style]||STY.none;
-  const size=H>=12?['extreme wide shot','Gran plano general']:H>=4?['wide shot','Plano general']:H>=2.5?['full shot','Plano entero']:H>=1.6?['cowboy shot','Plano americano']:H>=1.15?['medium shot','Plano medio']:H>=.8?['medium close-up','Plano medio corto']:H>=.4?['close-up','Primer plano']:['extreme close-up','Primerísimo primer plano'];
-  const p=i.pitch,ang=p>=65?['top-down shot','cenital']:p>=18?['high angle','picado']:p<=-50?['worm\'s-eye view','nadir']:p<=-15?['low angle','contrapicado']:m.height<.5?['ground-level shot','a ras del suelo']:['eye level','a nivel de ojos'];
-  const ao=Math.abs(m.orbit),side=ao<30?null:ao<65?['three-quarter view','tres cuartos']:ao<115?['profile view','perfil']:ao<150?['three-quarter back view','tres cuartos de espaldas']:['shot from behind','de espaldas'];
+  const size=H>=12?['extreme wide shot',_t('Gran plano general')]:H>=4?['wide shot',_t('Plano general')]:H>=2.5?['full shot',_t('Plano entero')]:H>=1.6?['cowboy shot',_t('Plano americano')]:H>=1.15?['medium shot',_t('Plano medio')]:H>=.8?['medium close-up',_t('Plano medio corto')]:H>=.4?['close-up',_t('Primer plano')]:['extreme close-up',_t('Primerísimo primer plano')];
+  const p=i.pitch,ang=p>=65?['top-down shot',_t('cenital')]:p>=18?['high angle',_t('picado')]:p<=-50?['worm\'s-eye view',_t('nadir')]:p<=-15?['low angle',_t('contrapicado')]:m.height<.5?['ground-level shot',_t('a ras del suelo')]:['eye level',_t('a nivel de ojos')];
+  const ao=Math.abs(m.orbit),side=ao<30?null:ao<65?['three-quarter view',_t('tres cuartos')]:ao<115?['profile view',_t('perfil')]:ao<150?['three-quarter back view',_t('tres cuartos de espaldas')]:['shot from behind',_t('de espaldas')];
   const act={idle:'standing',walk:'walking',talk:'talking',wave:'waving',dance:'dancing'}[m.action];
   const verb={idle:'stands still, glancing around',walk:'walks across the frame',talk:'talks, gesturing with one hand',wave:'waves at the camera',dance:'dances with energy, arms up'}[m.action];
   const subj='a person in a red shirt'+(m.second?' with a friend in a teal shirt':'');
@@ -303,7 +303,7 @@ function describe(){const m=MAN,i=manInfo,H=i.H,sty=STY[m.style]||STY.none;
   const co=[];if(m.lut==='teal')co.push('teal and orange color grade');if(m.lut==='noir')co.push('black and white');if(m.lut==='vint')co.push('warm vintage film look');
   if(m.sat<-.4)co.push('desaturated colors');else if(m.sat>.4)co.push('vivid saturated colors');if(m.con>.4)co.push('high contrast');else if(m.con<-.4)co.push('low contrast, flat look');
   if(m.ev<=-1)co.push('underexposed, moody');else if(m.ev>=1)co.push('overexposed, blown highlights');if(m.vig>.3)co.push('vignette');if(m.grain>.3)co.push('35mm film grain');
-  const fr=i.frac;const motion=[m.fps===12?'choppy 12 fps look':m.fps>=60?'smooth 60 fps':m.fps+' fps',fr>=1.5?'heavy motion blur':fr>=.35?'natural motion blur':'crisp motion, no motion blur'];
+  const fr=i.frac;const motion=[m.fps===12?'choppy 12 fps look':m.fps>=60?'smooth 60 fps':m.fps+' fps',fr>=1.5?'heavy motion blur':fr>=.35?'natural motion blur':_t('crisp motion, no motion blur')];
   const arS=({2.39:'2.39:1',1.3333:'4:3',1:'1:1',.5625:'9:16'})[m.aspect]||'16:9', arMJ=({2.39:'12:5',1.3333:'4:3',1:'1:1',.5625:'9:16'})[m.aspect]||'16:9';
   const look=co.join(', '), styleEn=sty.en||'', stylePart=[styleEn,look].filter(Boolean).join(', ');
   const place=sty.place||{day:'in a park with pine trees, a small house and a street lamp',golden:'in a park with pine trees at sunset',blue:'in a park at dusk, the street lamp just turned on',night:'in a park at night under a street lamp',sil:'on open ground against a sunset sky',studio:'in a dark studio with a black background',highkey:'in a bright white studio'}[m.amb];
@@ -323,26 +323,26 @@ function describe(){const m=MAN,i=manInfo,H=i.H,sty=STY[m.style]||STY.none;
     default:{const en=[shotStr+', of '+subj+' '+act+' '+place,mv,lens,light,co.concat(motion).join(', ')];if(m.aspect)en[4]+=', '+arS+' aspect ratio';if(styleEn)en.push(styleEn);out=en.filter(Boolean).map(C).join('. ')+'.'}
   }
   $('#m-read').textContent=size[1]+', '+ang[1]+(side?', '+side[1]:'');
-  $('#m-sub').textContent='Entran '+(H>=10?Math.round(H):H.toFixed(1))+' m de alto en el cuadro a la distancia del sujeto. Lente de '+mm+' mm a f/'+m.fstop+(i.dofOn?', con el fondo desenfocado.':', con todo en foco.');
+  $('#m-sub').textContent=_t('Entran ')+(H>=10?Math.round(H):H.toFixed(1))+_t(' m de alto en el cuadro a la distancia del sujeto. Lente de ')+mm+' mm a f/'+m.fstop+(i.dofOn?_t(', con el fondo desenfocado.'):_t(', con todo en foco.'));
   out=out.split('. ').map(x=>{const seen=new Set();return x.split(', ').filter(y=>{const k=y.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).join(', ')}).join('. ');
   $('#m-prompt').textContent=out;
-  $('#m-formula').textContent=FMT_NOTE[m.fmt]+(m.style!=='none'?' Estilo cargado: '+sty.n+'.':'');
+  $('#m-formula').textContent=FMT_NOTE[m.fmt]+(m.style!=='none'?_t(' Estilo cargado: ')+sty.n+'.':'');
 }
 let fitPending=false;
 function manualChanged(){if(mode!=='man')return;if(!fitPending){fitPending=true;requestAnimationFrame(()=>{fitPending=false;fitWitness(MANUAL,true)})}const S=fresh(0);manualFn(((T%8)+8)%8,S,fresh(0));describe();if(!playing)render()}
 const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const copyBtn='<button type="button" data-copy>Copiar</button>';
+const copyBtn=_t('<button type="button" data-copy>Copiar</button>');
 function gHTML(g){const o=['<div class="eyebrow">'+esc(g.g)+'</div><h2>'+esc(g.t)+'</h2><p>'+esc(g.lead)+'</p>'];
-  if(g.anat)o.push('<div><span class="lbl">Anatomía del prompt</span><div class="legend">'+g.anat.map((a,i)=>'<span class="seg k'+(i%6+1)+'">'+esc(a[0])+'</span>').join('')+'</div><div class="prompt long"><code>'+g.anat.map((a,i)=>'<span class="seg k'+(i%6+1)+'">'+esc(a[1])+'</span>').join(' ')+'</code>'+copyBtn+'</div></div>');
+  if(g.anat)o.push(_t('<div><span class="lbl">Anatomía del prompt</span><div class="legend">')+g.anat.map((a,i)=>'<span class="seg k'+(i%6+1)+'">'+esc(a[0])+'</span>').join('')+'</div><div class="prompt long"><code>'+g.anat.map((a,i)=>'<span class="seg k'+(i%6+1)+'">'+esc(a[1])+'</span>').join(' ')+'</code>'+copyBtn+'</div></div>');
   (g.tpl||[]).forEach(x=>o.push('<div><span class="lbl">'+esc(x.h)+'</span><div class="prompt long"><code>'+esc(x.code)+'</code>'+copyBtn+'</div></div>'));
   (g.lists||[]).forEach(x=>{const tg=x.ol?'ol':'ul';o.push('<div><span class="lbl">'+esc(x.h)+'</span><'+tg+'>'+x.items.map(i=>'<li>'+esc(i)+'</li>').join('')+'</'+tg+'></div>')});
   if(g.tbl)o.push('<div class="tbl"><table><thead><tr>'+g.tbl.head.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+g.tbl.rows.map(r=>'<tr>'+r.map(x=>'<td>'+esc(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');
-  if(g.lim)o.push('<p><span class="lbl">Límite</span>'+esc(g.lim)+'</p>');
-  if(g.err)o.push('<p><span class="lbl">Error típico</span>'+esc(g.err)+'</p>');
+  if(g.lim)o.push(_t('<p><span class="lbl">Límite</span>')+esc(g.lim)+'</p>');
+  if(g.err)o.push(_t('<p><span class="lbl">Error típico</span>')+esc(g.err)+'</p>');
   if(g.note)o.push('<p class="g-note">'+esc(g.note)+'</p>');
-  if(g.man)o.push('<div class="go-row"><button type="button" class="go solid" data-man="'+g.man+'">Armar este prompt en el modo manual</button></div>');
+  if(g.man)o.push('<div class="go-row"><button type="button" class="go solid" data-man="'+g.man+_t('">Armar este prompt en el modo manual</button></div>'));
   const bt=(g.go||[]).filter(id=>byId[id]).map(id=>'<button type="button" class="go" data-go="'+id+'">'+esc(byId[id].es)+'</button>');
-  if(bt.length)o.push('<div><span class="lbl">Ver en el glosario</span><div class="go-row">'+bt.join('')+'</div></div>');
+  if(bt.length)o.push(_t('<div><span class="lbl">Ver en el glosario</span><div class="go-row">')+bt.join('')+'</div></div>');
   o.push('<p class="g-note">'+esc(SRCNOTE)+'</p>');return o.join('')}
-function copyText(el,b){const done=()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar',1400)};const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Seleccionado';setTimeout(()=>b.textContent='Copiar',1400)};
+function copyText(el,b){const done=()=>{b.textContent=_t('Copiado');setTimeout(()=>b.textContent=_t('Copiar'),1400)};const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent=_t('Seleccionado');setTimeout(()=>b.textContent=_t('Copiar'),1400)};
   try{navigator.clipboard.writeText(el.textContent).then(done,sel)}catch(e){sel()}}
