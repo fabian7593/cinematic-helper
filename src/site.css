@@ -227,8 +227,8 @@ details.llm[open] summary{margin-bottom:8px}
 }
 
 /* v3: páginas por parte, pestañas y guía para empezar */
-#v-player:not(.lab) .layout{grid-template-columns:minmax(0,1fr);max-width:1000px;width:100%;margin:0 auto}
-#v-player:not(.lab) #crumbs{max-width:1000px;width:100%;margin:0 auto}
+#v-player:not(.lab) .layout{grid-template-columns:minmax(0,1fr);width:100%}
+#v-player:not(.lab) #crumbs{width:100%}
 #v-player:not(.lab) .below{grid-template-columns:minmax(0,1fr)}
 #v-player:not(.lab) figure.set{max-width:460px}
 #v-player.lab .ghead,#v-player.lab .tabs{display:none}
@@ -450,7 +450,6 @@ html.dr-open{overflow:hidden}
 .crumbs .bk:hover{background:var(--accent-soft);border-color:var(--accent)}
 .pathbar{background:var(--panel)}
 .pathbar .crumbs{padding:9px 0}
-.pathbar.narrow .crumbs{max-width:1000px;margin:0 auto}
 /* etiquetas sin mayúsculas forzadas */
 .lbl,.gen .lbl,.info .lbl,.gen-form legend,nav.terms h2,.panel legend{font-family:var(--f-body);font-weight:600;font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--muted)}
 .info .eyebrow,.num,.kicker,.eyebrow2{font-family:var(--f-body);font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;color:var(--accent)}
@@ -587,16 +586,25 @@ details.acc.vh{margin-top:0}
   #tools-grid .card .meta{font-size:12px}
 }
 
-/* ===== v7.1: menú fijo a la izquierda en pantallas grandes, sin saltos al abrir ===== */
+/* ===== v7.2: mismo ancho y márgenes en todas las pantallas; menú que se abre encima sin mover nada ===== */
 html{scrollbar-gutter:stable}
-:root{--side-w:260px}
-@media (min-width:1200px){
+.wrap{max-width:1240px}
+/* el monitor de las fichas no pasa del alto de la pantalla y queda alineado a la izquierda como el resto */
+#v-player:not(.lab) #player-stage{max-width:max(560px,calc((100vh - var(--hdrh,100px) - 110px) * 16 / 9))}
+.menu-btn .i-x,.menu-btn[aria-expanded="true"] .i-menu{display:none}
+.menu-btn[aria-expanded="true"] .i-x{display:block}
+/* lupa con más aire */
+.search .s-ic{left:16px}
+.search input{padding-left:46px;height:42px}
+@media (max-width:760px){.search .s-ic{left:calc(max(16px,env(safe-area-inset-left,0px)) + 16px)}}
+/* en computadora y tablet el menú baja desde el encabezado y aparece con un fundido corto; el contenido no se mueve */
+@media (min-width:761px){
+  .drawer{top:var(--hdrh,100px);width:320px;transform:none;opacity:0;visibility:hidden;transition:opacity .14s ease,visibility 0s linear .14s;padding-top:0;border-top:1px solid var(--line)}
+  .drawer.open{opacity:1;visibility:visible;transition:opacity .14s ease}
+  .dr-head{display:none}
+  .scrim{top:var(--hdrh,100px)}
   .menu-btn{border-color:transparent}
-  .menu-btn:hover{border-color:transparent}
-  html.docked .drawer{top:var(--hdrh,100px);bottom:0;width:var(--side-w);transform:none;visibility:visible;transition:none;box-shadow:none;z-index:30;padding-top:0}
-  html.docked .dr-head{display:none}
-  html.docked .scrim{display:none}
-  html.docked #page{padding-left:var(--side-w)}
-  html.docked .pathbar{padding-left:var(--side-w)}
-  html.docked .menu-btn{background:var(--accent-soft);color:var(--accent)}
+  .menu-btn:hover{background:var(--chip)}
+  .menu-btn[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:transparent}
 }
+@media (prefers-reduced-motion:reduce){.drawer,.drawer.open{transition:none}}

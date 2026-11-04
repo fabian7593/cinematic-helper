@@ -726,7 +726,7 @@ function activeCrumbs(){return [...document.querySelectorAll('nav.crumbs')].find
 function setTopH(){const h=hdr.offsetHeight,r=document.documentElement.style;r.setProperty('--hdrh',h+'px');r.setProperty('--toph',(h+(pathbar.hidden?0:pathbar.offsetHeight))+'px')}
 function pbCheck(){pbTick=false;const top=hdr.getBoundingClientRect().bottom;const hide=!pbAct||!pbAct.isConnected||pbAct.getBoundingClientRect().bottom>top;if(pathbar.hidden!==hide){pathbar.hidden=hide;setTopH()}}
 function updBack(){requestAnimationFrame(()=>{document.querySelectorAll('nav.crumbs').forEach(n=>{if(!n.closest('#pathbar')&&!n.querySelector('.bk'))n.insertAdjacentHTML('afterbegin',BK)});
-  pbAct=activeCrumbs();pathnav.innerHTML=pbAct?pbAct.innerHTML:'';pathbar.classList.toggle('narrow',!!(pbAct&&pbAct.id==='crumbs'&&!V.player.classList.contains('lab')));pbCheck();setTopH();
+  pbAct=activeCrumbs();pathnav.innerHTML=pbAct?pbAct.innerHTML:'';pbCheck();setTopH();
   const chain=new Set([curRoute].concat(pbAct?[...pbAct.querySelectorAll('a[data-r]')].map(a=>a.dataset.r):[]));drawer.querySelectorAll('.dr-sub a').forEach(a=>a.classList.toggle('on',!a.dataset.tf&&!a.dataset.sf&&chain.has(a.dataset.r)))})}
 window.addEventListener('scroll',()=>{if(!pbTick){pbTick=true;requestAnimationFrame(pbCheck)}},{passive:true});
 document.addEventListener('click',e=>{if(e.target.closest('.bk')){e.preventDefault();back()}});
@@ -785,18 +785,13 @@ $('#dg-produccion').innerHTML=PCH.map(c=>subLi('pc-'+c.id,c.n,c.num)).join('');
 $('#dg-herramientas').innerHTML=[['all',_t('Todas')]].concat(KINDS.filter(k=>TOOLS.some(t=>t.kind===k[0]))).map(k=>subLi('herramientas',k[1],'',' data-tf="'+k[0]+'"')).join('');
 $('#dg-estilos').innerHTML=[['all',_t('Todos')]].concat(STYLE_GROUPS).map(g=>subLi('estilos',g[1],'',' data-sf="'+g[0]+'"')).join('');
 const isOpen=()=>drawer.classList.contains('open');
-/* en pantallas grandes el menú queda fijo a la izquierda (se puede ocultar); en las chicas se abre encima */
-const mqWide=window.matchMedia('(min-width:1200px)');let dockOff=false;try{dockOff=localStorage.getItem('pap.dock')==='off'}catch(e){}
-const docked=()=>mqWide.matches&&!dockOff;
-function syncDock(){const d=docked();document.documentElement.classList.toggle('docked',d);if(d){drawer.classList.remove('open');scrim.classList.remove('on');scrim.hidden=true;document.documentElement.classList.remove('dr-open');drawer.inert=false}else drawer.inert=!isOpen();
-  menuBtn.setAttribute('aria-expanded',d||isOpen());menuBtn.setAttribute('aria-label',d?_t('Ocultar el menú'):_t('Abrir el menú'));if(typeof setTopH==='function')setTopH()}
-function openDrawer(){drawer.inert=false;drawer.classList.add('open');scrim.hidden=false;requestAnimationFrame(()=>scrim.classList.add('on'));menuBtn.setAttribute('aria-expanded','true');document.documentElement.classList.add('dr-open');
+const docked=()=>false;
+function openDrawer(){drawer.inert=false;drawer.classList.add('open');scrim.hidden=false;requestAnimationFrame(()=>scrim.classList.add('on'));menuBtn.setAttribute('aria-expanded','true');menuBtn.setAttribute('aria-label',_t('Cerrar el menú'));document.documentElement.classList.add('dr-open');
   const sec=drawer.querySelector('.dr-a[aria-current]');const g=sec&&sec.closest('.dr-grp');if(g){const x=g.querySelector('.dr-x');x.setAttribute('aria-expanded','true');g.querySelector('.dr-sub').hidden=false}
   (sec||drawer.querySelector('.dr-a')).focus({preventScroll:true})}
-function closeDrawer(ret){if(!isOpen()||docked())return;drawer.classList.remove('open');scrim.classList.remove('on');menuBtn.setAttribute('aria-expanded','false');document.documentElement.classList.remove('dr-open');
+function closeDrawer(ret){if(!isOpen()||docked())return;drawer.classList.remove('open');scrim.classList.remove('on');menuBtn.setAttribute('aria-expanded','false');menuBtn.setAttribute('aria-label',_t('Abrir el menú'));document.documentElement.classList.remove('dr-open');
   setTimeout(()=>{if(!isOpen()){scrim.hidden=true;drawer.inert=true}},230);if(ret)menuBtn.focus()}
-menuBtn.addEventListener('click',()=>{if(mqWide.matches){dockOff=!dockOff;try{localStorage.setItem('pap.dock',dockOff?'off':'on')}catch(e){}syncDock();return}isOpen()?closeDrawer(true):openDrawer()});
-if(mqWide.addEventListener)mqWide.addEventListener('change',syncDock);syncDock();$('#dr-close').addEventListener('click',()=>closeDrawer(true));scrim.addEventListener('click',()=>closeDrawer(true));
+menuBtn.addEventListener('click',()=>isOpen()?closeDrawer(true):openDrawer());$('#dr-close').addEventListener('click',()=>closeDrawer(true));scrim.addEventListener('click',()=>closeDrawer(true));
 drawer.addEventListener('click',e=>{const x=e.target.closest('.dr-x');if(!x)return;const on=x.getAttribute('aria-expanded')!=='true';x.setAttribute('aria-expanded',on);$('#'+x.getAttribute('aria-controls')).hidden=!on});
 document.addEventListener('keydown',e=>{if(!isOpen()||docked())return;if(e.key==='Escape'){e.preventDefault();closeDrawer(true);return}
   if(e.key==='Tab'){const f=[...drawer.querySelectorAll('a[href],button')].filter(x=>x.offsetParent);const i=f.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}}});

@@ -368,8 +368,8 @@ details.llm[open] summary{margin-bottom:8px}
 }
 
 /* v3: páginas por parte, pestañas y guía para empezar */
-#v-player:not(.lab) .layout{grid-template-columns:minmax(0,1fr);max-width:1000px;width:100%;margin:0 auto}
-#v-player:not(.lab) #crumbs{max-width:1000px;width:100%;margin:0 auto}
+#v-player:not(.lab) .layout{grid-template-columns:minmax(0,1fr);width:100%}
+#v-player:not(.lab) #crumbs{width:100%}
 #v-player:not(.lab) .below{grid-template-columns:minmax(0,1fr)}
 #v-player:not(.lab) figure.set{max-width:460px}
 #v-player.lab .ghead,#v-player.lab .tabs{display:none}
@@ -591,7 +591,6 @@ html.dr-open{overflow:hidden}
 .crumbs .bk:hover{background:var(--accent-soft);border-color:var(--accent)}
 .pathbar{background:var(--panel)}
 .pathbar .crumbs{padding:9px 0}
-.pathbar.narrow .crumbs{max-width:1000px;margin:0 auto}
 /* etiquetas sin mayúsculas forzadas */
 .lbl,.gen .lbl,.info .lbl,.gen-form legend,nav.terms h2,.panel legend{font-family:var(--f-body);font-weight:600;font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--muted)}
 .info .eyebrow,.num,.kicker,.eyebrow2{font-family:var(--f-body);font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;color:var(--accent)}
@@ -728,19 +727,28 @@ details.acc.vh{margin-top:0}
   #tools-grid .card .meta{font-size:12px}
 }
 
-/* ===== v7.1: menú fijo a la izquierda en pantallas grandes, sin saltos al abrir ===== */
+/* ===== v7.2: mismo ancho y márgenes en todas las pantallas; menú que se abre encima sin mover nada ===== */
 html{scrollbar-gutter:stable}
-:root{--side-w:260px}
-@media (min-width:1200px){
+.wrap{max-width:1240px}
+/* el monitor de las fichas no pasa del alto de la pantalla y queda alineado a la izquierda como el resto */
+#v-player:not(.lab) #player-stage{max-width:max(560px,calc((100vh - var(--hdrh,100px) - 110px) * 16 / 9))}
+.menu-btn .i-x,.menu-btn[aria-expanded="true"] .i-menu{display:none}
+.menu-btn[aria-expanded="true"] .i-x{display:block}
+/* lupa con más aire */
+.search .s-ic{left:16px}
+.search input{padding-left:46px;height:42px}
+@media (max-width:760px){.search .s-ic{left:calc(max(16px,env(safe-area-inset-left,0px)) + 16px)}}
+/* en computadora y tablet el menú baja desde el encabezado y aparece con un fundido corto; el contenido no se mueve */
+@media (min-width:761px){
+  .drawer{top:var(--hdrh,100px);width:320px;transform:none;opacity:0;visibility:hidden;transition:opacity .14s ease,visibility 0s linear .14s;padding-top:0;border-top:1px solid var(--line)}
+  .drawer.open{opacity:1;visibility:visible;transition:opacity .14s ease}
+  .dr-head{display:none}
+  .scrim{top:var(--hdrh,100px)}
   .menu-btn{border-color:transparent}
-  .menu-btn:hover{border-color:transparent}
-  html.docked .drawer{top:var(--hdrh,100px);bottom:0;width:var(--side-w);transform:none;visibility:visible;transition:none;box-shadow:none;z-index:30;padding-top:0}
-  html.docked .dr-head{display:none}
-  html.docked .scrim{display:none}
-  html.docked #page{padding-left:var(--side-w)}
-  html.docked .pathbar{padding-left:var(--side-w)}
-  html.docked .menu-btn{background:var(--accent-soft);color:var(--accent)}
+  .menu-btn:hover{background:var(--chip)}
+  .menu-btn[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:transparent}
 }
+@media (prefers-reduced-motion:reduce){.drawer,.drawer.open{transition:none}}
 </style>
 <script>try{var t=localStorage.getItem("pap.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
@@ -751,7 +759,7 @@ html{scrollbar-gutter:stable}
 <header class="hdr" id="hdr">
 <div class="util"><div class="wrap util-in"><div class="util-l"><p class="u1"><span class="os">Open source</span><span class="dot os"> · </span><span class="by">Creado por</span> <a class="ac" href="https://github.com/fabian7593" target="_blank" rel="noopener">Arcane Coder</a></p><p class="u2"><span class="fr">Fabian Rosales</span><span class="dot"> · </span><span class="ai-l">Investigación y desarrollo con Claude IA</span><span class="ai-s">Hecho con Claude IA</span><span class="ai-xs">con Claude IA</span></p></div><div class="util-r"><a class="soc" href="https://github.com/fabian7593" target="_blank" rel="noopener" aria-label="GitHub de Fabian Rosales" title="GitHub"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a><a class="soc" href="https://www.linkedin.com/in/frosales-softdev/" target="_blank" rel="noopener" aria-label="LinkedIn de Fabian Rosales" title="LinkedIn"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M0 1.15C0 .52.52 0 1.17 0h13.66C15.48 0 16 .52 16 1.15v13.7c0 .63-.52 1.15-1.17 1.15H1.17C.52 16 0 15.48 0 14.85V1.15zm4.94 12.24V6.17H2.54v7.22h2.4zM3.74 5.18c.84 0 1.36-.55 1.36-1.25-.02-.71-.52-1.25-1.34-1.25-.82 0-1.36.54-1.36 1.25 0 .7.52 1.25 1.33 1.25h.01zm4.91 8.21V9.36c0-.22.02-.43.08-.59.17-.43.57-.88 1.23-.88.87 0 1.22.66 1.22 1.63v3.87h2.4V9.25c0-2.22-1.18-3.25-2.76-3.25-1.27 0-1.84.7-2.16 1.19v.03h-.02l.02-.03V6.17h-2.4c.03.68 0 7.22 0 7.22h2.4z"/></svg><span>LinkedIn</span></a><label class="lang"><span class="sr-only">Idioma</span><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.3" d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 0c2 2 2.8 4.4 2.8 7S10 13 8 15M8 1C6 3 5.2 5.4 5.2 8S6 13 8 15M1.4 5.6h13.2M1.4 10.4h13.2"/></svg><select id="lang" aria-label="Idioma"><option value="es">Español</option><option value="en">English</option><option value="pt">Português</option></select></label><button type="button" class="icon-btn theme-btn" id="theme-btn" aria-label="Cambiar a tema oscuro" title="Tema claro u oscuro"><svg class="ic i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="ic i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button></div></div></div>
   <div class="wrap bar">
-    <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-controls="drawer" aria-expanded="false" aria-label="Abrir el menú"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="menu-t">Menú</span></button>
+    <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-controls="drawer" aria-expanded="false" aria-label="Abrir el menú"><svg class="ic i-menu" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="ic i-x" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span class="menu-t">Menú</span></button>
     <a class="brand" href="#inicio" data-r="inicio"><b>Cinematic Helper</b><small>Cine y producción con IA, explicado con animaciones</small></a>
     <div class="search" role="search">
       <svg class="ic s-ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><input type="search" id="q" placeholder="Buscar términos, herramientas, estilos" aria-label="Buscar término, herramienta, estilo o tema" autocomplete="off" aria-controls="qres">
@@ -5184,7 +5192,7 @@ function activeCrumbs(){return [...document.querySelectorAll('nav.crumbs')].find
 function setTopH(){const h=hdr.offsetHeight,r=document.documentElement.style;r.setProperty('--hdrh',h+'px');r.setProperty('--toph',(h+(pathbar.hidden?0:pathbar.offsetHeight))+'px')}
 function pbCheck(){pbTick=false;const top=hdr.getBoundingClientRect().bottom;const hide=!pbAct||!pbAct.isConnected||pbAct.getBoundingClientRect().bottom>top;if(pathbar.hidden!==hide){pathbar.hidden=hide;setTopH()}}
 function updBack(){requestAnimationFrame(()=>{document.querySelectorAll('nav.crumbs').forEach(n=>{if(!n.closest('#pathbar')&&!n.querySelector('.bk'))n.insertAdjacentHTML('afterbegin',BK)});
-  pbAct=activeCrumbs();pathnav.innerHTML=pbAct?pbAct.innerHTML:'';pathbar.classList.toggle('narrow',!!(pbAct&&pbAct.id==='crumbs'&&!V.player.classList.contains('lab')));pbCheck();setTopH();
+  pbAct=activeCrumbs();pathnav.innerHTML=pbAct?pbAct.innerHTML:'';pbCheck();setTopH();
   const chain=new Set([curRoute].concat(pbAct?[...pbAct.querySelectorAll('a[data-r]')].map(a=>a.dataset.r):[]));drawer.querySelectorAll('.dr-sub a').forEach(a=>a.classList.toggle('on',!a.dataset.tf&&!a.dataset.sf&&chain.has(a.dataset.r)))})}
 window.addEventListener('scroll',()=>{if(!pbTick){pbTick=true;requestAnimationFrame(pbCheck)}},{passive:true});
 document.addEventListener('click',e=>{if(e.target.closest('.bk')){e.preventDefault();back()}});
@@ -5243,18 +5251,13 @@ $('#dg-produccion').innerHTML=PCH.map(c=>subLi('pc-'+c.id,c.n,c.num)).join('');
 $('#dg-herramientas').innerHTML=[['all',_t('Todas')]].concat(KINDS.filter(k=>TOOLS.some(t=>t.kind===k[0]))).map(k=>subLi('herramientas',k[1],'',' data-tf="'+k[0]+'"')).join('');
 $('#dg-estilos').innerHTML=[['all',_t('Todos')]].concat(STYLE_GROUPS).map(g=>subLi('estilos',g[1],'',' data-sf="'+g[0]+'"')).join('');
 const isOpen=()=>drawer.classList.contains('open');
-/* en pantallas grandes el menú queda fijo a la izquierda (se puede ocultar); en las chicas se abre encima */
-const mqWide=window.matchMedia('(min-width:1200px)');let dockOff=false;try{dockOff=localStorage.getItem('pap.dock')==='off'}catch(e){}
-const docked=()=>mqWide.matches&&!dockOff;
-function syncDock(){const d=docked();document.documentElement.classList.toggle('docked',d);if(d){drawer.classList.remove('open');scrim.classList.remove('on');scrim.hidden=true;document.documentElement.classList.remove('dr-open');drawer.inert=false}else drawer.inert=!isOpen();
-  menuBtn.setAttribute('aria-expanded',d||isOpen());menuBtn.setAttribute('aria-label',d?_t('Ocultar el menú'):_t('Abrir el menú'));if(typeof setTopH==='function')setTopH()}
-function openDrawer(){drawer.inert=false;drawer.classList.add('open');scrim.hidden=false;requestAnimationFrame(()=>scrim.classList.add('on'));menuBtn.setAttribute('aria-expanded','true');document.documentElement.classList.add('dr-open');
+const docked=()=>false;
+function openDrawer(){drawer.inert=false;drawer.classList.add('open');scrim.hidden=false;requestAnimationFrame(()=>scrim.classList.add('on'));menuBtn.setAttribute('aria-expanded','true');menuBtn.setAttribute('aria-label',_t('Cerrar el menú'));document.documentElement.classList.add('dr-open');
   const sec=drawer.querySelector('.dr-a[aria-current]');const g=sec&&sec.closest('.dr-grp');if(g){const x=g.querySelector('.dr-x');x.setAttribute('aria-expanded','true');g.querySelector('.dr-sub').hidden=false}
   (sec||drawer.querySelector('.dr-a')).focus({preventScroll:true})}
-function closeDrawer(ret){if(!isOpen()||docked())return;drawer.classList.remove('open');scrim.classList.remove('on');menuBtn.setAttribute('aria-expanded','false');document.documentElement.classList.remove('dr-open');
+function closeDrawer(ret){if(!isOpen()||docked())return;drawer.classList.remove('open');scrim.classList.remove('on');menuBtn.setAttribute('aria-expanded','false');menuBtn.setAttribute('aria-label',_t('Abrir el menú'));document.documentElement.classList.remove('dr-open');
   setTimeout(()=>{if(!isOpen()){scrim.hidden=true;drawer.inert=true}},230);if(ret)menuBtn.focus()}
-menuBtn.addEventListener('click',()=>{if(mqWide.matches){dockOff=!dockOff;try{localStorage.setItem('pap.dock',dockOff?'off':'on')}catch(e){}syncDock();return}isOpen()?closeDrawer(true):openDrawer()});
-if(mqWide.addEventListener)mqWide.addEventListener('change',syncDock);syncDock();$('#dr-close').addEventListener('click',()=>closeDrawer(true));scrim.addEventListener('click',()=>closeDrawer(true));
+menuBtn.addEventListener('click',()=>isOpen()?closeDrawer(true):openDrawer());$('#dr-close').addEventListener('click',()=>closeDrawer(true));scrim.addEventListener('click',()=>closeDrawer(true));
 drawer.addEventListener('click',e=>{const x=e.target.closest('.dr-x');if(!x)return;const on=x.getAttribute('aria-expanded')!=='true';x.setAttribute('aria-expanded',on);$('#'+x.getAttribute('aria-controls')).hidden=!on});
 document.addEventListener('keydown',e=>{if(!isOpen()||docked())return;if(e.key==='Escape'){e.preventDefault();closeDrawer(true);return}
   if(e.key==='Tab'){const f=[...drawer.querySelectorAll('a[href],button')].filter(x=>x.offsetParent);const i=f.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}}});
