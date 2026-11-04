@@ -37,7 +37,10 @@ head = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="description" content="Film language and AI video production explained with animations: film glossary, step-by-step production, tools, style library and prompt generator. In English, Spanish and Portuguese.">\n'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">\n'
         '<style>body{margin:0;font:14px system-ui}[hidden]{display:none!important}img{max-width:100%}</style>\n'
-        '<style>' + rd('base.css') + rd('site.css') + '</style>\n</head>\n<body>\n')
+        '<style>' + rd('base.css') + rd('site.css') + '</style>\n'
+        # tema claro u oscuro elegido por la persona, antes de pintar la página
+        '<script>try{var t=localStorage.getItem("pap.theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>\n'
+        '</head>\n<body>\n')
 # traducciones al español de los prompts (pestaña Español)
 es = '<script>window.__ES=' + rd('es.json').replace('</', '<\\/') + ';</script>\n'
 # idiomas: español (original), inglés y portugués; el selector está arriba a la derecha

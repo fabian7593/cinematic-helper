@@ -24,6 +24,8 @@ Qué incluye:
   - traduce del español al inglés;
   - sugiere el plano siguiente.
 
+Se navega con un menú lateral, tiene tema claro y oscuro, y los detalles largos (fuentes, tablas, notas) quedan en plegables o en ventanas para no llenar la pantalla de texto.
+
 Cada prompt tiene dos pestañas: en inglés, para pegar en la herramienta, y en español (o portugués), para entender qué dice.
 
 ## Idiomas
